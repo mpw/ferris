@@ -634,10 +634,31 @@ namespace Ferris
         fh_model
         Model::FromMetadataContext( fh_context md )
         {
+            if( !md ) 
+            {
+                static fh_model nullModel;
+                static bool v = true;
+                if( v )
+                {
+                    v = false;
+                    
+                    Soprano::Model* model = 0;
+                    QList<Soprano::BackendSetting> settings;
+                    string backendName = "redland";
+                    // FIXME: this call may fail on osx.
+                    const Soprano::Backend* backend = Soprano::PluginManager::instance()->discoverBackendByName( backendName.c_str() );
+                    model = backend->createModel( settings );
+                    nullModel = new Model( model );
+                }
+                return nullModel;
+            }
+            
             if( md->isSubContextBound( "metadata" ) )
                 md = md->getSubContext( "metadata" );
 
             string backendName = getStrSubCtx( md, "backend", "redland" );
+            if( backendName.empty() )
+                backendName = "redland";
             string dbpath = md->getParent()->getDirPath();
             Soprano::Model* model = 0;
             LG_RDF_D << "FromMetadataContext() backend:" << backendName << " dbpath:" << dbpath << endl;

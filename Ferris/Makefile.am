@@ -114,7 +114,8 @@ if HAVE_SWIG_PERL
 SWIG_PERL_LTLIBNAMES = libferrisperl.la
 libferrisperl_wrap.cpp libferrisperl.pm: libferrisperl.i
 	swig -c++ -DLIBFERRIS_INTERNAL_COMPILING_SWIG_WRAPPER \
-		-I/usr/local/include -I/usr/include `pkg-config gtk+-2.0 ferrisstreams --cflags | sed s/-pthread//g ` \
+		-I/usr/local/include -I/usr/include \
+		`pkg-config gtk+-2.0 ferrisstreams --cflags | sed s/-pthread//g | sed s/-std=c++11//g ` \
 		-perl5 -module libferrisperl  -o $(srcdir)/libferrisperl_wrap.cpp $(srcdir)/libferrisperl.i
 	sed -i -e 's/#define SWIGPERL/#include <config.h>   #define SWIGPERL /g' $(srcdir)/libferrisperl_wrap.cpp
 

@@ -53,9 +53,10 @@ if HAVE_DBXML
 DBXMLDIR = dbxml
 endif
 
-if HAVE_SOPRANO
 SOPRANO = soprano
-endif
+# if HAVE_SOPRANO
+# SOPRANO = soprano
+# endif
 
 if HAVE_DTL
 DTL = dtl
@@ -95,9 +96,10 @@ if FERRIS_HAVE_PLASMA
 PLASMADIR = plasma
 endif
 
-if FERRIS_HAVE_SANE
 SANEDIR = sane
-endif
+# if FERRIS_HAVE_SANE
+# SANEDIR = sane
+# endif
 
 if FERRIS_HAVE_QPRINTER
 QPRINTERDIR = printer

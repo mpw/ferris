@@ -1,8 +1,10 @@
 PACKAGE=libferris
-AC_INIT(libferris, 1.5.30)
-LIBFERRIS_BETA=30
-LIBFERRIS_MINOR=5
-LIBFERRIS_MAJOR=1
+AC_INIT(libferris, 2.0.0)
+LIBFERRIS_MAJOR=`echo $VERSION | sed 's/^\([[0-9]]\)*\..*/\1/g'`
+LIBFERRIS_MINOR=$(echo $VERSION | sed 's/^[[0-9]]*\.\([[0-9]]\)*\..*/\1/g')
+LIBFERRIS_BETA=$(echo $VERSION | sed 's/^[[0-9]]*\.[[0-9]]*\.\([[0-9]]*\).*/\1/g')
+FERRIS_VERSION=$LIBFERRIS_MAJOR.$LIBFERRIS_MINOR.$LIBFERRIS_BETA
+LIBFERRIS_FULLV=$FERRIS_VERSION
 
 dnl
 dnl  /usr/local/src/git/gnulib/gnulib-tool --import strverscmp readlinkat extern-inline
@@ -11,15 +13,11 @@ dnl
 AC_SUBST(LIBFERRIS_MAJOR)
 AC_SUBST(LIBFERRIS_MINOR)
 AC_SUBST(LIBFERRIS_BETA)
-
-FERRIS_VERSION=$LIBFERRIS_MAJOR.$LIBFERRIS_MINOR.$LIBFERRIS_BETA
-LIBFERRIS_FULLV=$FERRIS_VERSION
 AC_SUBST(LIBFERRIS_FULLV)
 AC_SUBST(FERRIS_VERSION)
 AC_DEFINE_UNQUOTED(FERRIS_VERSION, "$FERRIS_VERSION", [] )
-
-VERSION=$FERRIS_VERSION
 AC_DEFINE_UNQUOTED(VERSION, "$VERSION", [] )
+
 
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_SRCDIR(Ferris/Ferris.cpp)
@@ -3162,14 +3160,6 @@ AC_SUBST(COMMONSQLDBDIR)
 COMMONSQLDBDIR_LA=" \$(top_builddir)/plugins/context/commonsqldbapi/libcommonsqldbapi.la "
 AC_SUBST(COMMONSQLDBDIR_LA)
 
-SOPRANOEAMODDIR="${absolute_srcdir}/plugins/eagenerators/soprano/"
-AC_SUBST(SOPRANOEAMODDIR)
-if test x"$have_soprano" = xyes; then
-SHAREDSOPRANOEA_LA=" \$(top_builddir)/plugins/eagenerators/soprano/libferrissopranoeashared.la "
-else
-SHAREDSOPRANOEA_LA=""
-fi
-AC_SUBST(SHAREDSOPRANOEA_LA)
 
 
 EAIDXCUSTOMFERRISDIR="${absolute_srcdir}/eaindexers_custom_plugin/"
@@ -4205,6 +4195,7 @@ AM_CONDITIONAL(BUILD_DBUS_MOUNTING, test x"$have_dbusmounting" = xyes)
 # Test for soprano RDF library
 ###############################################################################
 
+have_soprano=yes
 package=soprano
 	PKG_CHECK_MODULES(SOPRANO, soprano >= 2.3.0, 
 	[
@@ -4257,6 +4248,15 @@ AM_CONDITIONAL(HAVE_NEPOMUK, test x"$have_nepomuk" = xyes)
 AC_SUBST(NEPOMUK_CFLAGS)
 AC_SUBST(NEPOMUK_LIBS)
 AC_LANG_C
+
+SOPRANOEAMODDIR="${absolute_srcdir}/plugins/eagenerators/soprano/"
+AC_SUBST(SOPRANOEAMODDIR)
+if test x"$have_soprano" = xyes; then
+SHAREDSOPRANOEA_LA=" \$(top_builddir)/plugins/eagenerators/soprano/libferrissopranoeashared.la "
+else
+SHAREDSOPRANOEA_LA=""
+fi
+AC_SUBST(SHAREDSOPRANOEA_LA)
 
 ###############################################################################
 ###############################################################################
@@ -4737,7 +4737,7 @@ dnl SMALLOBJCXXFLAGS="-DMAX_SMALL_OBJECT_SIZE=64 -DDEFAULT_CHUNK_SIZE=4096"
 SMALLOBJCXXFLAGS="-DMAX_SMALL_OBJECT_SIZE=0 -DDEFAULT_CHUNK_SIZE=4096"
 FERRIS_CF=" $FERRIS_CF -I${absolute_srcdir} -I${absolute_srcdir}/Ferris $XML4C_CFLAGS $XALAN_CFLAGS "
 CFLAGS=" $KDE4_LINK_CFLAGS_PREFIX $STLPORT_CFLAGS $SIGC_CFLAGS $LOKI_CFLAGS $CFLAGS -I/usr/include/xfs $FERRIS_CF $STLDB4_CFLAGS $SMALLOBJCXXFLAGS "
-CXXFLAGS=" $KDE4_LINK_CFLAGS_PREFIX $STLPORT_CFLAGS $SIGC_CFLAGS $SMALLOBJCXXFLAGS $LOKI_CFLAGS $CXXFLAGS -I/usr/include/xfs $FERRIS_CF $GLIB_CFLAGS $OPENSSL_CFLAGS $STLDB4_CFLAGS  $QT_CFLAGS $QTNETWORK_CFLAGS "
+CXXFLAGS=" $KDE4_LINK_CFLAGS_PREFIX $STLPORT_CFLAGS $SIGC_CFLAGS $SMALLOBJCXXFLAGS $LOKI_CFLAGS $CXXFLAGS -I/usr/include/xfs $FERRIS_CF $GLIB_CFLAGS $OPENSSL_CFLAGS $STLDB4_CFLAGS  $QT_CFLAGS $QTNETWORK_CFLAGS  -std=c++11 "
 dnl LDFLAGS=" $LDFLAGS $STLPORT_LDFLAGS $SIGC_LDFLAGS $XML4C_LIBS $XALAN_LIBS $QT_LIBS $QTNETWORK_LIBS " 
 LDFLAGS_APP=" $LDFLAGS $STLPORT_LDFLAGS $SIGC_LDFLAGS $XML4C_LIBS $XALAN_LIBS $QT_LIBS $QTNETWORK_LIBS " 
 
@@ -5523,5 +5523,5 @@ echo "
 optional modules that will be compiled: 
 $modlist
 
-	Copyright (C) 2001-2015 Ben Martin
+	Copyright (C) 2001-2016 Ben Martin
 "

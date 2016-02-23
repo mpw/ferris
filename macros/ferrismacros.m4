@@ -640,26 +640,7 @@ dnl
 have_package=no
 sigc_required_version=$1
 
-dnl AC_ARG_WITH(sigcxx-2x,
-dnl AC_HELP_STRING([--with-sigcxx-2x=no],[use sigc++ 2.x, --with-sigcxx-2x=yes enables]),
-dnl [  ac_use_sigcxx_2=$withval
-dnl ], ac_use_sigcxx_2="no"
-dnl )
-
-AC_ARG_WITH(sigcxx-1x,
-AC_HELP_STRING([--with-sigcxx-1x=no],[use sigc++ 1.x, --with-sigcxx-1x=yes enables]),
-[  ac_use_sigcxx_1=$withval
-], ac_use_sigcxx_1="no"
-)
-
-
 package=sigc++-2.0
-dnl if test x"$ac_use_sigcxx_2" = xyes; then
-dnl 	package=sigc++-2.0
-dnl fi
-if test x"$ac_use_sigcxx_1" = xyes; then
-	package=sigc++-1.2
-fi
 
 version=$sigc_required_version
 PKG_CHECK_MODULES(SIGC, $package >= $version,
@@ -681,6 +662,8 @@ PKG_CHECK_MODULES(SIGC, $package >= $version,
 	[$3])     
 	])
 
+dnl This is not really good. But it seems that gcc wants it to work with sigc++ 2.x on Fedora.
+SIGC_CFLAGS="$SIGC_CFLAGS -std=c++11"
 AC_SUBST(SIGC_CFLAGS)
 AC_SUBST(SIGC_LIBS)
 ])

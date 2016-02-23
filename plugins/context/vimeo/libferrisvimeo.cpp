@@ -161,8 +161,8 @@ namespace Ferris
         if( !ret->isSubContextBound( "rsp" ) )
         {
             stringstream ss;
-            ss << "Error. No RSP element at top level of data." << endl
-               << "Data from server:" << tostream( doc, true ) << endl;
+            ss << "Error. No RSP element at top level of data." << endl;
+//               << "Data from server:" << tostream( doc, true ) << endl;
             DEBUG << tostr(ss);
             Throw_WebServiceException( tostr(ss), 0 );
         }

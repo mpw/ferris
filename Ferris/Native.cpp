@@ -1609,13 +1609,13 @@ NativeContext::priv_getIStream( ferris_ios::openmode m )
 //     }
     
     fh_ifstream fs( getDirPath().c_str(), ferris_ios::maskOffFerrisOptions(m) );
-
+        
     LG_NATIVE_D << "NativeContext::priv_getIStream() "
                 << " path:" << getDirPath()
                 << " m:" << m
                 << " m.masked:" << ferris_ios::maskOffFerrisOptions( m )
-                << " fs:" << fs
                 << endl;
+    
 
 #ifndef PLATFORM_OSX
     if( m & ferris_ios::o_mmap )
@@ -1679,8 +1679,8 @@ NativeContext::priv_getIOStream( ferris_ios::openmode m )
                 << " path:" << getDirPath()
                 << " m:" << m
                 << " m.masked:" << ferris_ios::maskOffFerrisOptions( m )
-                << " fs:" << fs
                 << endl;
+    
     if( !fs->good() )
     {
 //        const struct stat& sb = getStat_Follow();

@@ -55,6 +55,7 @@
 #include <FerrisException.hh>
 #include <Attribute.hh>
 #include <Ferris.hh>
+#include <Ferrisls_AggregateData.hh>
 
     using namespace Ferris;
     

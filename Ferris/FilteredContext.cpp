@@ -88,7 +88,8 @@ namespace Ferris
             
             fh_attribute a = c->getAttribute( eaname );
             fh_istream ss  = a->getIStream();
-            return getline( ss, val );
+            getline( ss, val );
+            return !ss.fail();
         }
         catch(...)
         {
@@ -107,7 +108,8 @@ namespace Ferris
             
             fh_attribute a = c->getAttribute( eaname );
             fh_istream ss  = a->getIStream();
-            return (ss >> val);
+            ss >> val;
+            return !ss.fail();
         }
         catch(...)
         {
@@ -127,7 +129,8 @@ namespace Ferris
             
             fh_attribute a = c->getAttribute( eaname );
             fh_istream ss  = a->getIStream();
-            return (ss >> val);
+            ss >> val;
+            return !ss.fail();
         }
         catch(...)
         {
@@ -147,7 +150,8 @@ namespace Ferris
             
             fh_attribute a = c->getAttribute( eaname );
             fh_istream ss  = a->getIStream();
-            return (ss >> val);
+            ss >> val;
+            return !ss.fail();
         }
         catch(...)
         {
@@ -317,7 +321,8 @@ namespace Ferris
                     fh_attribute a = c->getAttribute( eaname );
                     fh_istream iss = a->getIStream();
                     char ch;
-                    return iss >> ch;
+                    iss >> ch;
+                    return !iss.fail();
                 }
                 catch( exception& e )
                 {

@@ -11492,7 +11492,7 @@ Context::getMedallion()
     {
         connected = true;
         Factory::getPluginOutOfProcNotificationEngine().
-            getMedallionUpdated_Sig().connect( bind( sigc::ptr_fun( OnMedallionUpdated ), &cache ) );
+            getMedallionUpdated_Sig().connect( sigc::bind( sigc::ptr_fun( OnMedallionUpdated ), &cache ) );
     }
 
     if( fh_medallion m = cache.get( this ) )

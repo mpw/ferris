@@ -210,7 +210,9 @@ namespace Ferris
                 fh_stringstream ret;
                 if( !( m & std::ios::trunc ) )
                     ret = real_getIOStream( m );
-                ret->getCloseSig().connect( bind( sigc::mem_fun(*this, &_Self::priv_OnStreamClosed ), m ));
+                ret->getCloseSig().connect(
+                    sigc::bind(
+                        sigc::mem_fun(*this, &_Self::priv_OnStreamClosed ), m ));
 //                cerr << "priv_getIOStream()" << endl;
                 return ret;
             }

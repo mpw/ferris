@@ -74,7 +74,8 @@ namespace Ferris
         changelist_shell.push_back( make_pair( "??(", "?\?(" ));
         changelist_shell.push_back( make_pair( "??)", "?\?)" ));
         changelist_shell.push_back( make_pair( "??-", "?\?-" ));
-        changelist_shell.push_back( make_pair( "??/", "?\?/" ));
+//        changelist_shell.push_back( make_pair( "??/", "?\?/" ));
+        changelist_shell.push_back( make_pair( "??\/", "?\?\/" ));
         changelist_shell.push_back( make_pair( "??<", "?\?<" ));
         changelist_shell.push_back( make_pair( "??=", "?\?=" ));
         changelist_shell.push_back( make_pair( "??>", "?\?>" ));

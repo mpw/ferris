@@ -4388,7 +4388,7 @@ static short myCompareDocumentPosition(const DOMNode* x1, const DOMNode* other)
                     {
                         m_iss.read( (char*)toFill, maxToRead );
                         unsigned int ret = m_iss.gcount();
-//                        cerr << "readBytes() max:" << maxToRead << " got:" << ret << endl;
+                        cerr << "readBytes() max:" << maxToRead << " got:" << ret << endl;
                         return ret;
                     }
                 virtual const XMLCh* getContentType() const
@@ -4437,6 +4437,7 @@ static short myCompareDocumentPosition(const DOMNode* x1, const DOMNode* other)
             {
                 string earl = c->getURL();
                 fh_istream iss = c->getIStream();
+                cerr << " makeInputSource() c:" << c->getURL() << endl;
                 return makeInputSource( iss, earl.c_str(), XMLPlatformUtils::fgMemoryManager );
             }
         };

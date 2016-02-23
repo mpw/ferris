@@ -129,6 +129,7 @@ namespace Ferris
         {
             m_config = config;
             m_deviceName = deviceName;
+            DEBUG << "deviceName:" << m_deviceName << endl;
         }
         void constructObject( ConfiguredScannerContext* other )
         {
@@ -159,14 +160,17 @@ namespace Ferris
 
         void grabImage()
         {
+            cerr << "grabImage(top)" << endl;
             if( KSaneIface::KSaneWidget* z = getKSane() )
             {
+                cerr << "grabImage(1)" << endl;
                 startScan();
                 while( !scanCompleted() )
                 {
                     Main::processAllPendingEvents();
                     Time::Sleep( 0.001 );
                 }
+                cerr << "grabImage(done.)" << endl;
             }
         }
 
@@ -193,7 +197,6 @@ namespace Ferris
             {
 
                 m_ksane = new KSaneIface::KSaneWidget( 0 );
-                
                 if ( !m_ksane->openDevice( m_deviceName.c_str()))
                 {
                     DEBUG << "can not open device:" << m_deviceName << endl;

@@ -123,9 +123,9 @@ namespace Ferris
 
     
     
-        std::string
-        Contact::getVCard()
-        {
+    std::string
+    Contact::getVCard()
+    {
 // BEGIN:VCARD
 // VERSION:3.0
 // N:Gump;Forrest
@@ -142,45 +142,45 @@ namespace Ferris
 // REV:20080424T195243Z
 // END:VCARD
 //m_picURL
-            stringstream addrss;
+        stringstream addrss;
 //            addrss << m_city << ";" << m_state << ";" << m_country;
 
-            string revformat = "%Y%m%dT%H%M%S";
-            time_t revtime = Time::getTime();
+        string revformat = "%Y%m%dT%H%M%S";
+        time_t revtime = Time::getTime();
 
-            QByteArray photodata;
-            // if( !m_picURL.empty() )
-            // {
-            //     m_fb->fetchURL( m_picURL, photodata );
-            //     photodata = base64encode( photodata );
-            // }
+        QByteArray photodata;
+        // if( !m_picURL.empty() )
+        // {
+        //     m_fb->fetchURL( m_picURL, photodata );
+        //     photodata = base64encode( photodata );
+        // }
             
-            stringstream ss;
-            ss << "BEGIN:VCARD" << endl
-               << "VERSION:3.0" << endl
-               << "N:" << getUserName() << endl
-               << "FN:" << getRealName() << endl
-               << "ADR;TYPE=WORK:;;" << addrss.str() << endl
-               << "LABEL;TYPE=WORK:" << addrss.str() << endl
-               << "UID:" << m_id << endl
-               << "REV:" << Time::toTimeString(revtime,revformat) << endl
-               << "";
-            if( photodata.size() )
+        stringstream ss;
+        ss << "BEGIN:VCARD" << endl
+           << "VERSION:3.0" << endl
+           << "N:" << getUserName() << endl
+           << "FN:" << getRealName() << endl
+           << "ADR;TYPE=WORK:;;" << addrss.str() << endl
+           << "LABEL;TYPE=WORK:" << addrss.str() << endl
+           << "UID:" << m_id << endl
+           << "REV:" << Time::toTimeString(revtime,revformat) << endl
+           << "";
+        if( photodata.size() )
+        {
+            ss << "PHOTO;ENCODING=BASE64;TYPE=JPEG:" << endl;
+            //ss.write( photodata.data(), photodata.size() );
+            stringstream photodatass;
+            photodatass.write( photodata.data(), photodata.size() );
+            string s;
+            while( getline( photodatass, s ))
             {
-                ss << "PHOTO;ENCODING=BASE64;TYPE=JPEG:" << endl;
-                //ss.write( photodata.data(), photodata.size() );
-                stringstream photodatass;
-                photodatass.write( photodata.data(), photodata.size() );
-                string s;
-                while( getline( photodatass, s ))
-                {
-                    ss << " " << s << endl;
-                }
+                ss << " " << s << endl;
             }
-            ss << "END:VCARD" << endl;
-        
-            return ss.str();
         }
+        ss << "END:VCARD" << endl;
+        
+        return ss.str();
+    }
     
     
 
@@ -1277,8 +1277,8 @@ namespace Ferris
             if( !ret->isSubContextBound( "rsp" ) )
             {
                 stringstream ss;
-                ss << "Error. No RSP element at top level of data." << endl
-                   << "Data from server:" << tostream( doc, true ) << endl;
+                ss << "Error. No RSP element at top level of data." << endl;
+                    //<< "Data from server:" << tostream( doc, true ) << endl;
                 LG_WEBPHOTO_W << tostr(ss);
                 Throw_WebPhotoException( tostr(ss), 0 );
             }
