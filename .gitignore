@@ -35,3 +35,7 @@ depcomp
 compile
 aclocal.m4
 autom4te.cache
+gnulib
+lib
+snippet
+#config.h.in#
