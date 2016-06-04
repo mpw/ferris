@@ -31,8 +31,8 @@
 #ifndef _ALREADY_INCLUDED_FERRIS_SYNC_DELAYER_H_
 #define _ALREADY_INCLUDED_FERRIS_SYNC_DELAYER_H_
 
-#include <Functor.h>
 #include <map>
+#include <boost/function.hpp>
 
 namespace Ferris
 {
@@ -43,7 +43,8 @@ namespace Ferris
         ~SyncDelayer();
 
 
-        typedef Loki::Functor< void, LOKI_TYPELIST_1( SyncDelayer* ) > f_functor;
+        typedef boost::function<void (SyncDelayer*)> f_functor;
+        
         static bool exists();
         static void add( void* key, const f_functor& f );
         static void ensure( void* key, const f_functor& f );

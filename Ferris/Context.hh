@@ -35,7 +35,6 @@
 #include <Ferris/Ferris.hh>
 #include <Ferris/ChainedViewContext.hh>
 #include <Ferris/SignalStreams.hh>
-#include <sigc++/sigc++.h>
 #include <sys/utsname.h>
 
 namespace Ferris
@@ -376,9 +375,9 @@ namespace Ferris
                 
                 this->addAttribute(
                     rdn,
-                    FI(this, &_Self::getEAStream),
-                    FIO(this, &_Self::getEAStream),
-                    FCL(this, &_Self::setEAStream),
+                    boost::bind( &_Self::getEAStream, this, _1,_2,_3 ),
+                    boost::bind( &_Self::getEAStream, this, _1,_2,_3 ),
+                    boost::bind( &_Self::setEAStream, this, _1,_2,_3,_4 ),
                     FXD_BINARY,
                     true );
             }
@@ -558,7 +557,7 @@ namespace Ferris
                 
                 LG_CTX_D << "maybeEmitExists() this:" << this->getURL() 
                          << " emitting exists for c:" << c->getURL() << std::endl;
-                this->Emit_Exists( 0, c, c->getDirName(), c->getDirName(), 0 );
+                this->Emit_Exists( 0, c, c->getDirName(), c->getDirName() );
             }
         
         

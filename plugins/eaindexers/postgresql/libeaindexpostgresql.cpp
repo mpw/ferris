@@ -1058,6 +1058,7 @@ namespace Ferris
                     "  qconst alias for $1; \n"
                     "  eaname alias for $2; \n"
                     "  caseSensitive alias for $3; \n"
+                    "  arr text[]; \n"
                     "  q varchar; \n"
                     "  r record; \n"
                     "BEGIN \n"
@@ -1112,7 +1113,6 @@ namespace Ferris
                     throw;
             }
                         
-            
             work CreateDBTrans( *m_connection, "setup database" );
             
             
@@ -1477,13 +1477,16 @@ namespace Ferris
                     "	perform timelookup_consume( mydocid );"
                     "	return;"
                     "END;"
-                    "' LANGUAGE plpgsql;"
+                    "' LANGUAGE plpgsql;",
+                    0
                 };
-                
+
+                LG_EAIDX_D << "AAA SQL:" << fourGL << endl;
                 LG_IDX_D << "SQL:" << fourGL << endl;
                 Execute( CreateDBTrans, fourGL );
             }
-             
+
+            LG_EAIDX_D << "about to remake view" << endl;
             {
                 CreateIndex_remakeView_currentVersions( CreateDBTrans );
                 
@@ -1501,6 +1504,7 @@ namespace Ferris
             }
             
             
+            LG_EAIDX_D << "about to commit (final)" << endl;
             CreateDBTrans.commit();
 
             // we always have access to the URL string
@@ -4246,7 +4250,7 @@ namespace Ferris
             {
                 string earl;
                 c[0].to( earl );
-                m_urlcache_ref row = new m_urlcache_t;
+                m_urlcache_ref row( new m_urlcache_t());
                 
                 for ( result::tuple::const_iterator ti = c->begin(); ti != c->end(); ++ti )
                 {

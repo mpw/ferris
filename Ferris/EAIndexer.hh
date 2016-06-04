@@ -32,7 +32,6 @@
 
 #include <Ferris/HiddenSymbolSupport.hh>
 
-#include <sigc++/sigc++.h>
 
 #include <Ferris/TypeDecl.hh>
 #include <Ferris/Ferris.hh>
@@ -355,8 +354,8 @@ namespace Ferris
 
         class FERRISEXP_API EAIndexAddPopTableCollector
             :
-            public basic_PopTableCollector,
-            public Handlable
+            public Handlable,
+            public basic_PopTableCollector
         {
             fh_Ferrisls_feaindexadd_display_base m_obj;
 

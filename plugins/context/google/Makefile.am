@@ -13,12 +13,7 @@ libferrisgoogle_factory_la_LIBADD  = @LIBFERRIS_PLUGIN_FACTORY_LIBADD@
 libferrisgoogle_factory_la_LDFLAGS = @LIBFERRIS_PLUGIN_LT_LINE@
 libferrisgoogle_la_SOURCES         = libferrisgoogle.cpp
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	-I/usr/local/lib                                \
+INCLUDES = -I$(top_srcdir)/plugins/context              \
 	@QT_CFLAGS@                                     \
 	@QTNETWORK_CFLAGS@                              \
 	@QTDBUS_CFLAGS@ @QTNETWORK_CFLAGS@              \

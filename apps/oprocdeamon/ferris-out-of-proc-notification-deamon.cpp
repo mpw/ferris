@@ -382,7 +382,7 @@ int main( int argc, char** argv )
         fh_aiohandler aio = new AsyncIOHandler( fd );
         fh_xstreamcol xs = Factory::MakeXMLStreamCol();
         xs->attach( aio );
-        xs->getMessageArrivedSig().connect( sigc::ptr_fun( xml_msg_arrived ));
+        xs->getMessageArrivedSig().connect( &xml_msg_arrived );
         
         setupSignalHandlers();
         LG_JOURNAL_W << "server starting at pid:" << getpid() << endl;

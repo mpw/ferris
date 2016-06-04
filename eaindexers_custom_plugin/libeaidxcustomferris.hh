@@ -228,9 +228,9 @@ namespace Ferris
             friend struct invertedfile_dbiter_compare;
             friend int bt_compare_aidvid_cs(DB* rawdb, const DBT* a, const DBT* b );
 
-            typedef Loki::Functor< int,
-                                   LOKI_TYPELIST_2( const std::string&,
-                                                    const std::string&  ) > ValueCompare;
+            typedef boost::function< int
+                                   ( const std::string&,
+                                     const std::string&  ) > ValueCompare;
             ValueCompare m_valueCompare;
 
             /**
@@ -296,7 +296,7 @@ namespace Ferris
              */
             urllists_t find_partial( aid_t aid );
 
-            typedef Loki::Functor< bool, LOKI_TYPELIST_1( const std::string& ) > keyPredicate_t;
+            typedef boost::function< bool ( const std::string& ) > keyPredicate_t;
             urllists_t find_partial( aid_t aid, keyPredicate_t f );
             
             /**

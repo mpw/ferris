@@ -200,7 +200,7 @@ namespace Ferris
             m_fromserv_aio = new AsyncIOHandler( fd );
             m_fromserv_xs  = Factory::MakeXMLStreamCol();
             m_fromserv_xs->attach( m_fromserv_aio );
-            m_fromserv_xs->getMessageArrivedSig().connect( sigc::mem_fun( *this, &_Self::xml_msg_arrived ) );
+            m_fromserv_xs->getMessageArrivedSig().connect( boost::bind( &_Self::xml_msg_arrived, this, _1 ) );
             
 //             m_fromserv_aio->setFunctor(
 //                 AsyncIOHandler::AsyncIOFunctor_t(
@@ -336,9 +336,9 @@ namespace Ferris
             m_monitoredContexts.insert( GetImpl(c) );
 
             LG_JOURNAL_D << "connectSignals() c:" << toVoid(GetImpl(c)) << endl;
-            c->getNamingEvent_Created_Sig().connect( sigc::mem_fun( *this, &_Self::OnCreated ));
-            c->getNamingEvent_Exists_Sig() .connect( sigc::mem_fun( *this, &_Self::OnExists ));
-            c->getNamingEvent_Deleted_Sig().connect( sigc::mem_fun( *this, &_Self::OnDeleted ));
+            c->getNamingEvent_Created_Sig().connect( boost::bind( &_Self::OnCreated, this, _1,_2,_3,_4 ));
+            c->getNamingEvent_Exists_Sig() .connect( boost::bind( &_Self::OnExists,  this, _1,_2,_3,_4 ));
+            c->getNamingEvent_Deleted_Sig().connect( boost::bind( &_Self::OnDeleted, this, _1,_2,_3 ));
         }
     }
 
@@ -558,7 +558,7 @@ namespace Ferris
 //             cerr << "PluginOutOfProcNotificationEngine::xml_msg_arrived( medallion )"
 //                  << " url:" << url << endl;
             
-            getMedallionUpdated_Sig().emit( url );
+            getMedallionUpdated_Sig()( url );
         }
         else if( m[ KEY_COMMAND ] == COMMAND_ETAGERE_NEW_EMBLEM )
         {
@@ -716,11 +716,8 @@ namespace Ferris
     {
         PluginOutOfProcNotificationEngine& getPluginOutOfProcNotificationEngine()
         {
-            typedef Loki::SingletonHolder<
-                PluginOutOfProcNotificationEngine,
-                Loki::CreateUsingNew,
-                Loki::PhoenixSingleton > S;
-            return S::Instance();
+            typedef FerrisSingletonAlways< PluginOutOfProcNotificationEngine > S;
+            return S::instance();
         }
 
         void

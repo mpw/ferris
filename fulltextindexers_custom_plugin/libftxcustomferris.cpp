@@ -1561,6 +1561,7 @@ namespace Ferris
         Term::~Term()
         {
             LG_IDX_D << "~Term() id:" << m_id << " dirty:" << m_dirty << endl;
+//            cerr << "~Term() id:" << m_id << " dirty:" << m_dirty << endl;
 
             sync();
         }
@@ -1568,6 +1569,7 @@ namespace Ferris
         void
         Term::sync()
         {
+//            cerr << "Term::sync() m_dirty:" << m_dirty << endl;
             if( m_dirty )
             {
                 save();
@@ -2058,13 +2060,13 @@ namespace Ferris
                 fh_term ret = new Term( this, recno, true );
                 
                 ret->setID( recno );
+//                m_term_cache.put( recno, ret );
 
                 // We either need to cache the nkeys or save the new term
                 // to the db here to ensure that the next term added has the
                 // next logical ID
                 ret->append();
 
-//                m_term_cache.put( recno, ret );
                 
                 return ret;
             }
@@ -2125,13 +2127,14 @@ namespace Ferris
         void
         InvertedFile::sync()
         {
+            cerr << "InvertedFile::sync()" << endl;
             getDB()->sync();
 
-//             for( m_term_cache_t::iterator ti = m_term_cache.begin();
-//                  ti != m_term_cache.end(); ++ti )
-//             {
-//                 ti->second->sync();
-//             }
+            // for( m_term_cache_t::iterator ti = m_term_cache.begin();
+            //      ti != m_term_cache.end(); ++ti )
+            // {
+            //     ti->second->sync();
+            // }
         }
 
         fh_term
@@ -2140,15 +2143,15 @@ namespace Ferris
             fh_term t = Term::load( this, tid );
             return t;
             
-//             fh_term t = m_term_cache.get( tid );
-//             if( t )
-//                 return t;
+            // fh_term t = m_term_cache.get( tid );
+            // if( t )
+            //     return t;
 
-//             t = Term::load( this, tid );
-//             if( t )
-//                 m_term_cache.put( tid, t );
+            // t = Term::load( this, tid );
+            // if( t )
+            //     m_term_cache.put( tid, t );
             
-//             return t;
+            // return t;
         }
         
         
@@ -2170,7 +2173,7 @@ namespace Ferris
 //         namespace
 //         {
 //             static const std::string MetaIndexClassName = "native";
-//             static bool reged = MetaFullTextIndexerInterfaceFactory::Instance().
+//             static bool reged = MetaFullTextIndexerInterfaceFactory::instance().
 //                 Register( MetaIndexClassName,
 //                           &FullTextIndexManagerNative::Create );
 //             static bool regedx = appendToMetaFullTextIndexClassNames( MetaIndexClassName );
@@ -2260,7 +2263,7 @@ namespace Ferris
 
             try
             {
-                m_lex = LexiconFactory::Instance().CreateObject( lexicon_class );
+                m_lex = LexiconFactory::instance()[ lexicon_class ]();
             }
             catch( exception& e )
             {
@@ -2274,6 +2277,7 @@ namespace Ferris
 //                | Environment::get_openflag_init_lock()
 //                | Environment::get_openflag_init_log()
                 | Environment::get_openflag_init_mpool();
+            
             fh_env dbenv = new Environment( getBasePath(), environment_open_flags );
             m_inv        = new InvertedFile( this, dbenv );
             m_docmap     =
@@ -2427,11 +2431,11 @@ namespace Ferris
                     term->incrementCountForDocument( document );
                 }
                 
-
+                term->sync();
                 streamsize bdone = di->getBytesCompleted();
                 if( bdone % 16*1024 == 0 )
                 {
-                    di->getProgressSig().emit( c, bdone, totalBytes );
+                    di->getProgressSig()( c, bdone, totalBytes );
                 }
             }
 
@@ -2464,6 +2468,12 @@ namespace Ferris
                 document->setDocumentWeight( sum );
             }
 
+            LG_IDX_D << "DocumentIndexer::addContextToIndex(sync)" << endl;
+            for( termcache_t::iterator iter = termcache.begin(); iter!=termcache.end(); ++iter )
+            {
+                iter->second->sync();
+            }
+            
             LG_IDX_D << "DocumentIndexer::addContextToIndex(end)" << endl;
         }
         
@@ -2671,6 +2681,7 @@ namespace Ferris
         void
         FullTextIndexManagerNative::sync()
         {
+            cerr << "FullTextIndexManagerNative::sync()" << endl;
             m_lex->sync();
             m_inv->sync();
             m_docmap->sync();

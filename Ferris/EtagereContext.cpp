@@ -186,8 +186,8 @@ namespace Ferris
         createStateLessAttributes();
 
         fh_etagere et = Factory::getEtagere();
-        et->getAddedChild_Sig().connect(   sigc::mem_fun( *this, &_Self::OnChildAdded   ) );
-        et->getRemovedChild_Sig().connect( sigc::mem_fun( *this, &_Self::OnChildRemoved ) );
+        et->getAddedChild_Sig().connect(   boost::bind( &_Self::OnChildAdded,   this, _1, _2 ));
+        et->getRemovedChild_Sig().connect( boost::bind( &_Self::OnChildRemoved, this, _1, _2 ));
     }
     
     EtagereRootContext::~EtagereRootContext()
@@ -495,7 +495,7 @@ namespace Ferris
     {
         setContext( parent, monsterName( em->getName() ));
         createStateLessAttributes();
-        m_em->getAddedChild_Sig().connect( sigc::mem_fun( *this, &_Self::OnChildAdded ) );
+        m_em->getAddedChild_Sig().connect( boost::bind( &_Self::OnChildAdded, this, _1, _2 ) );
     }
     
     EmblemContext::~EmblemContext()

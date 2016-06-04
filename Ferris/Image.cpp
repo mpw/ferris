@@ -295,7 +295,7 @@ namespace Ferris
         get_RegisterImageEAGeneratorModule_extensions()[ implname ].push_back( ext );
     
         string k = tolowerstr()( ext );
-        f_imageEAGenerator func( gmodloaderiter->second, &imageEAGeneratorGModule::resolve );
+        f_imageEAGenerator func( boost::bind( &imageEAGeneratorGModule::resolve, gmodloaderiter->second, _1 ));
         getImageEAGenerators()[ k ] = make_pair( func, writable );
 
 

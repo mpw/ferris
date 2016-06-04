@@ -481,7 +481,7 @@ namespace Ferris
             string strkey = getName();
             char* key     = (char*)strkey.c_str();
 
-            string v = getEDBString( FDB_LOGGING, strkey, "" );
+            string v = getConfigString( GET_FDB_LOGGING(), strkey, "" );
             if( v.length() )
             {
                 std::stringstream ss;
@@ -551,7 +551,7 @@ namespace Ferris
         fh_ostream&
         LogStateBase::getStream( Timber::Facility_t f, state_t d )
         {
-            string lfn = getEDBString( FDB_GENERAL, LOGGING_TO_FILENAME_KEY, "" );
+            string lfn = getConfigString( GET_FDB_GENERAL(), LOGGING_TO_FILENAME_KEY, "" );
             if( !lfn.empty() )
             {
                 static fh_fstream fs = fh_fstream( lfn, ios::out | ios::app );
@@ -685,140 +685,140 @@ namespace Ferris
             {
                 virgin = false;
 
-//            c.insert(make_pair(LG_STRF::Instance().getName(), &LG_STRF::Instance()));
-                c.insert(make_pair(LG_STRF::Instance().getName(), &LG_STRF::Instance()));
-                c.insert(make_pair(LG_ATTR::Instance().getName(), &LG_ATTR::Instance()));
-                c.insert(make_pair(LG_OVERMOUNT::Instance().getName(), &LG_OVERMOUNT::Instance()));
-                c.insert(make_pair(LG_SORT::Instance().getName(), &LG_SORT::Instance()));
-                c.insert(make_pair(LG_IMAGE::Instance().getName(), &LG_IMAGE::Instance()));
-                c.insert(make_pair(LG_PNGIMAGE::Instance().getName(), &LG_PNGIMAGE::Instance()));
-                c.insert(make_pair(LG_JASPERIMAGE::Instance().getName(), &LG_JASPERIMAGE::Instance()));
-                c.insert(make_pair(LG_JPEGIMAGE::Instance().getName(), &LG_JPEGIMAGE::Instance()));
-                c.insert(make_pair(LG_DJVUIMAGE::Instance().getName(), &LG_DJVUIMAGE::Instance()));
-                c.insert(make_pair(LG_GIMPIMAGE::Instance().getName(), &LG_GIMPIMAGE::Instance()));
-                c.insert(make_pair(LG_MAGIKIMAGE::Instance().getName(), &LG_MAGIKIMAGE::Instance()));
-                c.insert(make_pair(LG_IMLIB2IMAGE::Instance().getName(),&LG_IMLIB2IMAGE::Instance()));
-                c.insert(make_pair(LG_STRATTR::Instance().getName(), &LG_STRATTR::Instance()));
-                c.insert(make_pair(LG_BYTEATTR::Instance().getName(), &LG_BYTEATTR::Instance()));
-                c.insert(make_pair(LG_CTX::Instance().getName(), &LG_CTX::Instance()));
-                c.insert(make_pair(LG_VM::Instance().getName(), &LG_VM::Instance()));
-                c.insert(make_pair(LG_NATIVE::Instance().getName(), &LG_NATIVE::Instance()));
-                c.insert(make_pair(LG_FACTORY::Instance().getName(), &LG_FACTORY::Instance()));
-                c.insert(make_pair(LG_ID3::Instance().getName(), &LG_ID3::Instance()));
-                c.insert(make_pair(LG_MPG::Instance().getName(), &LG_MPG::Instance()));
-                c.insert(make_pair(LG_PLUGIN::Instance().getName(), &LG_PLUGIN::Instance()));
-                c.insert(make_pair(LG_FFILTER::Instance().getName(), &LG_FFILTER::Instance()));
-                c.insert(make_pair(LG_MBOX::Instance().getName(), &LG_MBOX::Instance()));
-                c.insert(make_pair(LG_EDB::Instance().getName(), &LG_EDB::Instance()));
-                c.insert(make_pair(LG_PATHS::Instance().getName(), &LG_PATHS::Instance()));
-                c.insert(make_pair(LG_PCCTS::Instance().getName(), &LG_PCCTS::Instance()));
-                c.insert(make_pair(LG_FILTERPARSE::Instance().getName(), &LG_FILTERPARSE::Instance()));
-                c.insert(make_pair(LG_XFS::Instance().getName(), &LG_XFS::Instance()));
-                c.insert(make_pair(LG_SOCKET::Instance().getName(), &LG_SOCKET::Instance()));
-                c.insert(make_pair(LG_SQLDB::Instance().getName(), &LG_SQLDB::Instance()));
-                c.insert(make_pair(LG_SQLPLUS::Instance().getName(), &LG_SQLPLUS::Instance()));
-                c.insert(make_pair(LG_DTL::Instance().getName(), &LG_DTL::Instance()));
-                c.insert(make_pair(LG_CURL::Instance().getName(), &LG_CURL::Instance()));
-                c.insert(make_pair(LG_GTKFERRIS::Instance().getName(), &LG_GTKFERRIS::Instance()));
-                c.insert(make_pair(LG_FERRISCREATE::Instance().getName(), &LG_FERRISCREATE::Instance()));
-                c.insert(make_pair(LG_CREATE::Instance().getName(), &LG_CREATE::Instance()));
-                c.insert(make_pair(LG_SCHEMA::Instance().getName(), &LG_SCHEMA::Instance()));
-                c.insert(make_pair(LG_EMBLEM::Instance().getName(), &LG_EMBLEM::Instance()));
-                c.insert(make_pair(LG_TIME::Instance().getName(), &LG_TIME::Instance()));
-                c.insert(make_pair(LG_COPY::Instance().getName(), &LG_COPY::Instance()));
-                c.insert(make_pair(LG_MOVE::Instance().getName(), &LG_MOVE::Instance()));
-                c.insert(make_pair(LG_RM::Instance().getName(), &LG_RM::Instance()));
-                c.insert(make_pair(LG_DVDREAD::Instance().getName(), &LG_DVDREAD::Instance()));
-                c.insert(make_pair(LG_IPCCTX::Instance().getName(), &LG_IPCCTX::Instance()));
-                c.insert(make_pair(LG_FCLIP::Instance().getName(), &LG_FCLIP::Instance()));
-                c.insert(make_pair(LG_DB4::Instance().getName(), &LG_DB4::Instance()));
-                c.insert(make_pair(LG_GDBM::Instance().getName(), &LG_GDBM::Instance()));
-                c.insert(make_pair(LG_TDB::Instance().getName(), &LG_TDB::Instance()));
-                c.insert(make_pair(LG_COMMONDB::Instance().getName(), &LG_COMMONDB::Instance()));
-                c.insert(make_pair(LG_EET::Instance().getName(), &LG_EET::Instance()));
-                c.insert(make_pair(LG_FNEWS::Instance().getName(), &LG_FNEWS::Instance()));
-                c.insert(make_pair(LG_JOURNAL::Instance().getName(), &LG_JOURNAL::Instance()));
-                c.insert(make_pair(LG_LDAP::Instance().getName(), &LG_LDAP::Instance()));
-                c.insert(make_pair(LG_EXCEPTIONS::Instance().getName(), &LG_EXCEPTIONS::Instance()));
-                c.insert(make_pair(LG_FTXLEXI::Instance().getName(), &LG_FTXLEXI::Instance()));
-                c.insert(make_pair(LG_IDX::Instance().getName(), &LG_IDX::Instance()));
-                c.insert(make_pair(LG_EAIDX::Instance().getName(), &LG_EAIDX::Instance()));
-                c.insert(make_pair(LG_IOSTREAM::Instance().getName(), &LG_IOSTREAM::Instance()));
-                c.insert(make_pair(LG_XML::Instance().getName(), &LG_XML::Instance()));
-                c.insert(make_pair(LG_DOM::Instance().getName(), &LG_DOM::Instance()));
-                c.insert(make_pair(LG_EXTFS::Instance().getName(), &LG_EXTFS::Instance()));
-                c.insert(make_pair(LG_RUNNER::Instance().getName(), &LG_RUNNER::Instance()));
-                c.insert(make_pair(LG_A52::Instance().getName(), &LG_A52::Instance()));
-                c.insert(make_pair(LG_MPEG2::Instance().getName(), &LG_MPEG2::Instance()));
-                c.insert(make_pair(LG_RDF::Instance().getName(), &LG_RDF::Instance()));
-                c.insert(make_pair(LG_EXIF::Instance().getName(), &LG_EXIF::Instance()));
-                c.insert(make_pair(LG_CTXREC::Instance().getName(), &LG_CTXREC::Instance()));
-                c.insert(make_pair(LG_RTIMEPARSE::Instance().getName(), &LG_RTIMEPARSE::Instance()));
-                c.insert(make_pair(LG_LIBEXTRACTOR::Instance().getName(), &LG_LIBEXTRACTOR::Instance()));
-                c.insert(make_pair(LG_GPHOTO::Instance().getName(), &LG_GPHOTO::Instance()));
-                c.insert(make_pair(LG_FCA::Instance().getName(), &LG_FCA::Instance()));
-                c.insert(make_pair(LG_EVO::Instance().getName(), &LG_EVO::Instance()));
-                c.insert(make_pair(LG_SAMBA::Instance().getName(), &LG_SAMBA::Instance()));
-                c.insert(make_pair(LG_PG::Instance().getName(), &LG_PG::Instance()));
-                c.insert(make_pair(LG_BIBTEX::Instance().getName(), &LG_BIBTEX::Instance()));
-                c.insert(make_pair(LG_KDE::Instance().getName(), &LG_KDE::Instance()));
-                c.insert(make_pair(LG_ANNODEX::Instance().getName(), &LG_ANNODEX::Instance()));
-                c.insert(make_pair(LG_ASTEXT::Instance().getName(), &LG_ASTEXT::Instance()));
-                c.insert(make_pair(LG_FILEACTIONS::Instance().getName(), &LG_FILEACTIONS::Instance()));
-                c.insert(make_pair(LG_EMACS::Instance().getName(), &LG_EMACS::Instance()));
-                c.insert(make_pair(LG_FIREFOX::Instance().getName(), &LG_FIREFOX::Instance()));
-                c.insert(make_pair(LG_ICONSRV::Instance().getName(), &LG_ICONSRV::Instance()));
-                c.insert(make_pair(LG_XINE::Instance().getName(), &LG_XINE::Instance()));
-                c.insert(make_pair(LG_OBBY::Instance().getName(), &LG_OBBY::Instance()));
-                c.insert(make_pair(LG_XSLTFS::Instance().getName(), &LG_XSLTFS::Instance()));
-                c.insert(make_pair(LG_RDFATTRCACHE::Instance().getName(), &LG_RDFATTRCACHE::Instance()));
-                c.insert(make_pair(LG_FFUSE::Instance().getName(), &LG_FFUSE::Instance()));
-                c.insert(make_pair(LG_BEAGLE::Instance().getName(), &LG_BEAGLE::Instance()));
-                c.insert(make_pair(LG_GLOB::Instance().getName(), &LG_GLOB::Instance()));
-                c.insert(make_pair(LG_AMAROK::Instance().getName(), &LG_AMAROK::Instance()));
-                c.insert(make_pair(LG_XMMS::Instance().getName(), &LG_XMMS::Instance()));
-                c.insert(make_pair(LG_PRIVATE::Instance().getName(), &LG_PRIVATE::Instance()));
-                c.insert(make_pair(LG_DBUS::Instance().getName(), &LG_DBUS::Instance()));
-                c.insert(make_pair(LG_XQILLA::Instance().getName(), &LG_XQILLA::Instance()));
-                c.insert(make_pair(LG_WEBPHOTO::Instance().getName(), &LG_WEBPHOTO::Instance()));
-                c.insert(make_pair(LG_FSPOT::Instance().getName(), &LG_FSPOT::Instance()));
-                c.insert(make_pair(LG_STRIGI::Instance().getName(), &LG_STRIGI::Instance()));
-                c.insert(make_pair(LG_MDSERV::Instance().getName(), &LG_MDSERV::Instance()));
-                c.insert(make_pair(LG_VOLMAN::Instance().getName(), &LG_VOLMAN::Instance()));
-                c.insert(make_pair(LG_HAL::Instance().getName(), &LG_HAL::Instance()));
-                c.insert(make_pair(LG_EGO::Instance().getName(), &LG_EGO::Instance()));
-                c.insert(make_pair(LG_BGPROC::Instance().getName(), &LG_BGPROC::Instance()));
-                c.insert(make_pair(LG_FLAC::Instance().getName(), &LG_FLAC::Instance()));
-                c.insert(make_pair(LG_OGGZ::Instance().getName(), &LG_OGGZ::Instance()));
-                c.insert(make_pair(LG_TAGLIB::Instance().getName(), &LG_TAGLIB::Instance()));
-                c.insert(make_pair(LG_FFIND::Instance().getName(), &LG_FFIND::Instance()));
-                c.insert(make_pair(LG_QTSQL::Instance().getName(), &LG_QTSQL::Instance()));
-                c.insert(make_pair(LG_SQLITE::Instance().getName(), &LG_SQLITE::Instance()));
-                c.insert(make_pair(LG_RECORDFILE::Instance().getName(), &LG_RECORDFILE::Instance()));
-                c.insert(make_pair(LG_GOOGLE::Instance().getName(), &LG_GOOGLE::Instance()));
-                c.insert(make_pair(LG_BOXCOM::Instance().getName(), &LG_BOXCOM::Instance()));
-                c.insert(make_pair(LG_FACEBOOK::Instance().getName(), &LG_FACEBOOK::Instance()));
-                c.insert(make_pair(LG_VIMEO::Instance().getName(), &LG_VIMEO::Instance()));
-                c.insert(make_pair(LG_IDENTICA::Instance().getName(), &LG_IDENTICA::Instance()));
-                c.insert(make_pair(LG_ZONEMINDER::Instance().getName(), &LG_ZONEMINDER::Instance()));
-                c.insert(make_pair(LG_FERRISREST::Instance().getName(), &LG_FERRISREST::Instance()));
-                c.insert(make_pair(LG_KIO::Instance().getName(), &LG_KIO::Instance()));
-                c.insert(make_pair(LG_GDRIVE::Instance().getName(), &LG_GDRIVE::Instance()));
-                c.insert(make_pair(LG_QIO::Instance().getName(), &LG_QIO::Instance()));
-                c.insert(make_pair(LG_WEBSERVICE::Instance().getName(), &LG_WEBSERVICE::Instance()));
-                c.insert(make_pair(LG_GSTREAMER::Instance().getName(), &LG_GSTREAMER::Instance()));
-                c.insert(make_pair(LG_UPNP::Instance().getName(), &LG_UPNP::Instance()));
-                c.insert(make_pair(LG_USEROVERLAY::Instance().getName(), &LG_USEROVERLAY::Instance()));
-                c.insert(make_pair(LG_PLASMA::Instance().getName(), &LG_PLASMA::Instance()));
-                c.insert(make_pair(LG_SANE::Instance().getName(), &LG_SANE::Instance()));
-                c.insert(make_pair(LG_PRINTER::Instance().getName(), &LG_PRINTER::Instance()));
-                c.insert(make_pair(LG_PULSEAUDIO::Instance().getName(), &LG_PULSEAUDIO::Instance()));
-                c.insert(make_pair(LG_WIKI::Instance().getName(), &LG_WIKI::Instance()));
-                c.insert(make_pair(LG_SPIRITCONTEXT::Instance().getName(), &LG_SPIRITCONTEXT::Instance()));
-                c.insert(make_pair(LG_PASTEBIN::Instance().getName(), &LG_PASTEBIN::Instance()));
-                c.insert(make_pair(LG_LIBMEDIAINFO::Instance().getName(), &LG_LIBMEDIAINFO::Instance()));
-                c.insert(make_pair(LG_SUBTITLES::Instance().getName(), &LG_SUBTITLES::Instance()));
-                c.insert(make_pair(LG_FERRISQTGUI::Instance().getName(), &LG_FERRISQTGUI::Instance()));
+//            c.insert(make_pair(LG_STRF::instance().getName(), &LG_STRF::instance()));
+                c.insert(make_pair(LG_STRF::instance().getName(), &LG_STRF::instance()));
+                c.insert(make_pair(LG_ATTR::instance().getName(), &LG_ATTR::instance()));
+                c.insert(make_pair(LG_OVERMOUNT::instance().getName(), &LG_OVERMOUNT::instance()));
+                c.insert(make_pair(LG_SORT::instance().getName(), &LG_SORT::instance()));
+                c.insert(make_pair(LG_IMAGE::instance().getName(), &LG_IMAGE::instance()));
+                c.insert(make_pair(LG_PNGIMAGE::instance().getName(), &LG_PNGIMAGE::instance()));
+                c.insert(make_pair(LG_JASPERIMAGE::instance().getName(), &LG_JASPERIMAGE::instance()));
+                c.insert(make_pair(LG_JPEGIMAGE::instance().getName(), &LG_JPEGIMAGE::instance()));
+                c.insert(make_pair(LG_DJVUIMAGE::instance().getName(), &LG_DJVUIMAGE::instance()));
+                c.insert(make_pair(LG_GIMPIMAGE::instance().getName(), &LG_GIMPIMAGE::instance()));
+                c.insert(make_pair(LG_MAGIKIMAGE::instance().getName(), &LG_MAGIKIMAGE::instance()));
+                c.insert(make_pair(LG_IMLIB2IMAGE::instance().getName(),&LG_IMLIB2IMAGE::instance()));
+                c.insert(make_pair(LG_STRATTR::instance().getName(), &LG_STRATTR::instance()));
+                c.insert(make_pair(LG_BYTEATTR::instance().getName(), &LG_BYTEATTR::instance()));
+                c.insert(make_pair(LG_CTX::instance().getName(), &LG_CTX::instance()));
+                c.insert(make_pair(LG_VM::instance().getName(), &LG_VM::instance()));
+                c.insert(make_pair(LG_NATIVE::instance().getName(), &LG_NATIVE::instance()));
+                c.insert(make_pair(LG_FACTORY::instance().getName(), &LG_FACTORY::instance()));
+                c.insert(make_pair(LG_ID3::instance().getName(), &LG_ID3::instance()));
+                c.insert(make_pair(LG_MPG::instance().getName(), &LG_MPG::instance()));
+                c.insert(make_pair(LG_PLUGIN::instance().getName(), &LG_PLUGIN::instance()));
+                c.insert(make_pair(LG_FFILTER::instance().getName(), &LG_FFILTER::instance()));
+                c.insert(make_pair(LG_MBOX::instance().getName(), &LG_MBOX::instance()));
+                c.insert(make_pair(LG_EDB::instance().getName(), &LG_EDB::instance()));
+                c.insert(make_pair(LG_PATHS::instance().getName(), &LG_PATHS::instance()));
+                c.insert(make_pair(LG_PCCTS::instance().getName(), &LG_PCCTS::instance()));
+                c.insert(make_pair(LG_FILTERPARSE::instance().getName(), &LG_FILTERPARSE::instance()));
+                c.insert(make_pair(LG_XFS::instance().getName(), &LG_XFS::instance()));
+                c.insert(make_pair(LG_SOCKET::instance().getName(), &LG_SOCKET::instance()));
+                c.insert(make_pair(LG_SQLDB::instance().getName(), &LG_SQLDB::instance()));
+                c.insert(make_pair(LG_SQLPLUS::instance().getName(), &LG_SQLPLUS::instance()));
+                c.insert(make_pair(LG_DTL::instance().getName(), &LG_DTL::instance()));
+                c.insert(make_pair(LG_CURL::instance().getName(), &LG_CURL::instance()));
+                c.insert(make_pair(LG_GTKFERRIS::instance().getName(), &LG_GTKFERRIS::instance()));
+                c.insert(make_pair(LG_FERRISCREATE::instance().getName(), &LG_FERRISCREATE::instance()));
+                c.insert(make_pair(LG_CREATE::instance().getName(), &LG_CREATE::instance()));
+                c.insert(make_pair(LG_SCHEMA::instance().getName(), &LG_SCHEMA::instance()));
+                c.insert(make_pair(LG_EMBLEM::instance().getName(), &LG_EMBLEM::instance()));
+                c.insert(make_pair(LG_TIME::instance().getName(), &LG_TIME::instance()));
+                c.insert(make_pair(LG_COPY::instance().getName(), &LG_COPY::instance()));
+                c.insert(make_pair(LG_MOVE::instance().getName(), &LG_MOVE::instance()));
+                c.insert(make_pair(LG_RM::instance().getName(), &LG_RM::instance()));
+                c.insert(make_pair(LG_DVDREAD::instance().getName(), &LG_DVDREAD::instance()));
+                c.insert(make_pair(LG_IPCCTX::instance().getName(), &LG_IPCCTX::instance()));
+                c.insert(make_pair(LG_FCLIP::instance().getName(), &LG_FCLIP::instance()));
+                c.insert(make_pair(LG_DB4::instance().getName(), &LG_DB4::instance()));
+                c.insert(make_pair(LG_GDBM::instance().getName(), &LG_GDBM::instance()));
+                c.insert(make_pair(LG_TDB::instance().getName(), &LG_TDB::instance()));
+                c.insert(make_pair(LG_COMMONDB::instance().getName(), &LG_COMMONDB::instance()));
+                c.insert(make_pair(LG_EET::instance().getName(), &LG_EET::instance()));
+                c.insert(make_pair(LG_FNEWS::instance().getName(), &LG_FNEWS::instance()));
+                c.insert(make_pair(LG_JOURNAL::instance().getName(), &LG_JOURNAL::instance()));
+                c.insert(make_pair(LG_LDAP::instance().getName(), &LG_LDAP::instance()));
+                c.insert(make_pair(LG_EXCEPTIONS::instance().getName(), &LG_EXCEPTIONS::instance()));
+                c.insert(make_pair(LG_FTXLEXI::instance().getName(), &LG_FTXLEXI::instance()));
+                c.insert(make_pair(LG_IDX::instance().getName(), &LG_IDX::instance()));
+                c.insert(make_pair(LG_EAIDX::instance().getName(), &LG_EAIDX::instance()));
+                c.insert(make_pair(LG_IOSTREAM::instance().getName(), &LG_IOSTREAM::instance()));
+                c.insert(make_pair(LG_XML::instance().getName(), &LG_XML::instance()));
+                c.insert(make_pair(LG_DOM::instance().getName(), &LG_DOM::instance()));
+                c.insert(make_pair(LG_EXTFS::instance().getName(), &LG_EXTFS::instance()));
+                c.insert(make_pair(LG_RUNNER::instance().getName(), &LG_RUNNER::instance()));
+                c.insert(make_pair(LG_A52::instance().getName(), &LG_A52::instance()));
+                c.insert(make_pair(LG_MPEG2::instance().getName(), &LG_MPEG2::instance()));
+                c.insert(make_pair(LG_RDF::instance().getName(), &LG_RDF::instance()));
+                c.insert(make_pair(LG_EXIF::instance().getName(), &LG_EXIF::instance()));
+                c.insert(make_pair(LG_CTXREC::instance().getName(), &LG_CTXREC::instance()));
+                c.insert(make_pair(LG_RTIMEPARSE::instance().getName(), &LG_RTIMEPARSE::instance()));
+                c.insert(make_pair(LG_LIBEXTRACTOR::instance().getName(), &LG_LIBEXTRACTOR::instance()));
+                c.insert(make_pair(LG_GPHOTO::instance().getName(), &LG_GPHOTO::instance()));
+                c.insert(make_pair(LG_FCA::instance().getName(), &LG_FCA::instance()));
+                c.insert(make_pair(LG_EVO::instance().getName(), &LG_EVO::instance()));
+                c.insert(make_pair(LG_SAMBA::instance().getName(), &LG_SAMBA::instance()));
+                c.insert(make_pair(LG_PG::instance().getName(), &LG_PG::instance()));
+                c.insert(make_pair(LG_BIBTEX::instance().getName(), &LG_BIBTEX::instance()));
+                c.insert(make_pair(LG_KDE::instance().getName(), &LG_KDE::instance()));
+                c.insert(make_pair(LG_ANNODEX::instance().getName(), &LG_ANNODEX::instance()));
+                c.insert(make_pair(LG_ASTEXT::instance().getName(), &LG_ASTEXT::instance()));
+                c.insert(make_pair(LG_FILEACTIONS::instance().getName(), &LG_FILEACTIONS::instance()));
+                c.insert(make_pair(LG_EMACS::instance().getName(), &LG_EMACS::instance()));
+                c.insert(make_pair(LG_FIREFOX::instance().getName(), &LG_FIREFOX::instance()));
+                c.insert(make_pair(LG_ICONSRV::instance().getName(), &LG_ICONSRV::instance()));
+                c.insert(make_pair(LG_XINE::instance().getName(), &LG_XINE::instance()));
+                c.insert(make_pair(LG_OBBY::instance().getName(), &LG_OBBY::instance()));
+                c.insert(make_pair(LG_XSLTFS::instance().getName(), &LG_XSLTFS::instance()));
+                c.insert(make_pair(LG_RDFATTRCACHE::instance().getName(), &LG_RDFATTRCACHE::instance()));
+                c.insert(make_pair(LG_FFUSE::instance().getName(), &LG_FFUSE::instance()));
+                c.insert(make_pair(LG_BEAGLE::instance().getName(), &LG_BEAGLE::instance()));
+                c.insert(make_pair(LG_GLOB::instance().getName(), &LG_GLOB::instance()));
+                c.insert(make_pair(LG_AMAROK::instance().getName(), &LG_AMAROK::instance()));
+                c.insert(make_pair(LG_XMMS::instance().getName(), &LG_XMMS::instance()));
+                c.insert(make_pair(LG_PRIVATE::instance().getName(), &LG_PRIVATE::instance()));
+                c.insert(make_pair(LG_DBUS::instance().getName(), &LG_DBUS::instance()));
+                c.insert(make_pair(LG_XQILLA::instance().getName(), &LG_XQILLA::instance()));
+                c.insert(make_pair(LG_WEBPHOTO::instance().getName(), &LG_WEBPHOTO::instance()));
+                c.insert(make_pair(LG_FSPOT::instance().getName(), &LG_FSPOT::instance()));
+                c.insert(make_pair(LG_STRIGI::instance().getName(), &LG_STRIGI::instance()));
+                c.insert(make_pair(LG_MDSERV::instance().getName(), &LG_MDSERV::instance()));
+                c.insert(make_pair(LG_VOLMAN::instance().getName(), &LG_VOLMAN::instance()));
+                c.insert(make_pair(LG_HAL::instance().getName(), &LG_HAL::instance()));
+                c.insert(make_pair(LG_EGO::instance().getName(), &LG_EGO::instance()));
+                c.insert(make_pair(LG_BGPROC::instance().getName(), &LG_BGPROC::instance()));
+                c.insert(make_pair(LG_FLAC::instance().getName(), &LG_FLAC::instance()));
+                c.insert(make_pair(LG_OGGZ::instance().getName(), &LG_OGGZ::instance()));
+                c.insert(make_pair(LG_TAGLIB::instance().getName(), &LG_TAGLIB::instance()));
+                c.insert(make_pair(LG_FFIND::instance().getName(), &LG_FFIND::instance()));
+                c.insert(make_pair(LG_QTSQL::instance().getName(), &LG_QTSQL::instance()));
+                c.insert(make_pair(LG_SQLITE::instance().getName(), &LG_SQLITE::instance()));
+                c.insert(make_pair(LG_RECORDFILE::instance().getName(), &LG_RECORDFILE::instance()));
+                c.insert(make_pair(LG_GOOGLE::instance().getName(), &LG_GOOGLE::instance()));
+                c.insert(make_pair(LG_BOXCOM::instance().getName(), &LG_BOXCOM::instance()));
+                c.insert(make_pair(LG_FACEBOOK::instance().getName(), &LG_FACEBOOK::instance()));
+                c.insert(make_pair(LG_VIMEO::instance().getName(), &LG_VIMEO::instance()));
+                c.insert(make_pair(LG_IDENTICA::instance().getName(), &LG_IDENTICA::instance()));
+                c.insert(make_pair(LG_ZONEMINDER::instance().getName(), &LG_ZONEMINDER::instance()));
+                c.insert(make_pair(LG_FERRISREST::instance().getName(), &LG_FERRISREST::instance()));
+                c.insert(make_pair(LG_KIO::instance().getName(), &LG_KIO::instance()));
+                c.insert(make_pair(LG_GDRIVE::instance().getName(), &LG_GDRIVE::instance()));
+                c.insert(make_pair(LG_QIO::instance().getName(), &LG_QIO::instance()));
+                c.insert(make_pair(LG_WEBSERVICE::instance().getName(), &LG_WEBSERVICE::instance()));
+                c.insert(make_pair(LG_GSTREAMER::instance().getName(), &LG_GSTREAMER::instance()));
+                c.insert(make_pair(LG_UPNP::instance().getName(), &LG_UPNP::instance()));
+                c.insert(make_pair(LG_USEROVERLAY::instance().getName(), &LG_USEROVERLAY::instance()));
+                c.insert(make_pair(LG_PLASMA::instance().getName(), &LG_PLASMA::instance()));
+                c.insert(make_pair(LG_SANE::instance().getName(), &LG_SANE::instance()));
+                c.insert(make_pair(LG_PRINTER::instance().getName(), &LG_PRINTER::instance()));
+                c.insert(make_pair(LG_PULSEAUDIO::instance().getName(), &LG_PULSEAUDIO::instance()));
+                c.insert(make_pair(LG_WIKI::instance().getName(), &LG_WIKI::instance()));
+                c.insert(make_pair(LG_SPIRITCONTEXT::instance().getName(), &LG_SPIRITCONTEXT::instance()));
+                c.insert(make_pair(LG_PASTEBIN::instance().getName(), &LG_PASTEBIN::instance()));
+                c.insert(make_pair(LG_LIBMEDIAINFO::instance().getName(), &LG_LIBMEDIAINFO::instance()));
+                c.insert(make_pair(LG_SUBTITLES::instance().getName(), &LG_SUBTITLES::instance()));
+                c.insert(make_pair(LG_FERRISQTGUI::instance().getName(), &LG_FERRISQTGUI::instance()));
             }
             return c;
         }
@@ -893,7 +893,7 @@ namespace Ferris
                     int extraArgInfo = 0;
                     
                     if( !isTrue(
-                            getEDBString( FDB_GENERAL,
+                            getConfigString( GET_FDB_GENERAL(),
                                           SHOW_LOGGING_POPT_OPTIONS_BY_DEFAULT, "0" )))
                     {
                         extraArgInfo |= POPT_ARGFLAG_DOC_HIDDEN;
@@ -946,9 +946,13 @@ namespace Ferris
                 sl.push_back( iter->first );
             }
 
-            typedef Loki::SingletonHolder<PopTableCollector<LogStateBase>,
-            Loki::CreateUsingNew, Loki::NoDestroy > LoggPopt;
-            return LoggPopt::Instance().getTable( Desc, sl );
+            // typedef Loki::SingletonHolder<
+            //     PopTableCollector<LogStateBase>,
+            //     Loki::CreateUsingNew, Loki::NoDestroy > LoggPopt;
+            // return LoggPopt::instance().getTable( Desc, sl );
+
+            typedef FerrisSingletonAlways< PopTableCollector<LogStateBase> > LoggPopt;
+            return LoggPopt::instance().getTable( Desc, sl );
         }
     
 

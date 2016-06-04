@@ -117,7 +117,7 @@ namespace Ferris
     void
     TimeDelayedAction::fired()
     {
-        getFiredSignal().emit();
+        getFiredSignal()();
     }
     
     TimeDelayedAction::FiredSignal_t&

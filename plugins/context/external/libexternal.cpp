@@ -558,7 +558,7 @@ externalContext::getIOStream( ferris_ios::openmode m )
     copy( istreambuf_iterator<char>(filepipe), istreambuf_iterator<char>(),
           ostreambuf_iterator<char>(ss));
 
-    ss.getCloseSig().connect(sigc::mem_fun( *this, &externalContext::writeStream )); 
+    ss.getCloseSig().connect(boost::bind( &externalContext::writeStream, this, _1, _2 )); 
     return ss;
 }
 

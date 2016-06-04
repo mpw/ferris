@@ -77,7 +77,7 @@ namespace Ferris
             DEBUG << "updateColumnNames(getting ea-names-union-view)" << endl;
             addEAToSet( unionset,  getStrAttr( rc, "recommended-ea-union-view", "" ));
             DEBUG << "updateColumnNames(getting fixed additions)" << endl;
-            addEAToSet( unionset,  getEDBString( FDB_GENERAL,
+            addEAToSet( unionset,  getConfigString( FDB_GENERAL,
                                                  CFG_ATTRIBUTES_ALWAYS_IN_UI_MODEL_K,
                                                  CFG_ATTRIBUTES_ALWAYS_IN_UI_MODEL_DEFAULT ));
             unionset.insert( treeicon_pixbuf_cn );

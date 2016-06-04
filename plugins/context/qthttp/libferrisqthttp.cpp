@@ -38,11 +38,6 @@
 #include <Trimming.hh>
 #include <General.hh>
 
-#include <SmartPtr.h>
-#include <Singleton.h>
-#include <Factory.h>
-#include <Functor.h>
-
 #include <string>
 #include <map>
 #include <vector>
@@ -294,7 +289,7 @@ namespace Ferris
             }
         }
 
-        getContextEvent_Headers_Received_Sig().emit( this, strset );
+        getContextEvent_Headers_Received_Sig()( this, strset );
         m_waiter.unblock( reply );
     }
     

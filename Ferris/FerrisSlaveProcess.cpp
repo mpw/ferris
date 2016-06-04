@@ -146,7 +146,8 @@ namespace Ferris
         m_asyncSlave( 0 )
     {
         m_asyncSlave = CreateFerrisSlaveProcess( processName, "" );
-        m_asyncSlave->getChildCompleteSig().connect(  sigc::mem_fun( *this, &_Self::OnAsyncChildComeplete ) );
+        m_asyncSlave->getChildCompleteSig().connect(  boost::bind( &_Self::OnAsyncChildComeplete, this,
+                                                                   _1,_2,_3,_4) );
     }
 
     fh_FerrisSlaveProcess
@@ -213,7 +214,7 @@ namespace Ferris
         m_target( target )
     {
         m_eanamesIter = m_eanames.begin();
-        m_asyncSlave->getMessageArrivedSig().connect( sigc::mem_fun( *this, &_Self::OnAsyncXMLMessage ) );
+        m_asyncSlave->getMessageArrivedSig().connect( boost::bind( &_Self::OnAsyncXMLMessage, this, _1 ) );
     }
 
     BackgroundEAReader::~BackgroundEAReader()
@@ -270,7 +271,7 @@ namespace Ferris
             LG_BGPROC_D << "have eaname:" << eaname << " v:" << v << endl;
 
             bool isError = false;
-            getObtainedEASig().emit( this, eaname, v, isError );
+            getObtainedEASig()( this, eaname, v, isError );
         }
         else if( m.end() != m.find("outofband-error") )
         {
@@ -278,7 +279,7 @@ namespace Ferris
             string eaname = m["eaname"];
             LG_BGPROC_W << "ERROR:" << emsg << endl;
             bool isError = true;
-            getObtainedEASig().emit( this, eaname, emsg, isError );
+            getObtainedEASig()( this, eaname, emsg, isError );
         }
         else
         {
@@ -312,7 +313,8 @@ namespace Ferris
             }
             fh_BackgroundEAReader r = new BackgroundEAReader( target, tmp );
             addIRunnable( r );
-            r->getObtainedEASig().connect( sigc::mem_fun( *this, &_Self::OnChildBackgroundEA ));
+            r->getObtainedEASig().connect( boost::bind( &_Self::OnChildBackgroundEA, this,
+                                                        _1,_2,_3,_4 ));
 
             LG_BGPROC_D << "GroupBackgroundEAReader() eanamessz:" << eanamessz
                        << " numberPerChild:" << numberPerChild
@@ -337,7 +339,7 @@ namespace Ferris
     {
         LG_BGPROC_D << "OnChildBackgroundEA() bgr:" << bgr << " rdn:" << rdn << " v:" << v << endl;
         
-        getObtainedEASig().emit( bgr, rdn, v, isError );
+        getObtainedEASig()( bgr, rdn, v, isError );
     }
     
     

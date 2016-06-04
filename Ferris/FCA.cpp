@@ -72,21 +72,21 @@ extern "C" {
 #endif
 
 
-namespace Loki
-{
-    template
-    <
-        typename T,
-        template <class> class OP,
-        class CP,
-        template <class> class KP,
-        template <class> class SP
-    >
-    inline bool operator<(const SmartPtr<T, OP, CP, KP, SP>& lhs, const ::Ferris::Context* rhs)
-    {
-        return GetImpl(lhs) < rhs;
-    }
-};
+// namespace Loki
+// {
+//     template
+//     <
+//         typename T,
+//         template <class> class OP,
+//         class CP,
+//         template <class> class KP,
+//         template <class> class SP
+//     >
+//     inline bool operator<(const SmartPtr<T, OP, CP, KP, SP>& lhs, const ::Ferris::Context* rhs)
+//     {
+//         return GetImpl(lhs) < rhs;
+//     }
+// };
 
 
 
@@ -4107,9 +4107,6 @@ namespace Ferris
             typedef DatabaseResultSetContext _Self;
 
             typedef stringmap_t m_md_t;
-//            typedef std::hash_map< string, string > m_md_t;
-//            typedef Loki::AssocVector< string, string > m_md_t;
-//            typedef FAssocVector< string, string > m_md_t;
             m_md_t m_md;
 
         protected:

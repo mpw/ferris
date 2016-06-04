@@ -507,6 +507,9 @@
 /* Define to 1 if you have the 'gettimeofday' function. */
 #undef HAVE_GETTIMEOFDAY
 
+/* Used by some of the graphical tools to generate the UI at run time */
+#undef HAVE_GLADE
+
 /* */
 #undef HAVE_GNOMEVFS
 
@@ -566,9 +569,6 @@
 
 /* */
 #undef HAVE_LIBTEXTCAT
-
-/* is the libferrisloki library installed */
-#undef HAVE_LOKI
 
 /* Define to 1 if you have the 'lstat' function. */
 #undef HAVE_LSTAT
@@ -1068,9 +1068,6 @@
 /* Define to 1 if you have the `setenv' function. */
 #undef HAVE_SETENV
 
-/* Is sigc++ installed */
-#undef HAVE_SIGC
-
 /* Is socket++ installed */
 #undef HAVE_SOCKETPP
 
@@ -1085,9 +1082,6 @@
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
-
-/* Is STLPort 4.5+ installed */
-#undef HAVE_STLPORT
 
 /* Define to 1 if you have the 'strdup' function. */
 #undef HAVE_STRDUP
@@ -1286,17 +1280,11 @@
 /* Define to 1 if strerror(0) does not return a message implying success. */
 #undef REPLACE_STRERROR_0
 
-/* */
-#undef SIGCXX_HAS_LESS_THAN_FIVE_SIGNAL_ARGS_AS_MAX
-
 /* Define to 1 if the `S_IS*' macros in <sys/stat.h> do not work properly. */
 #undef STAT_MACROS_BROKEN
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
-
-/* Width of seekable units in iostreams */
-#undef STLPORT_IOSIZE
 
 /* Define to 1 if strerror_r returns char *. */
 #undef STRERROR_R_CHAR_P

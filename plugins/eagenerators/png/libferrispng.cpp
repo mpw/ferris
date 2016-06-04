@@ -55,11 +55,7 @@ class PNG_Image : public Image
     void setupGamma( png_infop info );
 
     bool usingTempRows;
-    typedef Loki::SmartPtr< guint32,
-                            Loki::RefCounted,
-                            Loki::AllowConversion,
-                            Loki::AssertCheck,
-                            FerrisLoki::FerrisExArraySmartPtrStorage > Row_t;
+    typedef boost::shared_ptr< guint32 > Row_t;
     typedef list< Row_t > TempRows_t;
     TempRows_t TempRows;
     

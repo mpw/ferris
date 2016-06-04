@@ -2,11 +2,7 @@ if HAVE_LIBMPEG3
 
 plugindir = $(libdir)/ferris/plugins/eagenerators
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
+INCLUDES = -I$(top_srcdir)/plugins/eagenerators         \
 	@GTK_CFLAGS@                                    \
 	@LIBMPEG3_CFLAGS@                               \
 	@CFLAGS@

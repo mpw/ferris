@@ -1,15 +1,6 @@
 EXTRA_DIST = 
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib                                               \
-	@STLPORT_CFLAGS@                                \
-	@SIGC_CFLAGS@                                   \
-	-I. 						\
-	-I$(srcdir) -I$(top_srcdir) -I$(top_srcdir)/src	\
-	-I$(top_builddir)				\
-        -I$(includedir)                                 \
-	-I/usr/local/include                            \
-	@GLIB_CFLAGS@                                   \
-	@CFLAGS@					\
+INCLUDES = @GLIB_CFLAGS@ @CFLAGS@ \
 	@COMPILE_SYMBOLS_AS_PUBLIC@
 
 noinst_LTLIBRARIES = libferrismg.la

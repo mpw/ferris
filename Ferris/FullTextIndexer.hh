@@ -45,8 +45,6 @@
 
 #include <Ferris/HiddenSymbolSupport.hh>
 
-#include <sigc++/sigc++.h>
-
 #include <Ferris/TypeDecl.hh>
 #include <Ferris/Ferris.hh>
 #include <Ferris/Cache.hh>

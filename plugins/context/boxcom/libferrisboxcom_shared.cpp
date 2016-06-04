@@ -363,10 +363,10 @@ namespace Ferris
     void
     BoxComClient::readAuthTokens()
     {
-        m_accessToken  = getEDBString( FDB_SECURE, "gdrive-access-token",  "" );
-        m_refreshToken = getEDBString( FDB_SECURE, "gdrive-refresh-token", "" );
+        m_accessToken  = getConfigString( FDB_SECURE, "gdrive-access-token",  "" );
+        m_refreshToken = getConfigString( FDB_SECURE, "gdrive-refresh-token", "" );
         m_accessToken_expiretime = toType<time_t>(
-            getEDBString( FDB_SECURE,
+            getConfigString( FDB_SECURE,
                           "gdrive-access-token-expires-timet", "0"));
     }
     
@@ -474,9 +474,9 @@ namespace Ferris
         cerr << "result:" << tostr(ba) << endl;
         stringmap_t sm = JSONToStringMap( tostr(ba) );
         time_t expiretime = Time::getTime() + toint(sm["expires_in"]);
-        setEDBString( FDB_SECURE, "gdrive-access-token",  sm["access_token"]  );
-        setEDBString( FDB_SECURE, "gdrive-refresh-token", sm["refresh_token"] );
-        setEDBString( FDB_SECURE, "gdrive-access-token-expires-timet", tostr(expiretime) );
+        setConfigString( FDB_SECURE, "gdrive-access-token",  sm["access_token"]  );
+        setConfigString( FDB_SECURE, "gdrive-refresh-token", sm["refresh_token"] );
+        setConfigString( FDB_SECURE, "gdrive-access-token-expires-timet", tostr(expiretime) );
         readAuthTokens();
     }
 
@@ -509,8 +509,8 @@ namespace Ferris
         cerr << "ensureAccessTokenFresh() result:" << tostr(ba) << endl;
         stringmap_t sm = JSONToStringMap( tostr(ba) );
         time_t expiretime = Time::getTime() + toint(sm["expires_in"]);
-        setEDBString( FDB_SECURE, "gdrive-access-token",  sm["access_token"]  );
-        setEDBString( FDB_SECURE, "gdrive-access-token-expires-timet", tostr(expiretime) );
+        setConfigString( FDB_SECURE, "gdrive-access-token",  sm["access_token"]  );
+        setConfigString( FDB_SECURE, "gdrive-access-token-expires-timet", tostr(expiretime) );
         readAuthTokens();
         cerr << "ensureAccessTokenFresh(e) m_accessToken:" << m_accessToken << endl;
     }

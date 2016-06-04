@@ -183,7 +183,7 @@ namespace Ferris
                 if( signalWindow > 5 )
                 {
                     signalWindow = 0;
-                    di->getProgressSig().emit( c, attributesDone, totalAttributes );
+                    di->getProgressSig()( c, attributesDone, totalAttributes );
                 }
                 ++attributesDone;
                 ++signalWindow;

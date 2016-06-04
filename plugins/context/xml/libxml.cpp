@@ -55,6 +55,14 @@ using namespace std;
 
 namespace Ferris
 {
+    template < class HT, class OT >
+    HT& Sink( HT& handle, const OT& obj )
+    {
+        HT th( obj );
+        handle = th;
+        return handle;
+    }
+    
     extern "C"
     {
         FERRISEXP_EXPORT fh_context Brew( RootContextFactory* rf )
@@ -123,7 +131,7 @@ namespace Ferris
                     alwaysJournalInitialized = true;
                     alwaysJournal =
                         isTrue(
-                            getEDBString( FDB_GENERAL, "always-journal-xml", "0" ));
+                            getConfigString( FDB_GENERAL, "always-journal-xml", "0" ));
                     LG_XML_D << "always-journal-xml config:" << alwaysJournal << endl;
 
                     if( !alwaysJournal )
@@ -173,7 +181,7 @@ namespace Ferris
                     DOMText* t = getDocument()->createTextNode( X(data.c_str()) );
                     node->appendChild( t );
                 }
-                Emit_Changed( 0, getDirPath(), getDirPath(), 0 );
+                Emit_Changed( 0, getDirPath(), getDirPath() );
             }
         
         virtual void OnOutOfProcContextCreationNotification( const std::string& rdn,
@@ -239,26 +247,19 @@ namespace Ferris
         friend fh_context Brew( RootContextFactory* rf ) throw( RootContextCreationFailed );
         Context* priv_CreateContext( Context* parent, string rdn );
 
-        typedef Loki::SmartPtr< XercesDOMParser,
-                                Loki::DestructiveCopy,
-                                Loki::DisallowConversion,
-                                Loki::AssertCheck,
-                                Loki::DefaultSPStorage > parser_t;
+        // typedef Loki::SmartPtr< XercesDOMParser,
+        //                         Loki::DestructiveCopy,
+        //                         Loki::DisallowConversion,
+        //                         Loki::AssertCheck,
+        //                         Loki::DefaultSPStorage > parser_t;
+        typedef boost::shared_ptr< XercesDOMParser > parser_t;
         parser_t parser;
     
-        typedef Loki::SmartPtr< DOMTreeErrorReporter,
-                                Loki::DestructiveCopy,
-                                Loki::DisallowConversion,
-                                Loki::AssertCheck,
-                                Loki::DefaultSPStorage > ErrorHandler_t;
+        typedef boost::shared_ptr< DOMTreeErrorReporter > ErrorHandler_t;
         ErrorHandler_t ErrorHandler;
     
 
-        typedef Loki::SmartPtr< XMLFormatter,
-                                Loki::DestructiveCopy,
-                                Loki::DisallowConversion,
-                                Loki::AssertCheck,
-                                Loki::DefaultSPStorage > gFormatter_t;
+        typedef boost::shared_ptr< XMLFormatter > gFormatter_t;
         gFormatter_t gFormatter;
     
     
@@ -571,6 +572,9 @@ XMLContext::XMLContext( Context* parent, const std::string& rdn )
     :
     _Base( parent, rdn )
 {
+    if( !parent )
+        setRefCounterToHigh();
+    
     createStateLessAttributes();    
 }
 
@@ -699,7 +703,8 @@ XMLContext::readXML( RootContextFactory* rf )
             Throw_RootContextCreationFailed( tostr(ss), 0 );
         }
 
-        setDocument( parser->adoptDocument() );
+        fh_domdoc dd( parser->adoptDocument() );
+        setDocument( dd );
         doc = getDocument();
         
 //         DOMDocument* parserOwnedDoc = parser->getDocument();
@@ -709,11 +714,7 @@ XMLContext::readXML( RootContextFactory* rf )
     }
     
 //    FerrisHandle<DOMPrintFormatTarget> formatTarget = new DOMPrintFormatTarget();
-    typedef Loki::SmartPtr< DOMPrintFormatTarget,
-              Loki::DestructiveCopy,
-              Loki::DisallowConversion,
-              Loki::AssertCheck,
-              Loki::DefaultSPStorage > DOMPrintFormatTarget_t;
+    typedef boost::shared_ptr< DOMPrintFormatTarget > DOMPrintFormatTarget_t;
     DOMPrintFormatTarget_t formatTarget(new DOMPrintFormatTarget());
     
     
@@ -771,7 +772,7 @@ XMLContext::ensureCreated( const string& rdn, DOMElement* e )
 {
     LG_XML_D << "============ XMLContext::ensureCreated() =========== rdn:" << rdn << endl;
 
-    Util::ValueBumpDrop<ref_count_t> dummy( ref_count );
+    Util::ValueBumpDrop<ref_count_t> dummy( m_ref_counter );
 
     if( !isSubContextBound( rdn ) )
     {

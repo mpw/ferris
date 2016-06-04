@@ -591,8 +591,9 @@ namespace Ferris
 
             
             m_asyncSlave = CreateFerrisSlaveProcess( "ea query", tostr(qss) );
-            m_asyncSlave->getMessageArrivedSig().connect( sigc::mem_fun( *this, &_Self::OnAsyncXMLMessage ) );
-            m_asyncSlave->getChildCompleteSig().connect(  sigc::mem_fun( *this, &_Self::OnAsyncChildComeplete ) );
+            m_asyncSlave->getMessageArrivedSig().connect( boost::bind( &_Self::OnAsyncXMLMessage, this, _1 ) );
+            m_asyncSlave->getChildCompleteSig().connect(  boost::bind( &_Self::OnAsyncChildComeplete, this,
+                                                                       _1,_2,_3,_4 ) );
             fh_runner r = m_asyncSlave->getRunner();
             // This is needed or we might miss the last bit of output
             r->setSpawnFlags( GSpawnFlags( r->getSpawnFlags() & ~(G_SPAWN_DO_NOT_REAP_CHILD)));

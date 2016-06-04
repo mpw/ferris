@@ -13,16 +13,9 @@ mocimpls.cpp: FerrisWebServices_private_moc.cpp FerrisQt_moc_impl.cpp  MetadataS
 # A list of all the files in the current directory which can be regenerated
 MAINTAINERCLEANFILES = Makefile.in
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib                                               \
-	@STLPORT_CFLAGS@                                \
-	-I. 						\
-	-I$(srcdir) -I$(top_srcdir) 			\
-	-I$(top_builddir)				\
-        -I$(includedir)                                 \
+INCLUDES =                                              \
 	-I$(top_srcdir)/plugins/context/                \
-	-I/usr/local/include                            \
 	@GLIB_CFLAGS@                                   \
-	@LOKI_CFLAGS@                                   \
 	@FSTREAM_CFLAGS@                                \
 	-I/usr/local/witme-file-3.35/include            \
 	@FAMPP2_CFLAGS@                                 \
@@ -183,9 +176,9 @@ libferrisocaml_wrap.c: libferrisocaml.i libferris.i
 	cat libferrisocaml_wrap.cpp >>libferrisocaml_wrap.c
 
 libferrisocaml.so: libferrisocaml_wrap.c
-	ocamlc -cc 'g++' -g -c  -ccopt "-I." -ccopt "$(SIGC_CFLAGS)" -ccopt "$(LOKI_CFLAGS)" -ccopt "$(GLIB_CFLAGS)" -ccopt "$(STLDB4_CFLAGS)" -ccopt "$(OPENSSL_CFLAGS)" -ccopt "$(SWIG_OCAML_CFLAGS)" -ccopt -g -ccopt "-xc++ " libferrisocaml_wrap.c
+	ocamlc -cc 'g++' -g -c  -ccopt "-I." -ccopt "$(GLIB_CFLAGS)" -ccopt "$(STLDB4_CFLAGS)" -ccopt "$(OPENSSL_CFLAGS)" -ccopt "$(SWIG_OCAML_CFLAGS)" -ccopt -g -ccopt "-xc++ " libferrisocaml_wrap.c
 	g++ -shared -o libferrisocaml.so libferrisocaml_wrap.o \
-$(SIGC_LIBS) $(LOKI_LIBS) $(GLIB_LIBS) $(STLDB4_LIBS) $(OPENSSL_LIBS)
+ $(GLIB_LIBS) $(STLDB4_LIBS) $(OPENSSL_LIBS)
 	OCAMLRUNPARAM="l=32000000" ocamldlgen \
 			libferrisocaml.ml libferrisocaml.so > libferrisocaml_dynamic.ml
 	mv -f           libferrisocaml_dynamic.ml libferrisocaml.ml
@@ -481,11 +474,9 @@ libferris_la_SOURCES =           \
 libferris_la_LIBADD =            \
 	-lfam -lfampp            \
 	-lcrypto -lssl           \
-	@LOKI_LIBS@              \
 	@FSTREAM_LIBS@           \
 	@XML4C_LIBS@             \
 	@XALAN_LIBS@             \
-	@STLPORT_LIB@            \
 	@DB4_LIBS@               \
 	@GNOMEVFS_LIBS@          \
 	@LIBFILE_LIBS@           \

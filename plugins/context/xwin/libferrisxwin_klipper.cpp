@@ -134,8 +134,7 @@ namespace Ferris
                     ret << qs;
                 }
                 ret->getCloseSig().connect(
-                    sigc::bind(
-                        sigc::mem_fun( *this, &_Self::OnStreamClosed ), m ));
+                    boost::bind( &_Self::OnStreamClosed, this, _1, _2, m ));
                 return ret;
             }
         

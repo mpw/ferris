@@ -177,7 +177,7 @@ namespace Ferris
                     r->setExitStatus( status );
 
                     int estatus = WEXITSTATUS( status );
-                    getChildCompleteSig().emit( this, r, status, estatus );
+                    getChildCompleteSig()( this, r, status, estatus );
 
                     //
                     // Reap the child.
@@ -253,7 +253,7 @@ namespace Ferris
 //             ChildStreamServer::ChildDiedFunctor_t(
 //                 this, &ChildWatcher::child_complete ));
 
-//         getChildCompleteSig().emit( this, r, status, m_childExitStatus, m_childWasCanceled );
+//         getChildCompleteSig()( this, r, status, m_childExitStatus, m_childWasCanceled );
 //     }
 
 //     void

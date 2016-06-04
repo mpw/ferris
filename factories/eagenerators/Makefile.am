@@ -96,12 +96,7 @@ if HAVE_MEDIAINFO
 MEDIAINFO = libferrismediainfoea_factory.cpp
 endif
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I..                                            \
-	-I$(top_srcdir)/plugins/eagenerators 		\
-	-I$(includedir)					\
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/eagenerators -I$(includedir) @CFLAGS@
 
 noinst_LTLIBRARIES = libferriseagenerator_factories.la
 libferriseagenerator_factories_la_SOURCES = \

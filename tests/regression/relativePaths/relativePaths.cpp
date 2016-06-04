@@ -58,7 +58,7 @@ void usage(poptContext optCon, int exitcode, char *error, char *addl)
 
 
 
-class relativePaths : public sigc::trackable
+class relativePaths : public Handlable
 {
     string earl;
     fh_context rctx;

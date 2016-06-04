@@ -123,7 +123,7 @@ namespace Ferris
     {
         typedef VolumeManager _Self;
         bool m_ignorePlugEvents;
-        sigc::connection CreatedConnection;
+        boost::signals2::connection CreatedConnection;
         
 
     protected:
@@ -307,8 +307,10 @@ namespace Ferris
             m_ignorePlugEvents( false )
             {
                 
-                CreatedConnection = volumectx->getNamingEvent_Created_Sig().connect(sigc::mem_fun( *this, &_Self::OnCreated ));
-                usbctx->getNamingEvent_Created_Sig().connect(sigc::mem_fun( *this, &_Self::OnCreated ));
+                CreatedConnection = volumectx->getNamingEvent_Created_Sig().connect(
+                    boost::bind( &_Self::OnCreated, this, _1, _2, _3, _4 ));
+                usbctx->getNamingEvent_Created_Sig().connect(
+                    boost::bind( &_Self::OnCreated, this, _1, _2, _3, _4 ));
                 
             }
         

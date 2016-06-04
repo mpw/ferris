@@ -39,7 +39,6 @@ namespace Ferris
     class FERRISEXP_API NamingEvent
     {
         fh_context source;
-        sigc::trackable* uobj;
         
     protected:
 
@@ -47,62 +46,62 @@ namespace Ferris
     
     public:
     
-        NamingEvent( fh_context _s, sigc::trackable* _uobj );
+        NamingEvent( fh_context _s );
         fh_context getSource();
     };
 
     class FERRISEXP_API NamingEvent_Changed : public NamingEvent
     {
     public:
-        NamingEvent_Changed( fh_context _s, sigc::trackable* _uobj );
+        NamingEvent_Changed( fh_context _s );
     };
 
     class FERRISEXP_API NamingEvent_Deleted : public NamingEvent
     {
     public:
-        NamingEvent_Deleted( fh_context _s, sigc::trackable* _uobj );
+        NamingEvent_Deleted( fh_context _s );
     };
 
     class FERRISEXP_API NamingEvent_Start_Execute : public NamingEvent
     {
     public:
-        NamingEvent_Start_Execute( fh_context _s, sigc::trackable* _uobj );
+        NamingEvent_Start_Execute( fh_context _s );
     };
 
     class FERRISEXP_API NamingEvent_Stop_Execute : public NamingEvent
     {
     public:
-        NamingEvent_Stop_Execute( fh_context _s, sigc::trackable* _uobj );
+        NamingEvent_Stop_Execute( fh_context _s );
     };
     
     class FERRISEXP_API NamingEvent_Created : public NamingEvent
     {
     public:
-        NamingEvent_Created( fh_context _s, sigc::trackable* _uobj );
+        NamingEvent_Created( fh_context _s );
     };
 
     class FERRISEXP_API NamingEvent_Moved : public NamingEvent
     {
     public:
-        NamingEvent_Moved( fh_context _s, sigc::trackable* _uobj );
+        NamingEvent_Moved( fh_context _s );
     };
     
     class FERRISEXP_API NamingEvent_Exists : public NamingEvent
     {
     public:
-        NamingEvent_Exists( fh_context _s, sigc::trackable* _uobj );
+        NamingEvent_Exists( fh_context _s );
     };
     
     class FERRISEXP_API NamingEvent_Start_Reading_Context : public NamingEvent
     {
     public:
-        NamingEvent_Start_Reading_Context( fh_context _s, sigc::trackable* _uobj );
+        NamingEvent_Start_Reading_Context( fh_context _s );
     };
 
     class FERRISEXP_API NamingEvent_Stop_Reading_Context : public NamingEvent
     {
     public:
-        NamingEvent_Stop_Reading_Context( fh_context _s, sigc::trackable* _uobj );
+        NamingEvent_Stop_Reading_Context( fh_context _s );
     };
 
 };

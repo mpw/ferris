@@ -31,7 +31,6 @@
 #include <EAN.hh>
 #include <Attribute_private.hh>
 #include <Runner.hh>
-#include <Singleton.h>
 #include <SignalStreams.hh>
 
 #include <Ferris_private.hh>  // VM debug
@@ -58,17 +57,17 @@ namespace Ferris
 
         if( !m )
         {
-            fh_context rdfdbc = Shell::acquireContext( "~/.ferris/rdfcacheattrs" );
+            fh_context rdfdbc = Shell::acquireContext( getDotFerrisPath() + "rdfcacheattrs" );
             std::string storage_name = getStrSubCtx( rdfdbc, "ferris-storage-name", "" );
 
             string dboptionsDefault = "";
             {
                 stringstream ss;
-                ss << "db-environment-dir='" << Shell::getHomeDirPath() << "/.ferris/rdfcacheattrs/" << "'";
+                ss << "db-environment-dir='" << getDotFerrisPath() << "/rdfcacheattrs/" << "'";
                 dboptionsDefault = tostr(ss);
             }
 
-            m = Model::FromMetadataContext( "~/.ferris/rdfcacheattrs/metadata" );
+            m = Model::FromMetadataContext( getDotFerrisPath() + "rdfcacheattrs/metadata" );
                 
             // if( !storage_name.empty() )
             // {
@@ -190,7 +189,7 @@ namespace Ferris
         if( v )
         {
             v = false;
-            ret = isTrue( getEDBString( FDB_GENERAL,
+            ret = isTrue( getConfigString( FDB_GENERAL,
                                         CFG_RDFCACHE_ATTRS_ENABLED_K,
                                         CFG_RDFCACHE_ATTRS_ENABLED_DEFAULT ) );
         }
@@ -241,12 +240,12 @@ namespace Ferris
                 if( !cptr || cptr[0] == '\0' )
                     return getNullStringPointer();
 
-                cerr << "StaticStringGenerator() sptr:" << cptr << endl;
+//                cerr << "StaticStringGenerator() sptr:" << cptr << endl;
                 
                 m_cache_t::iterator iter = getCache().find( cptr );
                 if( iter == getCache().end() )
                 {
-                    cerr << "StaticStringGenerator() adding:" << cptr << endl;
+//                    cerr << "StaticStringGenerator() adding:" << cptr << endl;
                     iter = getCache().insert( make_pair( cptr, string( cptr ) ) ).first;
                 }
                 return &iter->second;
@@ -325,6 +324,7 @@ namespace Ferris
         :
         theParent( parent )
     {
+//        cerr << "Attribute() this: " << (void*)this << endl;
     }
 
     /**
@@ -332,6 +332,7 @@ namespace Ferris
      */
     Attribute::~Attribute()
     {
+//        cerr << "~Attribute()" << endl;
     }
 
     /**
@@ -1277,16 +1278,19 @@ namespace Ferris
 //                  << endl;
 //             cerr << "EA_Atom_ReadWrite::getIOStream(8)" << endl;
 //             cerr << "EA_Atom_ReadWrite::getIOStream(8) ss.rc:" << ss->rdbuf()->getReferenceCount() << endl;
-            ss->getCloseSig().connect(
-                sigc::bind(
-                    sigc::bind(
-                        sigc::bind(
-                            sigc::mem_fun( *this, &_Self::On_IOStreamClosed),
-                            rdn ),
-                        c ),
-                    m )
-                );
+            // ss->getCloseSig().connect(
+            //     sigc::bind(
+            //         sigc::bind(
+            //             sigc::bind(
+            //                 sigc::mem_fun( *this, &_Self::On_IOStreamClosed),
+            //                 rdn ),
+            //             c ),
+            //         m )
+            //     );
 
+            ss->getCloseSig().connect(
+                boost::bind( &_Self::On_IOStreamClosed, this, _1, _2, m, c, rdn ));
+            
             AdjustForOpenMode_Opening( ss, m );
             return ss;
         }
@@ -1413,8 +1417,8 @@ namespace Ferris
 
     fh_istream
     EA_Atom_ReadWrite_OpenModeCached::getIStream( Context* c,
-                                   const std::string& rdn,
-                                   ferris_ios::openmode m )
+                                                  const std::string& rdn,
+                                                  ferris_ios::openmode m )
         throw (FerrisParentNotSetError,
                CanNotGetStream,
                std::exception)
@@ -1474,11 +1478,11 @@ namespace Ferris
     
     fh_istream
     EA_Atom_Static::getIStream( Context* c,
-                                      const std::string& rdn,
-                                      ferris_ios::openmode m )
-            throw (FerrisParentNotSetError,
-                   CanNotGetStream,
-                   exception)
+                                const std::string& rdn,
+                                ferris_ios::openmode m )
+        throw (FerrisParentNotSetError,
+               CanNotGetStream,
+               exception)
     {
         fh_stringstream ss;
         ss << theValue;
@@ -1593,6 +1597,7 @@ namespace Ferris
         theAttributeName( aName ),
         theContext( c )
     {
+//        cerr << "AttributeProxy() c:" << (void*)GetImpl(c) << " atom:" << (void*)_atom << endl;
         if( !aName.length() || aName == "." )
         {
             theAttributeName = "content";
@@ -1601,7 +1606,27 @@ namespace Ferris
         theParent  = GetImpl( c );
     }
     
+    AttributeProxy::~AttributeProxy()
+    {
+//        cerr << "~AttributeProxy()" << endl;
+    }
 
+    void AttributeProxy::testCLEAN()
+    {
+//        cerr << "AttributeProxy::testCLEAN(TOP) this: " << (void*)this << endl;
+        atom = 0;
+//        cerr << "AttributeProxy::testCLEAN(1) theContext.rc: " << theContext->getReferenceCount() << endl;
+        theContext = 0;
+//        cerr << "AttributeProxy::testCLEAN(2) theParent:" << (void*)theParent << endl;
+        theParent = 0;
+        // cerr << "AttributeProxy::testCLEAN(3)" << endl;
+        // cerr << "AttributeProxy::testCLEAN(4)" << endl;
+        // cerr << "AttributeProxy::testCLEAN(5)" << endl;
+        
+        // cerr << "AttributeProxy::testCLEAN(end)" << endl;
+    }
+    
+    
     
     Handlable::ref_count_t
     AttributeProxy::AddRef()
@@ -1627,7 +1652,7 @@ namespace Ferris
     EA_Atom*
     AttributeProxy::getAttr()
     {
-         EA_Atom* ret = atom;
+        EA_Atom* ret = atom;
         
 //         ret = theContext->getAttributePtr(theAttributeName);
         
@@ -1723,15 +1748,20 @@ namespace Ferris
     ///////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////
 
-    typedef Loki::SingletonHolder<
-        Loki::AssocVector< Loki::TypeInfo,
-                           AttributeCollection::SLAttributes_t* >,
-        Loki::CreateUsingNew, Loki::NoDestroy > StateLessAttrsHolder;
-    
-    typedef Loki::SingletonHolder<
-        AttributeCollection::SLAttributes_t,
-        Loki::CreateUsingNew, Loki::NoDestroy > getStateLessAttrs_NULL_Holder;
+    // typedef Loki::SingletonHolder<
+    //     Loki::AssocVector< Loki::TypeInfo,
+    //                        AttributeCollection::SLAttributes_t* >,
+    //     Loki::CreateUsingNew, Loki::NoDestroy > StateLessAttrsHolder;
+    typedef FerrisSingletonAlways<
+        std::map< boost::typeindex::type_index,
+                  AttributeCollection::SLAttributes_t* > > StateLessAttrsHolder;
 
+    
+    // typedef Loki::SingletonHolder<
+    //     AttributeCollection::SLAttributes_t,
+    //     Loki::CreateUsingNew, Loki::NoDestroy > getStateLessAttrs_NULL_Holder;
+    typedef FerrisSingletonAlways< AttributeCollection::SLAttributes_t > getStateLessAttrs_NULL_Holder;
+    
     typedef FERRIS_STD_HASH_MAP< string, AttributeCollection::SLAttributes_t* > DynamicClassStateLessAttrsHolder_t;
     static DynamicClassStateLessAttrsHolder_t& getDynamicClassStateLessAttrsHolder()
     {
@@ -1743,7 +1773,7 @@ namespace Ferris
 
     AttributeCollection::AttributeCollection()
         :
-        getStateLessAttrs_cache( &getStateLessAttrs_NULL_Holder::Instance() ),
+        getStateLessAttrs_cache( &getStateLessAttrs_NULL_Holder::instance() ),
         getStateLessAttrs_cache_isRAW( true ),
         m_namespaces( 0 ),
         m_RDFCacheMTime( 0 )
@@ -1766,11 +1796,11 @@ namespace Ferris
 //             cerr << "Setting up SL cache"
 //                  << " this:" << dynamic_cast<Context*>(this)
 //                  << " deep:" << getDeepestTypeInfo().name() << endl;
-            SLAttributes_t* newcol = StateLessAttrsHolder::Instance()[ getDeepestTypeInfo() ];
+            SLAttributes_t* newcol = StateLessAttrsHolder::instance()[ getDeepestTypeInfo() ];
             if( !newcol )
             {
                 newcol = new SLAttributes_t();
-                StateLessAttrsHolder::Instance()[ getDeepestTypeInfo() ] = newcol;
+                StateLessAttrsHolder::instance()[ getDeepestTypeInfo() ] = newcol;
             }
             getStateLessAttrs_cache = newcol;
         }
@@ -1817,7 +1847,7 @@ namespace Ferris
     }
 
     
-    Loki::TypeInfo
+    boost::typeindex::type_index
     AttributeCollection::getDeepestTypeInfo()
     {
         TypeInfos_t ti = getTypeInfos();
@@ -1825,7 +1855,7 @@ namespace Ferris
     }
     
     
-    std::list< Loki::TypeInfo >
+    std::list< boost::typeindex::type_index >
     AttributeCollection::getTypeInfos()
     {
         TypeInfos_t TypeInfos;
@@ -1880,7 +1910,12 @@ namespace Ferris
         {
             string rdn_exp = expandEAName( rdn, false );
 //            cerr << "AttributeCollection::getAttribute() making proxy for rdn:" << rdn << endl;
-            return new AttributeProxy( static_cast<Context*>(this), atom, rdn_exp );
+/////            return new AttributeProxy( static_cast<Context*>(this), atom, rdn_exp );
+
+            fh_attribute ret( new AttributeProxy( static_cast<Context*>(this), atom, rdn_exp ));
+            ret->AddRef();
+//            ret->setRefCounterToHigh();
+            return ret;
         }
 
         std::stringstream ss;
@@ -2470,7 +2505,7 @@ namespace Ferris
              static FERRIS_STD_HASH_SET< std::string > col;
              if( col.empty() )
              {
-                 string d = getEDBString( FDB_GENERAL,
+                 string d = getConfigString( FDB_GENERAL,
                                           CFG_RDFCACHE_ATTRS_LIST_K,
                                           CFG_RDFCACHE_ATTRS_LIST_DEFAULT );
                  if( !d.empty() )

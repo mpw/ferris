@@ -10,15 +10,8 @@ CLEANFILES = $(MOC_DEP_SRCS)
 
 plugindir = $(libdir)/ferris/plugins/context
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	@CONTEXT_PLUGIN_CFLAGS@                         \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@QT_CFLAGS@                                     \
-	@QTNETWORK_CFLAGS@                              \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/context \
+	@QT_CFLAGS@ @QTNETWORK_CFLAGS@ @CFLAGS@
 
 plugin_LTLIBRARIES = libferrisqthttp.la libferrisqthttp_factory.la 
 

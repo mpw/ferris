@@ -84,7 +84,7 @@ namespace Ferris
          */
         virtual void fired();
 
-        typedef sigc::signal0< void > FiredSignal_t;
+        typedef boost::signals2::signal< void () > FiredSignal_t;
         FiredSignal_t& getFiredSignal();
 
         /**

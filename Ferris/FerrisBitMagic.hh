@@ -10,7 +10,7 @@
 // Small object allocation, by default both ptr_allocator and block_allocator use this to
 // speed up small allocations.
 //
-#include <FerrisLoki/loki/SmallObj.h>
+//#include <FerrisLoki/loki/SmallObj.h>
 
 
         /********************************************************************************/
@@ -5240,15 +5240,15 @@ class block_allocator
         {
             return 256;
         }
-    static FerrisLoki::FerrisSmallObjAllocator& getAlloc()
-        {
-            static FerrisLoki::FerrisSmallObjAllocator *ret = 0;
-            if( !ret )
-            {
-                ret = new FerrisLoki::FerrisSmallObjAllocator( getSAMaxSz() );
-            }
-            return *ret;
-        }
+    // static FerrisLoki::FerrisSmallObjAllocator& getAlloc()
+    //     {
+    //         static FerrisLoki::FerrisSmallObjAllocator *ret = 0;
+    //         if( !ret )
+    //         {
+    //             ret = new FerrisLoki::FerrisSmallObjAllocator( getSAMaxSz() );
+    //         }
+    //         return *ret;
+    //     }
     
     
 public:
@@ -5260,13 +5260,24 @@ public:
     */
     static FerrisBitMagic::word_t* allocate(size_t n, const void *)
     {
-        if( n < getSAMaxSz() )
-        {
-            return (FerrisBitMagic::word_t*)getAlloc().Allocate( n * sizeof(FerrisBitMagic::word_t) );
-        }
-        
-//        std::cerr << "allocate() n:" << n << std::endl;        
+#ifdef BMSSE2OPT
+# ifdef _MSC_VER
+        return (FerrisBitMagic::word_t*) ::_aligned_malloc(n * sizeof(FerrisBitMagic::word_t), 16);
+#else
+        return (FerrisBitMagic::word_t*) ::_mm_malloc(n * sizeof(FerrisBitMagic::word_t), 16);
+# endif
+
+#else
         return (FerrisBitMagic::word_t*) ::malloc(n * sizeof(FerrisBitMagic::word_t));
+#endif
+        
+//         if( n < getSAMaxSz() )
+//         {
+//             return (FerrisBitMagic::word_t*)getAlloc().Allocate( n * sizeof(FerrisBitMagic::word_t) );
+//         }
+        
+// //        std::cerr << "allocate() n:" << n << std::endl;        
+//         return (FerrisBitMagic::word_t*) ::malloc(n * sizeof(FerrisBitMagic::word_t));
     }
     /**
     The member function frees storage for an array of n FerrisBitMagic::word_t 
@@ -5274,13 +5285,24 @@ public:
     */
     static void deallocate(FerrisBitMagic::word_t* p, size_t n)
     {
-        if( n < getSAMaxSz() )
-        {
-            return getAlloc().Deallocate( p, n * sizeof(FerrisBitMagic::word_t) );
-        }
-        
-//        std::cerr << "deallocate() n:" << n << std::endl;        
+#ifdef BMSSE2OPT
+# ifdef _MSC_VER
+        ::_aligned_free(p);
+#else
+        ::_mm_free(p);
+# endif
+
+#else
         ::free(p);
+#endif
+        
+//         if( n < getSAMaxSz() )
+//         {
+//             return getAlloc().Deallocate( p, n * sizeof(FerrisBitMagic::word_t) );
+//         }
+        
+// //        std::cerr << "deallocate() n:" << n << std::endl;        
+//         ::free(p);
     }
 };
     
@@ -5366,37 +5388,39 @@ class ptr_allocator
         {
             return 256;
         }
-    static FerrisLoki::FerrisSmallObjAllocator& getAlloc()
-        {
-//             static Loki::SmallObjAllocator ret( 2*4096, getSAMaxSz() );
-//             return ret;
-            static FerrisLoki::FerrisSmallObjAllocator* ret = 0;
-            if( !ret )
-            {
-                ret = new FerrisLoki::FerrisSmallObjAllocator( getSAMaxSz() );
-            }
-            return *ret;
-        }
+//     static FerrisLoki::FerrisSmallObjAllocator& getAlloc()
+//         {
+// //             static Loki::SmallObjAllocator ret( 2*4096, getSAMaxSz() );
+// //             return ret;
+//             static FerrisLoki::FerrisSmallObjAllocator* ret = 0;
+//             if( !ret )
+//             {
+//                 ret = new FerrisLoki::FerrisSmallObjAllocator( getSAMaxSz() );
+//             }
+//             return *ret;
+//         }
     
 public:
     static void* allocate(size_t n, const void *)
     {
-        if( n < getSAMaxSz() )
-        {
-            return (FerrisBitMagic::word_t*)getAlloc().Allocate( n * sizeof(void*) );
-        }
+         return ::malloc(n * sizeof(void*));
+        // if( n < getSAMaxSz() )
+        // {
+        //     return (FerrisBitMagic::word_t*)getAlloc().Allocate( n * sizeof(void*) );
+        // }
         
-        return ::malloc(n * sizeof(void*));
+        // return ::malloc(n * sizeof(void*));
     }
 
     static void deallocate(void* p, size_t n)
     {
-        if( n < getSAMaxSz() )
-        {
-            return getAlloc().Deallocate( p, n * sizeof(void*) );
-        }
+         ::free(p);
+        // if( n < getSAMaxSz() )
+        // {
+        //     return getAlloc().Deallocate( p, n * sizeof(void*) );
+        // }
         
-        ::free(p);
+        // ::free(p);
     }
 };
     

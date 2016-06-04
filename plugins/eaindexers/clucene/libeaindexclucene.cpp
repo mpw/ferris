@@ -232,13 +232,15 @@ namespace Ferris
 
             l_IndexWriter m_writer;
             l_IndexWriter getIndexWriter()
+            {
+                if( !m_writer )
                 {
-                    if( !m_writer )
-                    {
-                        m_writer = new IndexWriter( getPath().c_str(), newAnalyzer(), false );
-                    }
-                    return m_writer;
+                    m_writer = l_IndexWriter(
+                        new IndexWriter(
+                            getPath().c_str(), newAnalyzer(), false ));
                 }
+                return m_writer;
+            }
 
             Searcher* m_SearcherFor_isFileNewerThanIndexedVersion;
             Searcher* getSearcherFor_isFileNewerThanIndexedVersion()
@@ -295,7 +297,7 @@ namespace Ferris
 
             
             virtual bool getIndexMethodSupportsIsFileNewerThanIndexedVersion()
-                { return true; }
+            { return true; }
             virtual bool isFileNewerThanIndexedVersion( const fh_context& c );
         };
 
@@ -346,7 +348,7 @@ namespace Ferris
         
         void
         EAIndexerCLucene::CreateIndex( fh_context c,
-                                    fh_context md )
+                                       fh_context md )
         {
         }
         
@@ -472,9 +474,9 @@ namespace Ferris
                             add( doc, attributeName, padInteger( toint( v )) );
                             
                             //  doc->add( 
-                                // *Field::Keyword( (char*)attributeName.c_str(),
-                                //                 padInteger( toint( v )).c_str()
-                                //     ));
+                            // *Field::Keyword( (char*)attributeName.c_str(),
+                            //                 padInteger( toint( v )).c_str()
+                            //     ));
                         }
                         else if( isDouble( att ))
                         {
@@ -638,7 +640,7 @@ namespace Ferris
             fh_attribute orderedtla = q->getAttribute("in-order-insert-list");
             fh_istream   orderedtls = orderedtla->getIStream();
             
-             cerr << "ExecuteQuery() token:" << tokenfc << endl;
+            cerr << "ExecuteQuery() token:" << tokenfc << endl;
 //             cerr << " q.child count:" << q->SubContextCount() << endl;
 
             string s;
@@ -768,9 +770,9 @@ namespace Ferris
                         {
                             string earl = *si;
                             LG_IDX_D << "Adding matching url:" << earl << endl;
-                            l_Term t = newterm( "ferris-url", earl );
-                            l_TermQuery pq = new TermQuery( t );
-                            query->add( pq, false, false, false );
+                            l_Term t( newterm( "ferris-url", earl ));
+                            l_TermQuery pq( new TermQuery( GetImpl(t) ));
+                            query->add( GetImpl(pq), false, false, false );
                         }
                         LG_IDX_D << "Done...." << endl;
                     }
@@ -966,7 +968,7 @@ namespace Ferris
                 LG_EAIDX_D << "ExecuteQuery() building lucene query " << endl;
                 BooleanQuery* outerq = new BooleanQuery();
                 outerq->setMaxClauseCount( 50000 );
-                l_BooleanQuery query = BuildQuery( q, output, qobj, outerq );
+                l_BooleanQuery query( BuildQuery( q, output, qobj, outerq ));
 //             BooleanQuery* query = _CLNEW BooleanQuery();
 //             {
 // //                 Term* t = new Term( "ferris-url", "fdff" );
@@ -1071,12 +1073,12 @@ namespace Ferris
 
 
             
-            l_Term t = newterm( "ferris-url", c->getURL() );
-            l_TermQuery pq = new TermQuery( t );
+            l_Term t( newterm( "ferris-url", c->getURL() ));
+            l_TermQuery pq( new TermQuery( GetImpl(t) ));
 
 //            auto_ptr<Searcher> searcher( new IndexSearcher( getPath().c_str() ) );
             Searcher* searcher = getSearcherFor_isFileNewerThanIndexedVersion();
-            l_Hits hits = searcher->search( pq );
+            l_Hits hits = l_Hits(searcher->search( GetImpl(pq) ));
 
             LG_EAIDX_D << "isFileNewerThanIndexedVersion(T2) c:" << c->getURL() << endl;
             

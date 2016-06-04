@@ -879,7 +879,7 @@ PASinkInfo::priv_setVolume( pa_volume_t v )
                    std::exception)
             {
                 fh_stringstream ret = real_getIOStream( m );
-                ret->getCloseSig().connect( sigc::bind( sigc::mem_fun(*this, &_Self::OnStreamClosed ), m )); 
+                ret->getCloseSig().connect( boost::bind( &_Self::OnStreamClosed, this, _1, _2, m )); 
                 return ret;
             }
         
@@ -979,7 +979,7 @@ PASinkInfo::priv_setVolume( pa_volume_t v )
                    std::exception)
             {
                 fh_stringstream ret = real_getIOStream( m );
-                ret->getCloseSig().connect( sigc::bind( sigc::mem_fun(*this, &_Self::OnStreamClosed ), m )); 
+                ret->getCloseSig().connect( boost::bind( &_Self::OnStreamClosed, this, _1, _2, m )); 
                 return ret;
             }
         

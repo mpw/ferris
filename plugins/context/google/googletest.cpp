@@ -72,6 +72,7 @@ void explore_tree( fh_GoogleClient g, fh_GoogleDocumentFolder f, int indent = 0 
 }
 
 fh_YoutubeUpload u = 0;
+fh_YoutubeUpload u2;
 void OnStreamClosed( fh_istream& ss, std::streamsize tellp )
 {
     cerr << "OnStreamClosed()" << endl;
@@ -109,7 +110,7 @@ int main( int argc, char** argv )
     if( 1 )
     {
         u = g->createYoutubeUpload();
-        u->AddRef();
+        u2 = u;
         
         int ContentLength = 271978;
 //        ContentLength = toint(getStrAttr( inputc, "size", "100" ));
@@ -124,7 +125,7 @@ int main( int argc, char** argv )
             fh_istream  iss = Factory::fcin();
             fh_iostream oss = u->createStreamingUpload( ContentType );
             cerr << "have oss" << endl;
-            oss->getCloseSig().connect( sigc::ptr_fun( &OnStreamClosed ) );
+            oss->getCloseSig().connect( &OnStreamClosed );
             cerr << "connected oss" << endl;
             copy( istreambuf_iterator<char>(iss),
                   istreambuf_iterator<char>(),

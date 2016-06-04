@@ -80,9 +80,6 @@ extern "C" {
 #include <Ferrisls_AggregateData.hh>
 #include <FerrisDOM.hh>
 
-#include <Singleton.h>
-#include <LokiTypeInfo.h>
-
 // user-owner-name //
 #include <grp.h>
 #include <pwd.h>
@@ -160,9 +157,41 @@ using namespace Ferris::RDFCore;
 
 namespace Ferris
 {
-    const string FERRIS_CONFIG_APPS_DIR = "/.ferris/apps.db";
-    const string FERRIS_CONFIG_EVENT_DIR = "/.ferris/eventbind.db";
-    const string FERRIS_CONFIG_MIMEBIND_DIR = "/.ferris/mimebind.db";
+    // const char* getDotFerrisPathCSTR()
+    // {
+    //     static std::string s = getDotFerrisPath();
+    //     return s.c_str();
+    // }
+    
+    
+    std::string getDotFerrisPath()
+    {
+//        return "~/.ferris/";
+        
+        static string ret = "";
+        static bool v = true;
+        if( v )
+        {
+            v = false;
+            ret = Shell::getHomeDirPath_nochecks() + "/.ferris/";
+            char* p = getenv("LIBFERRIS_DOT_FERRIS_PATH");
+            if( p )
+            {
+                ret = p;
+                ret += "/";
+            }
+        }
+        
+        return ret;
+    }
+    std::string getDotFerrisPartialMatchPath()
+    {
+        return "/.ferris/";
+    }
+    
+    const string FERRIS_CONFIG_APPS_DIR =     getDotFerrisPartialMatchPath() + "/apps.db";
+    const string FERRIS_CONFIG_EVENT_DIR =    getDotFerrisPartialMatchPath() + "/eventbind.db";
+    const string FERRIS_CONFIG_MIMEBIND_DIR = getDotFerrisPartialMatchPath() + "/mimebind.db";
 
     const string EANAME_SL_EMBLEM_ID_PREKEY = "emblem:id-";
     const string EANAME_SL_EMBLEM_ID_FUZZY_PREKEY = "emblem:id-fuzzy-";
@@ -199,7 +228,7 @@ namespace Ferris
         {
             v = false;
 
-            string path = Shell::getHomeDirPath() + "/.ferris/use-out-of-process-metadata";
+            string path = getDotFerrisPath() + "/use-out-of-process-metadata";
             int rc = access( path.c_str(), F_OK );
             if( !rc )
             {
@@ -243,7 +272,7 @@ namespace Ferris
     {
         string path = c->getDirPath();
 
-        if( string::npos != path.find( "/.ferris/" ) )
+        if( string::npos != path.find( getDotFerrisPartialMatchPath()))
         {
             if( string::npos != path.find( FERRIS_CONFIG_APPS_DIR ))
             {
@@ -254,16 +283,16 @@ namespace Ferris
             {
                 return "name,ferris-appname,ferris-iconname";
             }
-            else if( string::npos != path.find( "/.ferris/file-clipboard.db/" ))
+            else if( string::npos != path.find( getDotFerrisPartialMatchPath() + "file-clipboard.db/" ))
             {
                 return "name,undo,redo";
             }
-            else if( string::npos != path.find( "/.ferris/file-clipboard.db" ))
+            else if( string::npos != path.find( getDotFerrisPartialMatchPath() + "file-clipboard.db" ))
             {
                 return "name,action,"
                     "commands-use-sloth,commands-use-auto-close,commands-use-extra-options";
             }
-            else if( string::npos != path.find( "/.ferris/schema" ))
+            else if( string::npos != path.find( getDotFerrisPartialMatchPath() + "schema" ))
             {
                 return "name,uname,ferrisenum,ferrisname,possiblesort,defaultsort,defaultvalue,description,uuid";
             }
@@ -293,7 +322,7 @@ namespace Ferris
 
         static stringlist_t autorea =
             Util::parseCommaSeperatedList(
-                getEDBString( FDB_GENERAL,
+                getConfigString( FDB_GENERAL,
                               CFG_ATTRIBUTES_TO_AUTO_REA_K,
                               CFG_ATTRIBUTES_TO_AUTO_REA_DEFAULT ));
         static bool autorea_is_empty = autorea.empty();
@@ -686,14 +715,16 @@ string makeFerrisPluginPath( const std::string& dir, const std::string& libname 
     {
         const std::string MetaIndexClassName = ferristype;
 
-        typedef Loki::Functor< FullTextIndex::MetaFullTextIndexerInterface*, ::Loki::NullType > CreateFunction_t;
+        typedef boost::function< FullTextIndex::MetaFullTextIndexerInterface* () > CreateFunction_t;
 
-        CreateFunction_t f = Loki::BindFirst(
-            Loki::Functor< FullTextIndex::MetaFullTextIndexerInterface*, LOKI_TYPELIST_1( const char* ) >
-            ( &CreateFullTextIndexerGeneric ), libname );
+        // CreateFunction_t f = Loki::BindFirst(
+        //     boost::function< FullTextIndex::MetaFullTextIndexerInterface*( const char* ) >
+        //     ( &CreateFullTextIndexerGeneric ), libname );
+        CreateFunction_t f = boost::bind( &CreateFullTextIndexerGeneric, libname );
+
         
-        bool reged = FullTextIndex::MetaFullTextIndexerInterfaceFactory::Instance().
-            Register( MetaIndexClassName, f );
+        bool reged = FullTextIndex::MetaFullTextIndexerInterfaceFactory::instance()[ MetaIndexClassName ] = f;
+//            Register( MetaIndexClassName, f );
         bool regedx = FullTextIndex::appendToMetaFullTextIndexClassNames( MetaIndexClassName );
     }
     
@@ -730,15 +761,15 @@ string makeFerrisPluginPath( const std::string& dir, const std::string& libname 
     {
         const std::string MetaIndexClassName = ferristype;
 
-        typedef Loki::Functor< EAIndex::MetaEAIndexerInterface*, ::Loki::NullType > CreateFunction_t;
+        typedef boost::function< EAIndex::MetaEAIndexerInterface* () > CreateFunction_t;
 
-        CreateFunction_t f = Loki::BindFirst(
-            Loki::Functor< EAIndex::MetaEAIndexerInterface*, LOKI_TYPELIST_1( const char* ) >
-            ( &CreateEAIndexerGeneric ), libname );
+        // CreateFunction_t f = Loki::BindFirst(
+        //     boost::function< EAIndex::MetaEAIndexerInterface* ( const char* ) >
+        //     ( &CreateEAIndexerGeneric ), libname );
+        CreateFunction_t f = boost::bind( &CreateEAIndexerGeneric, libname );
 
         
-        EAIndex::MetaEAIndexerInterfaceFactory::Instance().
-            Register( MetaIndexClassName, f );
+        EAIndex::MetaEAIndexerInterfaceFactory::instance()[ MetaIndexClassName ] = f;
         EAIndex::appendToMetaEAIndexClassNames( MetaIndexClassName );
     }
     
@@ -1859,8 +1890,8 @@ string makeFerrisPluginPath( const std::string& dir, const std::string& libname 
          */
         fh_context getCreateHistory()
         {
-            string CREATEHISTORY_URL = Shell::getHomeDirPath_nochecks() + CREATEHISTORY_RELATIVE;
-            string dotferrisPath = Shell::getHomeDirPath_nochecks() + "/.ferris";
+            string CREATEHISTORY_URL = CREATEHISTORY_RELATIVE;
+            string dotferrisPath = getDotFerrisPath();
             string dbName = "/cache.db";
             string dbPath = dotferrisPath + dbName;
             
@@ -2289,12 +2320,15 @@ string makeFerrisPluginPath( const std::string& dir, const std::string& libname 
         m_forcePassiveViewCache( false ),
         m_forcePassiveViewCacheIsValid( false ),
         m_holdingReferenceToParentContext( false ),
+        m_forceNoEAGeneratorsForContext( false ),
+        m_forceNoOverMountForEAForContext( false ),
         AggregateData( 0 ),
         m_handlablesToReleaseWithContext( 0 )
     {
         getCacheManager()->addToFreeList( this );
-        getNamingEvent_Stop_Reading_Context_Sig().connect( mem_fun( *this, &Context::ReadDone ));
+        getNamingEvent_Stop_Reading_Context_Sig().connect( boost::bind( &Context::ReadDone, this, boost::arg<1>() ));
 
+//        cerr << "Context() this:" << this << endl;
         LG_CTX_D << "Context() this:" << this << endl;
 
         
@@ -2336,12 +2370,15 @@ string makeFerrisPluginPath( const std::string& dir, const std::string& libname 
         m_forcePassiveViewCache( false ),
         m_forcePassiveViewCacheIsValid( false ),
         m_holdingReferenceToParentContext( false ),
+        m_forceNoEAGeneratorsForContext( false ),
+        m_forceNoOverMountForEAForContext( false ),
         AggregateData( 0 ),
         m_handlablesToReleaseWithContext( 0 )
     {
         getCacheManager()->addToFreeList( this );
-        getNamingEvent_Stop_Reading_Context_Sig().connect(sigc::mem_fun( *this, &Context::ReadDone ));
+        getNamingEvent_Stop_Reading_Context_Sig().connect(boost::bind( &Context::ReadDone, this, boost::arg<1>() ));
 
+//        cerr << "Context() this:" << this << " rdn:" << getDirName() << endl;
         LG_CTX_D << "Context() this:" << this << endl;
 
 //        createStateLessAttributes();
@@ -2358,13 +2395,14 @@ string makeFerrisPluginPath( const std::string& dir, const std::string& libname 
  */
     Context::~Context()
     {
+//        cerr << "~Context() this:" << this << " rdn:" << getDirName() << endl;
         LG_CTX_I << "~Context() this:" << this << " rdn:" << getDirName() << endl;
 //         if( ((string)"schema.xml") == getDirName() )
 //         {
 //             CERR << "~Context() this:" << this << " rdn:" << getDirName() << endl;
 //             CERR << "~Context() cc:" << getCoveredContext() << endl;
 //             CERR << "~Context() omc:" << getOverMountContext() << endl;
-//             CERR << "~Context() ref_count:" << ref_count << endl;
+//             CERR << "~Context() ref_count:" << getReferenceCount() << endl;
 //             CERR << "-- BEGIN DEBUG_dumpcl Context::~Context()--\n";
 //             dumpEntireContextListMemoryManagementData( Factory::fcerr() );
 //             CERR << "-- END DEBUG_dumpMemc Context::~Context()--\n"
@@ -2388,7 +2426,8 @@ string makeFerrisPluginPath( const std::string& dir, const std::string& libname 
             {
                 Handlable* h = *iter;
                 ++iter;
-                h->Release();
+//                h->Release();
+                intrusive_ptr_release(h);
             }
             delete m_handlablesToReleaseWithContext;
         }
@@ -2405,7 +2444,8 @@ string makeFerrisPluginPath( const std::string& dir, const std::string& libname 
         if( !m_handlablesToReleaseWithContext )
             m_handlablesToReleaseWithContext = new m_handlableList_t;
 
-        h->AddRef();
+//        h->AddRef();
+        intrusive_ptr_add_ref( h );
         m_handlablesToReleaseWithContext->push_back( h );
     }
     
@@ -2918,11 +2958,11 @@ string makeFerrisPluginPath( const std::string& dir, const std::string& libname 
             if( created )
             {
 //                DEBUG_dumpcl("created new itemAAA");
-                Emit_Created( 0, ret, rdn, rdn, 0 );
+                Emit_Created( 0, ret, rdn, rdn );
             }
             else
             {
-                Emit_Exists( 0, ret, rdn, rdn, 0 );
+                Emit_Exists( 0, ret, rdn, rdn );
             }
         }
 
@@ -3067,7 +3107,7 @@ string makeFerrisPluginPath( const std::string& dir, const std::string& libname 
          */
         unOverMount_delete( deletedItems, oc );
         OverMountContext_Delegate = 0;
-        oc->ref_count=ImplementationDetail::MAX_REF_COUNT;
+        oc->setRefCounterToHigh();
 ///        Remove( oc );
         Private::CacheManagerImpl* cm = Private::getCacheManagerImpl();
         cm->removeFromFreeList( oc, true );
@@ -3294,7 +3334,7 @@ string makeFerrisPluginPath( const std::string& dir, const std::string& libname 
             const string& rdn = ctx->getDirName();
             LG_CTX_D << " rdn:" << rdn << endl;
             LG_CTX_D << " NumberOfSubContexts:" << NumberOfSubContexts << endl;
-            Emit_Deleted( 0, rdn, rdn, 0 );
+            Emit_Deleted( 0, rdn, rdn );
         }
         
         /*
@@ -3380,7 +3420,7 @@ static bool isSorter( Context* c )
     Context::dumpRefDebugData( fh_ostream ss )
     {
         ss << "C"
-           << " rc:" << ref_count
+           << " rc:" << getReferenceCount()
            << " numSc:" << NumberOfSubContexts
            << " item.sz:" << getItems().size()
            << " claim:" << isReClaimable()
@@ -3431,8 +3471,7 @@ static bool isSorter( Context* c )
 
         sh_t sh = ss.sh;
         sh->getGenericCloseSig().connect(
-            sigc::mem_fun( *selfp,
-                        &Context::StreamIsClosingHandler ));
+            boost::bind( &Context::StreamIsClosingHandler, selfp, boost::arg<1>() ));
     }
 
     /*
@@ -3467,9 +3506,10 @@ static bool isSorter( Context* c )
      * @param h The stream that is being returned to the user.
      */
     void
-    Context::StreamIsClosingHandler( FerrisLoki::Handlable* h )
+    Context::StreamIsClosingHandler( Handlable* h )
     {
-        Release();
+//        Release();
+        intrusive_ptr_release( this );
     }
 
     
@@ -3495,10 +3535,10 @@ static bool isSorter( Context* c )
          * Perform a few assertions just to make sure that the freelist code is working
          * as expected.
          */
-        if( ref_count > getMinimumReferenceCount())
+        if( getReferenceCount() > getMinimumReferenceCount())
         {
             LG_VM_D << "isReClaimable() path:" << getDirPath() << endl
-                      << " ref_count:" << ref_count
+                      << " ref_count:" << getReferenceCount()
                       << " getMinimumReferenceCount():" << getMinimumReferenceCount()
                       << " ref_count > getMinimumReferenceCount()"
                       << endl;
@@ -3541,7 +3581,7 @@ static bool isSorter( Context* c )
                 << " c:"     << toVoid(child)
                 << " path:"   << getDirPath()
                 << " child:" << rdn
-                << " rc:" << child->ref_count
+                << " rc:" << child->getReferenceCount()
                 << endl;
 
         /*
@@ -3565,14 +3605,14 @@ static bool isSorter( Context* c )
                 /*
                  * Chained node is pointing to a non chained node as its parent.
                  */
-//                 cerr << "reclaimobj2A  rc:" << cc->ref_count << endl;
+//                 cerr << "reclaimobj2A  rc:" << cc->getReferenceCount() << endl;
 //                 cerr << "reclaimobj2A rdn:" << cc->getDirName() << endl;
                 Items_t::iterator ci = getItemIter( cc->getDirName() );
 //            iterator ci = find( cc->getDirName() );
 //                cerr << "reclaimobj2B" << endl;
                 if( *ci != cc )
                 {
-//                     cerr << "reclaimobj2C rc:" << cc->ref_count
+//                     cerr << "reclaimobj2C rc:" << cc->getReferenceCount()
 //                          << " SC:" << (dynamic_cast<SortedContext*>(cc)!=0)
 //                          << endl;
 
@@ -3581,10 +3621,10 @@ static bool isSorter( Context* c )
                      */
                     if( dynamic_cast<SortedContext*>( cc ) )
                     {
-                        if( cc->ref_count > 2 )
+                        if( cc->getReferenceCount() > 2 )
                             return false;
                     }
-                    else if( cc->ref_count > 1 )
+                    else if( cc->getReferenceCount() > 1 )
                         return false;
                 
                     /*
@@ -3619,7 +3659,7 @@ static bool isSorter( Context* c )
         
 #ifdef FERRIS_DEBUG_VM
         DEBUG_dumpcl("Context::reclaimContextObject(1)");
-        cerr << "reclaimobj4 parent.rc:" << ref_count << endl;
+        cerr << "reclaimobj4 parent.rc:" << getReferenceCount() << endl;
 #endif
 
         /*
@@ -3629,19 +3669,19 @@ static bool isSorter( Context* c )
                  << " path:" << child->getDirPath() << endl;
 //    dumpOutItems();
 
-        LG_VM_W << "Context::reclaimContextObject(bump) c:" << toVoid(child) << " rc:" << child->ref_count << endl;
+        LG_VM_W << "Context::reclaimContextObject(bump) c:" << toVoid(child) << " rc:" << child->getReferenceCount() << endl;
 
         // Keep a reference to the child so that it is not collected by having a zero rc.
-        child->ref_count+=1000;
+        child->setRefCounterToHigh();
 //         cerr << "reclaimobj4 -- have temp ref" << endl;
-//         cerr << "reclaimobj4.1 parent.rc:" << ref_count << endl;
+//         cerr << "reclaimobj4.1 parent.rc:" << getReferenceCount() << endl;
 //         cerr << "reclaimobj4.1 this:" << toVoid(this) << " child:" << toVoid(child)  << endl;
         Remove( child, false );
-//         cerr << "reclaimobj4.2 parent.rc:" << ref_count << endl;
+//         cerr << "reclaimobj4.2 parent.rc:" << getReferenceCount() << endl;
         // The context still exists, so we keep knowing about it.
         // thus we must counter the decrement done in Remove().
         ++NumberOfSubContexts;
-//         cerr << "reclaimobj5 parent.rc:" << ref_count << endl;
+//         cerr << "reclaimobj5 parent.rc:" << getReferenceCount() << endl;
 
         LG_VM_D << "About to delete child:" << rdn << endl;
 
@@ -3714,7 +3754,7 @@ static bool isSorter( Context* c )
 //                  fh_context ret = priv_getSubContext( rdn );
                     fh_context ret = *subc_iter;
                     ret->setHasBeenDeleted( false );
-                    Emit_Exists( 0, ret, rdn, rdn, 0 );
+                    Emit_Exists( 0, ret, rdn, rdn );
                     return ret;
                 }
             }
@@ -4352,7 +4392,7 @@ Context::getRelativeContext(
 //         {
 //             Context* c = GetImpl(*iter);
 
-//             cerr << "Context::clearContext() rc:" << c->ref_count
+//             cerr << "Context::clearContext() rc:" << c->getReferenceCount()
 //                  << " getURL():" << c->getURL()
 //                  << endl;
 //             getCacheManager()->removeFromFreeList( c );
@@ -4374,7 +4414,7 @@ void
 Context::Emit_MedallionUpdated()
 {
     LG_CTX_D << "Context::Emit_MedallionUpdated() c:" << getURL() << endl;
-    getNamingEvent_MedallionUpdated_Sig().emit( ThisContext() );
+    getNamingEvent_MedallionUpdated_Sig()( ThisContext() );
 }
 
 
@@ -4392,13 +4432,12 @@ Context::Emit_MedallionUpdated()
  *                  supplied data
  */
     void
-    Context::Emit_Changed( NamingEvent_Changed* e,
-                           const string& olddn, const string& newdn, sigc::trackable* ExtraData )
+    Context::Emit_Changed( NamingEvent_Changed* e, const string& olddn, const string& newdn )
     {
         LG_CTX_D << "--- Context::Emit_Changed() newdn:" << newdn << " path:" << getDirPath() << endl;
 
-        NamingEvent_Changed ev( ThisContext(), ExtraData );
-        getNamingEvent_Changed_Sig().emit( &ev, olddn, newdn );
+        NamingEvent_Changed ev( ThisContext() );
+        getNamingEvent_Changed_Sig()( &ev, olddn, newdn );
     }
 
 
@@ -4416,10 +4455,10 @@ Context::Emit_MedallionUpdated()
  */
     void
     Context::Emit_Deleted( NamingEvent_Deleted* e,
-                           string olddn, string newdn, sigc::trackable* ExtraData )
+                           string olddn, string newdn )
     {
-        NamingEvent_Deleted ev( ThisContext(), ExtraData );
-        getNamingEvent_Deleted_Sig().emit( &ev, olddn, newdn );
+        NamingEvent_Deleted ev( ThisContext() );
+        getNamingEvent_Deleted_Sig()( &ev, olddn, newdn );
     }
 
 /**
@@ -4436,10 +4475,10 @@ Context::Emit_MedallionUpdated()
  */
     void
     Context::Emit_Start_Execute( NamingEvent_Start_Execute* e,
-                                 string olddn, string newdn, sigc::trackable* ExtraData )
+                                 string olddn, string newdn )
     {
-        NamingEvent_Start_Execute ev( ThisContext(), ExtraData );
-        getNamingEvent_Start_Execute_Sig().emit( &ev, olddn, newdn );
+        NamingEvent_Start_Execute ev( ThisContext() );
+        getNamingEvent_Start_Execute_Sig()( &ev, olddn, newdn );
     }
 
 
@@ -4457,10 +4496,10 @@ Context::Emit_MedallionUpdated()
  */
     void
     Context::Emit_Stop_Execute( NamingEvent_Stop_Execute* e,
-                                string olddn, string newdn, sigc::trackable* ExtraData )
+                                string olddn, string newdn )
     {
-        NamingEvent_Stop_Execute ev( ThisContext(), ExtraData );
-        getNamingEvent_Stop_Execute_Sig().emit( &ev, olddn, newdn );
+        NamingEvent_Stop_Execute ev( ThisContext() );
+        getNamingEvent_Stop_Execute_Sig()( &ev, olddn, newdn );
     }
 
 
@@ -4479,14 +4518,14 @@ Context::Emit_MedallionUpdated()
     void
     Context::Emit_Created( NamingEvent_Created* e,
                            const fh_context& newc,
-                           string olddn, string newdn, sigc::trackable* ExtraData )
+                           string olddn, string newdn )
     {
         LG_CTX_D << "Context::Emit_Created() rdn:" << olddn << endl;
         if( isBound( newc ) )
             LG_CTX_D << "Context::Emit_Created() c:" << toVoid(GetImpl(newc)) << endl;
 
-        NamingEvent_Created ev( ThisContext(), ExtraData );
-        getNamingEvent_Created_Sig().emit( &ev, newc, olddn, newdn );
+        NamingEvent_Created ev( ThisContext() );
+        getNamingEvent_Created_Sig()( &ev, newc, olddn, newdn );
     }
 
 
@@ -4503,11 +4542,10 @@ Context::Emit_MedallionUpdated()
  *                  supplied data
  */
     void
-    Context::Emit_Moved( NamingEvent_Moved* e,
-                         string olddn, string newdn, sigc::trackable* ExtraData )
+    Context::Emit_Moved( NamingEvent_Moved* e, string olddn, string newdn )
     {
-        NamingEvent_Moved ev( ThisContext(), ExtraData );
-        getNamingEvent_Moved_Sig().emit( &ev, olddn, newdn );
+        NamingEvent_Moved ev( ThisContext() );
+        getNamingEvent_Moved_Sig()( &ev, olddn, newdn );
     }
 
     fh_context
@@ -4530,15 +4568,13 @@ Context::Emit_MedallionUpdated()
  *                  supplied data
  */
     void
-    Context::Emit_Exists( NamingEvent_Exists* e,
-                          const fh_context& newc,
-                          string olddn, string newdn, sigc::trackable* ExtraData )
+    Context::Emit_Exists( NamingEvent_Exists* e, const fh_context& newc, string olddn, string newdn )
     {
         LG_CTX_D << "Emit_Exists for path:" << getDirPath() 
                  << " olddn:" << olddn << endl;
 
-        NamingEvent_Exists ev( ThisContext(), ExtraData );
-        getNamingEvent_Exists_Sig().emit( &ev, newc, olddn, newdn );
+        NamingEvent_Exists ev( ThisContext() );
+        getNamingEvent_Exists_Sig()( &ev, newc, olddn, newdn );
     }
 
 
@@ -4555,11 +4591,10 @@ Context::Emit_MedallionUpdated()
  *                  supplied data
  */
     void
-    Context::Emit_Start_Reading_Context( NamingEvent_Start_Reading_Context* e,
-                                         sigc::trackable* ExtraData )
+    Context::Emit_Start_Reading_Context( NamingEvent_Start_Reading_Context* e )
     {
-        NamingEvent_Start_Reading_Context ev( ThisContext(), ExtraData );
-        getNamingEvent_Start_Reading_Context_Sig().emit( &ev );
+        NamingEvent_Start_Reading_Context ev( ThisContext() );
+        getNamingEvent_Start_Reading_Context_Sig()( &ev );
     }
 
 
@@ -4576,11 +4611,10 @@ Context::Emit_MedallionUpdated()
  *                  supplied data
  */
 void
-Context::Emit_Stop_Reading_Context( NamingEvent_Stop_Reading_Context* e,
-                                    sigc::trackable* ExtraData )
+Context::Emit_Stop_Reading_Context( NamingEvent_Stop_Reading_Context* e )
 {
-    NamingEvent_Stop_Reading_Context ev( ThisContext(), ExtraData );
-    getNamingEvent_Stop_Reading_Context_Sig().emit( &ev );
+    NamingEvent_Stop_Reading_Context ev( ThisContext() );
+    getNamingEvent_Stop_Reading_Context_Sig()( &ev );
 }
 
 
@@ -4702,7 +4736,7 @@ Context::getContextEvent_Headers_Received_Sig()
             if( !getCacheManager()->insideCleanupCall() )
             {
                 LG_CTX_D << "emit_changed... getDirPath()" << getDirPath() << endl;
-                Emit_Changed( 0, getDirPath(), getDirPath(), 0 );
+                Emit_Changed( 0, getDirPath(), getDirPath() );
             }
         }
     }
@@ -4834,7 +4868,7 @@ Context::getContextEvent_Headers_Received_Sig()
     {
         if( !FiredStartReading )
         {
-            Emit_Start_Reading_Context( 0, 0 );
+            Emit_Start_Reading_Context( 0 );
             FiredStartReading = 1;
         }
     }
@@ -4850,7 +4884,7 @@ Context::getContextEvent_Headers_Received_Sig()
     {
         if( FiredStartReading )
         {
-            Emit_Stop_Reading_Context( 0, 0 );
+            Emit_Stop_Reading_Context( 0 );
             ClearStartReadingFlag();
         }
     }
@@ -4976,6 +5010,7 @@ Context::tryToOverMount( bool silentIgnore, bool attemptingOverMountOnlyToFindEA
                    << " isBound(OverMountContext_Delegate):" << isBound(OverMountContext_Delegate)
                    << " isBound( CoveredContext ):" << isBound( CoveredContext )
                    << endl;
+
     
     
     //
@@ -5116,7 +5151,7 @@ Context::readOverMount()
         c->HaveReadDir=1;
         LG_CTX_D << "Context::readOverMount() set haveReadDir to true url:" << getURL() << endl;
     
-        c->getNamingEvent_Stop_Reading_Context_Sig().connect(sigc::mem_fun( *this, &Context::ReadDone ));
+        c->getNamingEvent_Stop_Reading_Context_Sig().connect(boost::bind( &Context::ReadDone, this, boost::arg<1>() ));
         getOverMountContext()->priv_read();
         while(ReadingDir)
         {
@@ -5328,7 +5363,7 @@ Context::OnReadComplete_setupUserOverlayLinks()
 
         try
         {
-            fh_context r = Resolve("~/.ferris/user-overlay-links.xml/user-overlay-links");
+            fh_context r = Resolve(getDotFerrisPath() + "user-overlay-links.xml/user-overlay-links");
             fh_context byRegex = r->getSubContext("link-by-regex");
 
             for( Context::iterator ci = byRegex->begin(); ci != byRegex->end(); ++ci )
@@ -5380,7 +5415,7 @@ Context::OnReadComplete_setupUserOverlayLinks()
                 {
                     fh_context ret = *subc_iter;
                     ret->setHasBeenDeleted( false );
-                    Emit_Exists( 0, ret, rdn, rdn, 0 );
+                    Emit_Exists( 0, ret, rdn, rdn );
                 }
                 else
                 {
@@ -5533,7 +5568,7 @@ Context::OnReadComplete_setupUserOverlayLinks()
 //                      << (*iter)->getDirName() << endl;
                 if( !(*iter)->HasBeenDeleted )
                 {
-                    Emit_Exists( 0, *iter, (*iter)->getDirName(), (*iter)->getDirName(), 0 );
+                    Emit_Exists( 0, *iter, (*iter)->getDirName(), (*iter)->getDirName() );
                 }
             }
         }
@@ -5573,21 +5608,21 @@ Context::OnReadComplete_setupUserOverlayLinks()
     Handlable::ref_count_t
     Context::AddRef()
     {
-        if( ref_count >= ImplementationDetail::MAX_REF_COUNT )
-            return ref_count;
+        if( getReferenceCount() >= ImplementationDetail::MAX_REF_COUNT )
+            return getReferenceCount();
         
-//     LG_CTX_D << "Context::add_ref() ref_count:" << ref_count << " path:" << getDirPath() << endl;
-//         cerr << "Context::add_ref() rc:" << ref_count << " c:" << toVoid(this)
+//     LG_CTX_D << "Context::add_ref() ref_count:" << getReferenceCount() << " path:" << getDirPath() << endl;
+//         cerr << "Context::add_ref() rc:" << getReferenceCount() << " c:" << toVoid(this)
 //              << " mc:" << getMinimumReferenceCount() << endl;
 
-//         CERR << "Context::AddRef() this:" << (void*)this << " rdn:" << getDirName() << " rc:" << ref_count << endl;
+//         CERR << "Context::AddRef() this:" << (void*)this << " rdn:" << getDirName() << " rc:" << getReferenceCount() << endl;
 
         if( Private::haveAnyContextReferenceWatches() )
         {
             if( Private::getContextReferenceWatches().count( this ) )
             {
                 cerr << "Context::AddRef()   c:" << toVoid(this)
-                     << " rc:" << ref_count 
+                     << " rc:" << getReferenceCount() 
                      << " mc:" << getMinimumReferenceCount()
                      << endl;
             }
@@ -5597,7 +5632,7 @@ Context::OnReadComplete_setupUserOverlayLinks()
             Private::getContextReferenceWatchesByName().count( getDirName() ) )
         {
             cerr << "Context::AddRef(n)  c:" << toVoid(this)
-                 << " rc:" << ref_count 
+                 << " rc:" << getReferenceCount() 
                  << " mc:" << getMinimumReferenceCount()
                  << endl;
             BackTrace();
@@ -5607,16 +5642,16 @@ Context::OnReadComplete_setupUserOverlayLinks()
             if( isParentBound() && Private::getContextParentReferenceWatches().count( getParent() ) )
             {
                 cerr << "Context::AddRef(P)  c:" << toVoid(this)
-                     << " rc:" << ref_count 
+                     << " rc:" << getReferenceCount() 
                      << " mc:" << getMinimumReferenceCount()
                      << endl;
             }
         }
         
-        if( ref_count == getMinimumReferenceCount() )
+        if( getReferenceCount() == getMinimumReferenceCount() )
         {
 //             LG_VM_D << "Context::add_ref() ref_count == getMinimumReferenceCount() "
-//                     << " ref_count:" << ref_count
+//                     << " ref_count:" << getReferenceCount()
 //                     << " min:" << getMinimumReferenceCount()
 // //                    << " p:" << getDirPath()
 //                     << " dirname:" << getDirName()
@@ -5625,7 +5660,7 @@ Context::OnReadComplete_setupUserOverlayLinks()
 
 //             cerr << "Context::AddRef () PROPERGATE UPWARD for c:" << toVoid(this)
 //                  << " p:" << getDirPath()
-//                  << " rc:" << ref_count
+//                  << " rc:" << getReferenceCount()
 //                  << " minRC:" << getMinimumReferenceCount()
 //                  << endl;
 
@@ -5660,13 +5695,13 @@ Context::OnReadComplete_setupUserOverlayLinks()
     Handlable::ref_count_t
     Context::Release()
     {
-//    LG_CTX_D << "Context::rem_ref() rc:" << ref_count << " p:" << getDirPath() << endl;
-//         cerr << "Context::rem_ref() rc:" << ref_count << " c:" << toVoid(this)
+//    LG_CTX_D << "Context::rem_ref() rc:" << getReferenceCount() << " p:" << getDirPath() << endl;
+//         cerr << "Context::rem_ref() rc:" << getReferenceCount() << " c:" << toVoid(this)
 //              << " mc:" << getMinimumReferenceCount() << endl;
 
 
-        if( ref_count >= ImplementationDetail::MAX_REF_COUNT )
-            return ref_count;
+        if( getReferenceCount() >= ImplementationDetail::MAX_REF_COUNT )
+            return getReferenceCount();
             
         ref_count_t ret = Handlable::Release();
 
@@ -5675,7 +5710,7 @@ Context::OnReadComplete_setupUserOverlayLinks()
             if( Private::getContextReferenceWatches().count( this ) )
             {
                 cerr << "Context::Release()  c:" << toVoid(this)
-                     << " rc:" << ref_count 
+                     << " rc:" << getReferenceCount() 
                      << " mc:" << getMinimumReferenceCount()
                      << endl;
             }
@@ -5684,7 +5719,7 @@ Context::OnReadComplete_setupUserOverlayLinks()
             && Private::getContextReferenceWatchesByName().count( getDirName() ) )
         {
             cerr << "Context::Release(n) c:" << toVoid(this)
-                 << " rc:" << ref_count 
+                 << " rc:" << getReferenceCount() 
                  << " mc:" << getMinimumReferenceCount()
                  << endl;
             BackTrace();
@@ -5693,7 +5728,7 @@ Context::OnReadComplete_setupUserOverlayLinks()
             && isParentBound() && Private::getContextReferenceWatches().count( getParent() ) )
         {
             cerr << "Context::Release(P) c:" << toVoid(this)
-                 << " rc:" << ref_count 
+                 << " rc:" << getReferenceCount() 
                  << " mc:" << getMinimumReferenceCount()
                  << endl;
 //            BackTrace();
@@ -5708,7 +5743,7 @@ Context::OnReadComplete_setupUserOverlayLinks()
                 {
 //                     cerr << "Context::Release() PROPERGATE UPWARD for c:" << toVoid(this)
 //                          << " p:" << getDirPath()
-//                          << " rc:" << ref_count
+//                          << " rc:" << getReferenceCount()
 //                          << " ret:" << ret
 //                          << " minRC:" << getMinimumReferenceCount()
 //                          << endl;
@@ -5727,7 +5762,7 @@ Context::OnReadComplete_setupUserOverlayLinks()
                         p->Release();
                         m_holdingReferenceToParentContext = false;
                         
-//                        if( p->ref_count > p->getMinimumReferenceCount() )
+//                        if( p->getReferenceCount() > p->getMinimumReferenceCount() )
 //                              p->Release();
                     }
 
@@ -5742,7 +5777,7 @@ Context::OnReadComplete_setupUserOverlayLinks()
 //                         if( isParentBound() && Private::getContextReferenceWatches().count( getParent() ) )
 //                             cerr << "Context::Release(q) c:" << toVoid(this) << " Chaining up..." << endl;
                         
-//                         if( p->ref_count > p->getMinimumReferenceCount() )
+//                         if( p->getReferenceCount() > p->getMinimumReferenceCount() )
 //                               p->Release();
 //                     }
                     
@@ -5752,19 +5787,19 @@ Context::OnReadComplete_setupUserOverlayLinks()
         catch( exception& e )
         {
             // Dead Reference Detected (maybe)
-//             cerr << "Context::Release() rc:" << ref_count
+//             cerr << "Context::Release() rc:" << getReferenceCount()
 //                  << " e:" << e.what()
 //                  << endl;
-            LG_VM_W << "Context::Release() rc:" << ref_count
+            LG_VM_W << "Context::Release() rc:" << getReferenceCount()
                     << " e:" << e.what()
                     << endl;
         }
         catch( ... )
         {
-//             cerr << "Context::Release() rc:" << ref_count
+//             cerr << "Context::Release() rc:" << getReferenceCount()
 //                  << " e ... " 
 //                  << endl;
-            LG_VM_W << "Context::Release() rc:" << ref_count
+            LG_VM_W << "Context::Release() rc:" << getReferenceCount()
                     << " e ... " 
                     << endl;
         }
@@ -5773,7 +5808,7 @@ Context::OnReadComplete_setupUserOverlayLinks()
         
     
 //     LG_VM_D << "Context::rem_ref() path:" << getDirPath()
-//          << " rc:" << ref_count
+//          << " rc:" << getReferenceCount()
 //          << " attr_created:" << AttributesHaveBeenCreated
 //          << " attr_count:" << getAttributeCount()
 //          << endl;
@@ -5786,7 +5821,7 @@ Context::OnReadComplete_setupUserOverlayLinks()
 //     if( !AttributesHaveBeenCreated )
 //         Handlable::rem_ref();
     
-//     if( ref_count > getAttributeCount())
+//     if( getReferenceCount() > getAttributeCount())
 //         Handlable::rem_ref();
 
         return ret > 0 ? ret : 1;
@@ -6935,7 +6970,7 @@ SL_getSizeMediaCountStream( Context* c, const std::string& rdn, EA_Atom* atom )
         szss >> s;
     }
 
-    double MediaSize = toType<double>( getEDBString(
+    double MediaSize = toType<double>( getConfigString(
                                            FDB_GENERAL,
                                            MediaSizeKey,
                                            MediaSizeDefault ));
@@ -7796,7 +7831,7 @@ Context::getAsRDFXML( fh_stringstream& ss )
         fh_context ret = parent_newc->priv_readSubContext( rdn, false, true );
         parent_newc->SubContextNamesCacheIsValid = false;
         parent_newc->bumpVersion();
-        Emit_Moved( 0, oldrdn, newPath, 0 );
+        Emit_Moved( 0, oldrdn, newPath );
         
         /* delete child */
         eraseItemByName( getItems(), oldrdn );
@@ -8017,7 +8052,7 @@ Context::getAsRDFXML( fh_stringstream& ss )
             }
         }
 
-        if( string::npos != path.find( "/.ferris/apps.db" ))
+        if( string::npos != path.find( getDotFerrisPartialMatchPath() + "apps.db" ))
         {
             return "desktop/application";
         }
@@ -8072,7 +8107,7 @@ Context::getForcePassiveView()
     if( v() )
     {
         stringlist_t sl;
-        string d = getEDBString( FDB_GENERAL, CFG_FORCE_PASSIVE_VIEW_K, CFG_FORCE_PASSIVE_VIEW_DEFAULT );
+        string d = getConfigString( FDB_GENERAL, CFG_FORCE_PASSIVE_VIEW_K, CFG_FORCE_PASSIVE_VIEW_DEFAULT );
         if( d.empty() )
         {
             haveRegex = false;
@@ -8830,8 +8865,7 @@ SL_getExtentsBranch( Context* c, const std::string& rdn, EA_Atom* atom )
             && !isAttributeBound( attr, false ) )
         {
             LG_NATIVE_D << "Adding is-broken-link" << endl;
-            addAttribute( attr, this,
-                          &Context::getFerrisIsBrokenLinkStream,
+            addAttribute( attr, this, &Context::getFerrisIsBrokenLinkStream,
                           XSD_BASIC_BOOL, false );
         }
         
@@ -9334,15 +9368,24 @@ Context::createStateLessAttributes( bool force )
             for( digestNames_t::iterator iter = digestNames.begin();
                  iter != digestNames.end(); ++iter )
             {
+                // ContextClass_SLEA(
+                //     *iter,
+                //     Loki::BindFirst(
+                //         Loki::Functor<fh_istream, LOKI_TYPELIST_4( string,
+                //                                               Context*,
+                //                                               const std::string&,
+                //                                               EA_Atom* ) >
+                //         (SL_getDigestStream), *iter ),
+                //     FXD_DIGEST );
+
                 ContextClass_SLEA(
                     *iter,
-                    Loki::BindFirst(
-                        Loki::Functor<fh_istream, LOKI_TYPELIST_4( string,
-                                                              Context*,
-                                                              const std::string&,
-                                                              EA_Atom* ) >
-                        (SL_getDigestStream), *iter ),
+                    boost::bind( SL_getDigestStream, *iter,
+                                 boost::lambda::_1,
+                                 boost::lambda::_2,
+                                 boost::lambda::_3 ),
                     FXD_DIGEST );
+                
             }
 
 #ifdef FERRIS_HAVE_LIBZ
@@ -9383,13 +9426,13 @@ Context::createStateLessAttributes( bool force )
 //                     createStateLessAttributesForEmblem( em );
 //                 }
                 et->visitAllEmblems(
-                    Etagere::f_emblemVisitor( this, &_Self::createStateLessAttributesForEmblem ) );
+                    Etagere::f_emblemVisitor( boost::bind( &_Self::createStateLessAttributesForEmblem, this, boost::arg<1>() ) ) );
             }
             catch( exception& e )
             {
                 LG_CTX_W << "Problem adding stateless ea for emblems:" << e.what() << endl;
             }
-            et->getEmblemCreated_Sig().connect( sigc::mem_fun( *this, &_Self::OnEmblemCreated ));
+            et->getEmblemCreated_Sig().connect( boost::bind( &_Self::OnEmblemCreated, this, boost::arg<1>(), boost::arg<2>()  ));
 
             ContextClass_SLEA( "emblem:list",    &_Self::SL_getEmblemListAll,     FXD_STRINGLIST );
             ContextClass_SLEA( "emblem:list-ui", &_Self::SL_getEmblemListDefault, FXD_STRINGLIST );
@@ -9858,64 +9901,69 @@ Context::supplementStateLessAttributes( bool force )
 
 //        cerr << "Context::priv_createAttributes() url:" << getURL() << endl;
 //        BackTrace();
-        
-        /*
-         * FIXME: should really cache this.
-         */
-        for( int Pri = AttributeCreator::CREATE_PRI_MAX_INTERNAL_USE_ONLY; Pri >= 0; --Pri )
+
+        if( !m_forceNoEAGeneratorsForContext )
         {
-//             for( EAGenFactorys_t::const_iterator iter = getEAGenFactorys().begin();
-//                  iter != getEAGenFactorys().end(); iter++ )
-            ensureEAGenFactorysSetup();
-            EAGenFactorys_iterator iterend = EAGenFactorys_iterator( this, true );
-            for( EAGenFactorys_iterator iter = EAGenFactorys_iterator( this );
-                 iter != iterend; ++iter )
+            
+            /*
+             * FIXME: should really cache this.
+             */
+            for( int Pri = AttributeCreator::CREATE_PRI_MAX_INTERNAL_USE_ONLY; Pri >= 0; --Pri )
             {
-                
-                LG_CTX_D << "Context::priv_createAttributes() "
-                         << " path:" << getDirPath()
-                         << " pri:" << (*iter)->getCreatePriority()
-                         << endl;
-                
-                if( (*iter)->getCreatePriority() == Pri )
+                ensureEAGenFactorysSetup();
+                EAGenFactorys_iterator iterend = EAGenFactorys_iterator( this, true );
+                for( EAGenFactorys_iterator iter = EAGenFactorys_iterator( this );
+                     iter != iterend; ++iter )
                 {
-                    if( LIBFERRIS_DISABLE_EAGEN_KDE || LIBFERRIS_DISABLE_EAGEN_RDF )
+                
+                    LG_CTX_D << "Context::priv_createAttributes() "
+                             << " this:" << (void*)this
+                             << " path:" << getDirPath()
+                             << " pri:" << (*iter)->getCreatePriority()
+                             << endl;
+                
+                    if( (*iter)->getCreatePriority() == Pri )
                     {
-                        if( StaticGModuleMatchedEAGeneratorFactory* ff
-                            = dynamic_cast<StaticGModuleMatchedEAGeneratorFactory*>( GetImpl(*iter) ) )
+                        if( LIBFERRIS_DISABLE_EAGEN_KDE || LIBFERRIS_DISABLE_EAGEN_RDF )
                         {
-                            const std::string& sn = ff->getShortName();
-                            if( LIBFERRIS_DISABLE_EAGEN_RDF && sn == "rdf" )
+                            if( StaticGModuleMatchedEAGeneratorFactory* ff
+                                = dynamic_cast<StaticGModuleMatchedEAGeneratorFactory*>( GetImpl(*iter) ) )
                             {
-                                continue;
-                            }
-                            if( LIBFERRIS_DISABLE_EAGEN_KDE && sn == "kde3_metadata" )
-                            {
-                                continue;
+                                const std::string& sn = ff->getShortName();
+                                if( LIBFERRIS_DISABLE_EAGEN_RDF && sn == "rdf" )
+                                {
+                                    continue;
+                                }
+                                if( LIBFERRIS_DISABLE_EAGEN_KDE && sn == "kde3_metadata" )
+                                {
+                                    continue;
+                                }
+                                cerr << "sn:" << sn << endl;
                             }
                         }
-                    }
                     
-                    try
-                    {
-                        LG_CTX_D << "About to trybrew this:" << getURL() << endl;
-                        (*iter)->tryBrew( this );
-                    }
-                    catch( exception& e )
-                    {
-                        LG_ATTR_D << "e:" << e.what() << endl;
+                        try
+                        {
+                            LG_CTX_D << "About to trybrew this:" << getURL() << endl;
+                            (*iter)->tryBrew( this );
+                        }
+                        catch( exception& e )
+                        {
+                            LG_ATTR_D << "e:" << e.what() << endl;
+                        }
                     }
                 }
             }
-        }
         
-//         cerr << "Context::priv_createAttributes(end) "
-//              << " path:" << getDirPath()
-//              << endl;
-//         LG_ATTR_I << "Context::priv_createAttributes(3) creating EAGenFactories for:"
-//                   << getDirPath() << endl;
+        
+//             cerr << "Context::priv_createAttributes(end) "
+//                  << " path:" << getDirPath()
+//                  << endl;
+//             LG_ATTR_I << "Context::priv_createAttributes(3) creating EAGenFactories for:"
+//                       << getDirPath() << endl;
 
-        imageEAGenerator_priv_createAttributes();
+            imageEAGenerator_priv_createAttributes();
+        }
     }
 
 
@@ -10350,7 +10398,7 @@ Context::getStatelessEAGenFactorys()
                     if( getItems().empty() && isReClaimable() )
                     {
 //                         cerr << "adding-to-free-list cmdc:" << (void*)cc
-//                              << " rc:" << ref_count
+//                              << " rc:" << getReferenceCount()
 //                              << " mRC:" << getMinimumReferenceCount()
 //                              << endl;
 //                         BackTrace();
@@ -10366,7 +10414,7 @@ Context::getStatelessEAGenFactorys()
                 return;
         }
         
-        LG_VM_D << "TryToAddOurselfToFreeList() rc:" << ref_count 
+        LG_VM_D << "TryToAddOurselfToFreeList() rc:" << getReferenceCount() 
                 << " this:" << toVoid(this)
                 << " path:" << getDirPath() 
                 << endl;
@@ -10426,7 +10474,7 @@ Context::getStatelessEAGenFactorys()
                 /* Subcase B */
 
                 Context* cc = GetImpl(root->CoveredContext);
-                if( cc->ref_count == 1 + getMinimumReferenceCount() )
+                if( cc->getReferenceCount() == 1 + getMinimumReferenceCount() )
                 {
                     /* CoveredContext reference plus the minimum */
                     invokeClean = true;
@@ -10655,6 +10703,12 @@ Context::tryToFindAttributeByOverMounting( const std::string& eaname )
         || eaname == "http://witme.sf.net/libferris-core/xmp-0.1/index-mtime" )
     {
         LG_OVERMOUNT_I << "Not overmounting for XMP data." << endl;
+        return;
+    }
+
+    if( m_forceNoOverMountForEAForContext )
+    {
+        LG_OVERMOUNT_I << "overmount attempt turned off explicitly for context." << endl;
         return;
     }
     
@@ -11384,6 +11438,8 @@ Context::priv_getRecommendedEA()
 
             ret << adjustRecommendedEAForDotFiles( this,
                 getOverMountContext()->priv_getRecommendedEA());
+            
+            
 
 //             cerr << "Context::getRecommendedEA()" << endl;
 //             cerr << "Context::getRecommendedEA() omc:" << getOverMountContext()->priv_getRecommendedEA() << endl;
@@ -11402,8 +11458,6 @@ Context::priv_getRecommendedEA()
             const fh_context& thisp = this;
             for( int Pri = AttributeCreator::CREATE_PRI_MAX_INTERNAL_USE_ONLY; Pri >= 0; --Pri )
             {
-//                 for( EAGenFactorys_t::const_iterator iter = getEAGenFactorys().begin();
-//                      iter != getEAGenFactorys().end(); iter++ )
                 ensureEAGenFactorysSetup();
                 EAGenFactorys_iterator iterend = EAGenFactorys_iterator( this, true );
                 for( EAGenFactorys_iterator iter = EAGenFactorys_iterator( this );
@@ -11464,7 +11518,7 @@ OnMedallionUpdated( std::string url, Cache< Context*, fh_medallion >* cache )
         if( c->getURL() == url )
         {
             ci->second->reload();
-            c->Emit_Changed( 0, url, url, 0 );
+            c->Emit_Changed( 0, url, url );
             c->Emit_MedallionUpdated();
             break;
         }
@@ -11492,7 +11546,10 @@ Context::getMedallion()
     {
         connected = true;
         Factory::getPluginOutOfProcNotificationEngine().
-            getMedallionUpdated_Sig().connect( sigc::bind( sigc::ptr_fun( OnMedallionUpdated ), &cache ) );
+            getMedallionUpdated_Sig().connect(
+                std::bind2nd(
+                    std::ptr_fun( &OnMedallionUpdated ),
+                    &cache ));
     }
 
     if( fh_medallion m = cache.get( this ) )
@@ -11580,14 +11637,14 @@ Context::resolveFerrisXMLNamespace( const std::string& s )
         gboolean
         EventPending()
         {
-            return Fampp::Fampp::Instance().Pending();
+            return Fampp::Fampp::instance().Pending();
         }
 
         void
         processEvent()
         {
-            if( Fampp::Fampp::Instance().Pending() )
-                Fampp::Fampp::Instance().NextEvent();
+            if( Fampp::Fampp::instance().Pending() )
+                Fampp::Fampp::instance().NextEvent();
         }
 
         static void ProcessFAMExceptions()
@@ -11935,12 +11992,14 @@ std::string
 //                    cerr << "ssarray_index:" << ssarray_index << endl;
 //                    BackTrace();
 
-                    typedef Loki::SmartPtr< fh_stringstream,
-                        Loki::RefLinked, 
-                        Loki::AllowConversion,
-                        FerrisLoki::FerrisExSmartPointerChecker,
-                        FerrisLoki::FerrisExSmartPtrStorage > fh_ss_ptr;
-                    fh_ss_ptr fh_ss_ref = 0;
+                    // typedef Loki::SmartPtr< fh_stringstream,
+                    //     Loki::RefLinked, 
+                    //     Loki::AllowConversion,
+                    //     FerrisLoki::FerrisExSmartPointerChecker,
+                    //     FerrisLoki::FerrisExSmartPtrStorage > fh_ss_ptr;
+                    typedef boost::intrusive_ptr<fh_stringstream> fh_ss_ptr;
+                    
+                    fh_ss_ptr fh_ss_ref;
                     
                     if( ssarray_index >= ssarray_maxlevels )
                     {
@@ -12460,8 +12519,8 @@ void FerrisInternal::reparentSelectionContext( Context* parent, fh_context NewCh
     {
         std::string getCURLProxyCommandLineOption()
         {
-            string proxyname = getEDBString( FDB_GENERAL, "curl-use-proxy-name", "" );
-            string proxyport = getEDBString( FDB_GENERAL, "curl-use-proxy-port", "" );
+            string proxyname = getConfigString( FDB_GENERAL, "curl-use-proxy-name", "" );
+            string proxyport = getConfigString( FDB_GENERAL, "curl-use-proxy-port", "" );
             stringstream ret;
             if( !proxyname.empty() )
             {

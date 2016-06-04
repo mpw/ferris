@@ -32,8 +32,6 @@
 
 #include <Ferris/HiddenSymbolSupport.hh>
 
-#include <sigc++/sigc++.h>
-
 #include <Ferris/TypeDecl.hh>
 #include <Ferris/Ferris.hh>
 #include <Ferris/Cache.hh>
@@ -267,7 +265,7 @@ namespace Ferris
             fh_doc append( fh_context c );
             fh_doc lookup( docid_t id );
 
-            typedef Loki::Functor< void, LOKI_TYPELIST_2( const std::string&, docid_t ) >
+            typedef boost::function< void ( const std::string&, docid_t ) >
             ForEachDocumentFunctor_t;
             void for_each( ForEachDocumentFunctor_t f );
             
@@ -701,8 +699,8 @@ namespace Ferris
             fh_database  m_db;
             fh_nidx      m_idx;
 
-//             typedef Cache< termid_t, fh_term > m_term_cache_t;
-//             m_term_cache_t m_term_cache;
+            // typedef Cache< termid_t, fh_term > m_term_cache_t;
+            // m_term_cache_t m_term_cache;
 
             /**
              * other methods in the class should call here to get a

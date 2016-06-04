@@ -8,13 +8,7 @@ libferrisdvdread_factory_la_LDFLAGS = @LIBFERRIS_PLUGIN_LT_LINE@
 
 libferrisdvdread_la_SOURCES = libferrisdvdread.cpp
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@DVDREAD_CFLAGS@                                \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/context @DVDREAD_CFLAGS@ @CFLAGS@
 
 libferrisdvdread_la_LDFLAGS = @DVDREAD_LIBS@ @GLIB_LIBS@ \
 	@LIBFERRIS_PLUGIN_LT_LINE@

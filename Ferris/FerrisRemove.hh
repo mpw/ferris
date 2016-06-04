@@ -54,8 +54,8 @@ namespace Ferris
     
     class FERRISEXP_API RemovePopTableCollector
         :
-        public basic_PopTableCollector,
-        public Handlable
+        public Handlable,
+        public basic_PopTableCollector
     {
         fh_rm rm;
         
@@ -117,25 +117,25 @@ namespace Ferris
         
     public:
 
-        typedef sigc::signal3< void,
-                               FerrisRm&,       // thisobj,
-                               fh_context,      // target,
-                               std::string      // target Description,
-                               > RemoveVerboseSignal_t;
+        typedef boost::signals2::signal< void (
+            FerrisRm&,       // thisobj,
+            fh_context,      // target,
+            std::string      // target Description,
+            ) > RemoveVerboseSignal_t;
         RemoveVerboseSignal_t& getRemoveVerboseSignal();
 
-        typedef sigc::signal3< void,
-                               FerrisRm&,        // thisobj,
-                               std::string,      // target Description,
-                               std::string       // reason
-                               > SkippingSignal_t;
+        typedef boost::signals2::signal< void (
+            FerrisRm&,        // thisobj,
+            std::string,      // target Description,
+            std::string       // reason
+            ) > SkippingSignal_t;
         SkippingSignal_t& getSkippingSignal();
 
-        typedef sigc::signal3< bool,
-                               FerrisRm&,       // thisobj,
-                               fh_context,      // target,
-                               std::string      // target Description,
-                               > AskRemoveSignal_t;
+        typedef boost::signals2::signal< bool (
+            FerrisRm&,       // thisobj,
+            fh_context,      // target,
+            std::string      // target Description,
+            ) > AskRemoveSignal_t;
         AskRemoveSignal_t& getAskRemoveSignal();
 
     protected:

@@ -2,13 +2,7 @@ if HAVE_TAGLIB
 
 plugindir = $(libdir)/ferris/plugins/eagenerators
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@TAGLIB_CFLAGS@	                        \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/eagenerators @TAGLIB_CFLAGS@ @CFLAGS@
 
 plugin_LTLIBRARIES = libferristaglib.la 
 libferristaglib_la_SOURCES = libferristaglib.cpp

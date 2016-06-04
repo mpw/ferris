@@ -2,13 +2,7 @@ if HAVE_LIBEXTRACTOR
 
 plugindir = $(libdir)/ferris/plugins/eagenerators
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@LIBEXTRACTOR_CFLAGS@	                        \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/eagenerators @LIBEXTRACTOR_CFLAGS@ @CFLAGS@
 
 plugin_LTLIBRARIES = libferrisextractor.la 
 libferrisextractor_la_SOURCES = libferrisextractor.cpp

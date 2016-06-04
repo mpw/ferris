@@ -442,7 +442,7 @@ namespace Ferris
         SvmLight_BinaryClassifierAgentImplemenation::setStateDir( const std::string& s )
         {
             _Base::setStateDir( s );
-            m_lex = LexiconFactory::Instance().CreateObject( SVMLIGHT_LEXICON_CLASS_DEFAULT );
+            m_lex = LexiconFactory::instance()[ SVMLIGHT_LEXICON_CLASS_DEFAULT ]();
             m_lex->setPathManager( this );
             m_lex->setIndex( 0 );
         }

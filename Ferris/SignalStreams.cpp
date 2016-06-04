@@ -49,7 +49,6 @@
 #endif
 
 using namespace std;
-using namespace FerrisLoki;
 
 namespace Ferris
 {
@@ -667,7 +666,7 @@ bool isCompressedContext( fh_context c )
 
                 // add to bitmap for compressed extents
                 bm[ n ] = n;
-                progress_sig.emit( c, target, n, totalblocks );
+                progress_sig( c, target, n, totalblocks );
             }
             compressed_buffer_free( buffer );
             delete [] uncompressed_buffer;

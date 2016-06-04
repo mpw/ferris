@@ -748,9 +748,9 @@ namespace Ferris
     protected:
 
         virtual void createStateLessAttributes( bool force = false );
-        virtual void getTypeInfos( std::list< Loki::TypeInfo >& l )
+        virtual void getTypeInfos( std::list< boost::typeindex::type_index >& l )
             {
-                l.push_back( typeid( _Self ) );
+                l.push_back( boost::typeindex::type_id<_Self>() );
                 _Base::getTypeInfos( l );
             }        
     public:

@@ -38,21 +38,12 @@
 #include <Trimming.hh>
 #include <General.hh>
 
-#include <SmartPtr.h>
-#include <Singleton.h>
-#include <Factory.h>
-#include <Functor.h>
-
 #include <string>
 #include <map>
 #include <vector>
 
 #include <sys/utsname.h>
 #include <time.h>
-
-#include <sigc++/sigc++.h>
-#include <sigc++/slot.h>
-#include <sigc++/bind.h>
 
 #include <Ferris/FerrisQt_private.hh>
 #include <Ferris/FerrisKDE.hh>

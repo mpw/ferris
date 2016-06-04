@@ -31,8 +31,6 @@
 #include <Ferris/Ferris.hh>
 
 #include <glib.h>
-#include <sigc++/sigc++.h>
-#include <sigc++/slot.h>
 
 #include "MetadataServer_private.hh"
 #include <Ferris/FerrisQt_private.hh>
@@ -261,8 +259,9 @@ namespace Ferris
         if( !ret )
         {
 //            string shortNamesToUseString = "xine,imlib2,jpeg,magick,png";
-            string shortNamesToUseString = getStrSubCtx( "~/.ferris/use-out-of-process-metadata-plugins",
-                                                         "xine,imlib2,jpeg,magick,png" );
+            string shortNamesToUseString = getStrSubCtx(
+                getDotFerrisPath() + "use-out-of-process-metadata-plugins",
+                "xine,imlib2,jpeg,magick,png" );
 
             ret = new s_ImageEAGeneratorsExtensionToShortName_t();
             s_ImageEAGeneratorsExtensionToShortName_t& all = getImageEAGeneratorsExtensionToShortName();

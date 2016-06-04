@@ -321,7 +321,7 @@ namespace FerrisUI
         m_ctxConnection.disconnect();
         m_ctx = c;
         m_ctxConnection = m_ctx->getNamingEvent_MedallionUpdated_Sig()
-            .connect( sigc::mem_fun( *this, &_Self::OnMedallionUpdated ));
+            .connect( boost::bind( &_Self::OnMedallionUpdated, this, _1 ));
         
         Time::Benchmark bm2("+++setContext(2)");
         update_model();
@@ -617,7 +617,7 @@ namespace FerrisUI
         }
 
         update_model();
-        m_et->getEmblemCreated_Sig().connect( sigc::mem_fun( *this, &_Self::OnEmblemCreated ));
+        m_et->getEmblemCreated_Sig().connect( boost::bind( &_Self::OnEmblemCreated, this, _1, _2 ));
 
         
         return w_baseWidget;

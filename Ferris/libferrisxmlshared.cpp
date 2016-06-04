@@ -682,7 +682,7 @@ namespace Ferris
         LG_XML_D << "XMLBaseContext::priv_getIOStream()" << endl;
 //        BackTrace();
         fh_stringstream ret = real_getIOStream( m );
-        ret->getCloseSig().connect( sigc::bind( sigc::mem_fun(*this, &_Self::OnStreamClosed ), m )); 
+        ret->getCloseSig().connect( boost::bind( &_Self::OnStreamClosed, this, _1, _2, m )); 
         return ret;
     }
 
@@ -906,6 +906,7 @@ namespace Ferris
     fh_iostream
     XMLBaseContext::getEA( Context* _c, const std::string& rdn, EA_Atom* atom )
     {
+//        cerr << "XMLBaseContext::getEA()" << endl;
         
         if( _Self* c = dynamic_cast<_Self*>( _c ))
         {

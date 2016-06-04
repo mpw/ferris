@@ -52,9 +52,6 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/tuple/tuple_io.hpp>
 
-#include <Singleton.h>
-#include <Factory.h>
-#include <Functor.h>
 
 #include <iomanip>
 #include <errno.h>
@@ -136,15 +133,16 @@ namespace Ferris
             static string getClassName()
                 { return "boost-multi-index"; }
         };
-        bool Lexicon_BoostMultiIndex::reged = LexiconFactory::Instance().
-        Register( Lexicon_BoostMultiIndex::getClassName(),
-                  &MakeObject<Lexicon,Lexicon_BoostMultiIndex>::Create );
+        bool Lexicon_BoostMultiIndex::reged = LexiconFactory::instance()
+            [ Lexicon_BoostMultiIndex::getClassName() ]
+            = boost::factory<Lexicon_BoostMultiIndex*>();
         bool Lexicon_BoostMultiIndex::regedx = appendToLexiconClassNames(
             Lexicon_BoostMultiIndex::getClassName() );
 
 
-        static bool rg = LexiconFactory::Instance().
-        Register( "boost-multi-index", &MakeObject<Lexicon,Lexicon_BoostMultiIndex>::Create );
+        static bool rg = LexiconFactory::instance()
+            [ "boost-multi-index" ]
+            = boost::factory<Lexicon_BoostMultiIndex*>();
         static bool rx = appendToLexiconAliasNames( "boost-multi-index" );
 
 

@@ -32,10 +32,6 @@
 
 #include <Ferris/HiddenSymbolSupport.hh>
 
-#include <FerrisLoki/loki/Singleton.h>
-#include <FerrisLoki/loki/Factory.h>
-#include <FerrisLoki/loki/Functor.h>
-
 #ifdef GCC_HASCLASSVISIBILITY
     #pragma GCC visibility push(default)
 #endif
@@ -80,8 +76,8 @@ namespace Ferris
         
         stringlist_t& getLexiconClassNames();
         bool appendToLexiconClassNames( const std::string& s );
-        typedef Loki::SingletonHolder<
-            Loki::Factory< Lexicon, string >, Loki::CreateUsingNew, Loki::NoDestroy >
+        typedef FerrisSingletonAlways<
+            std::map< string, boost::function< Lexicon*() > > >
         LexiconFactory;
         stringlist_t& getLexiconAliasNames();
         bool appendToLexiconAliasNames( const std::string& s );
@@ -90,8 +86,8 @@ namespace Ferris
         
         stringlist_t& getReverseLexiconClassNames();
         bool appendToReverseLexiconClassNames( const std::string& s );
-        typedef Loki::SingletonHolder<
-            Loki::Factory< ReverseLexicon, string >, Loki::CreateUsingNew, Loki::NoDestroy >
+        typedef FerrisSingletonAlways<
+            std::map< string, boost::function< ReverseLexicon*() > > >
         ReverseLexiconFactory;
         
         /********************************************************************************/

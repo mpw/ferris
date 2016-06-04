@@ -39,7 +39,6 @@
 
 #include <fstream>
 
-#include <sigc++/sigc++.h>
 
 #define FERRISEXP_ASTEXT_PLUGIN FERRISEXP_DLLLOCAL
 

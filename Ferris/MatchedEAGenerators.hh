@@ -76,8 +76,8 @@ public:
 
 class FERRISEXP_API MatchedEAGeneratorFactory
     :
-    public AttributeCreator,
-    public Handlable
+        public Handlable,
+        public AttributeCreator
 {
 public:
 

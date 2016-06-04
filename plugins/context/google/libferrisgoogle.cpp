@@ -42,6 +42,9 @@ using namespace std;
 
 namespace Ferris
 {
+    using boost::lambda::_1;
+    using boost::lambda::_2;
+
     extern "C"
     {
         FERRISEXP_EXPORT fh_context Brew( RootContextFactory* rf )
@@ -525,8 +528,7 @@ namespace Ferris
             {
                 fh_stringstream ret = real_getIOStream( m );
                 ret->getCloseSig().connect(
-                    sigc::bind(
-                        sigc::mem_fun(*this, &_Self::OnStreamClosed ), m )); 
+                    boost::bind( &_Self::OnStreamClosed, this, _1, _2, m )); 
                 return ret;
             }
         fh_istream

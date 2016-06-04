@@ -33,7 +33,6 @@
 #include <string>
 #include <Ferris/TypeDecl.hh>
 #include <Ferris/Ferris.hh>
-#include <FerrisLoki/loki/Factory.h>
 #include "General.hh"
 
 #include "EAIndexerSQLCommon_private.hh"

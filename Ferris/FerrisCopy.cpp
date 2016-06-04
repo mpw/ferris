@@ -43,9 +43,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <sigc++/sigc++.h>
-#include <sigc++/slot.h>
-
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -174,7 +171,7 @@ namespace Ferris
         {
             fh_stringstream ss;
             ss << "Attempt to copy into self";
-            getSkippingContextSignal().emit(
+            getSkippingContextSignal()(
                 *this,
                 getSourceDescription(),
                 tostr(ss) );
@@ -410,7 +407,7 @@ namespace Ferris
                 
                 if( attemptRecursiveCopy )
                 {
-                    getSkippingContextSignal().emit(
+                    getSkippingContextSignal()(
                         *this,
                         getSourceDescription(),
                         "error getting real paths" );
@@ -457,7 +454,7 @@ namespace Ferris
                     LG_COPY_D << "perform_copy() AttemptToCopyIntoSelf is true, src:" << getSourceDescription() << endl;
                     fh_stringstream ss;
                     ss << "Attempt to copy into self";
-                    getSkippingContextSignal().emit(
+                    getSkippingContextSignal()(
                         *this,
                         getSourceDescription(),
                         tostr(ss) );
@@ -469,7 +466,7 @@ namespace Ferris
                     dev_t d = toType<dev_t>(getEA( src, "device", "0" ));
                     if( CurrentFileSystemDev != d )
                     {
-                        getSkippingContextSignal().emit(
+                        getSkippingContextSignal()(
                             *this,
                             getSourceDescription(),
                             "Attempt to move to a different filesystem" );
@@ -482,7 +479,7 @@ namespace Ferris
                 {
                     if( toType<int>(getEA( src, "is-dir", "0" )))
                     {
-                        getSkippingContextSignal().emit(
+                        getSkippingContextSignal()(
                             *this,
                             getSourceDescription(),
                             "omitting directory" );
@@ -505,13 +502,13 @@ namespace Ferris
                         {
                             fh_attribute attr = dstparent->getAttribute( DstAttr );
 
-                            if( !getAskReplaceAttributeSignal().emit(
+                            if( !getAskReplaceAttributeSignal()(
                                     *this, src, dst,
                                     getSourceDescription(),
                                     getDestinationDescription( dstparent ),
                                     attr ))
                             {
-                                getSkippingContextSignal().emit(
+                                getSkippingContextSignal()(
                                     *this,
                                     getSourceDescription(),
                                     "skipping" );
@@ -568,12 +565,12 @@ namespace Ferris
                                               << " dstdesc:" << getDestinationDescription( dst )
                                               << endl;
                                 
-                                    if( !getAskReplaceContextSignal().emit(
+                                    if( !getAskReplaceContextSignal()(
                                             *this, src, dst,
                                             getSourceDescription(),
                                             getDestinationDescription( dst ) ))
                                     {
-                                        getSkippingContextSignal().emit(
+                                        getSkippingContextSignal()(
                                             *this,
                                             getSourceDescription(),
                                             "skipping" );
@@ -594,7 +591,7 @@ namespace Ferris
 
                                     if( srctt == -1 || dsttt == -1 )
                                     {
-                                        getSkippingContextSignal().emit(
+                                        getSkippingContextSignal()(
                                             *this,
                                             getSourceDescription(),
                                             "skipping" );
@@ -602,7 +599,7 @@ namespace Ferris
                                     }
                                     if( srctt <= dsttt )
                                     {
-                                        getSkippingContextSignal().emit(
+                                        getSkippingContextSignal()(
                                             *this,
                                             getSourceDescription(),
                                             "src not newer, skipping" );
@@ -684,7 +681,7 @@ namespace Ferris
 
                     if( Verbose )
                     {
-                        getCopyVerboseSignal().emit( *this, src, dst,
+                        getCopyVerboseSignal()( *this, src, dst,
                                                      getSourceDescription(),
                                                      getDestinationDescription() );
                     }
@@ -809,7 +806,7 @@ namespace Ferris
 //                                         ThrowFromErrno( eno, ss.str(), 0 );
 //                                     }
 
-//                                     getCopyPorgressSignal().emit( *this,
+//                                     getCopyPorgressSignal()( *this,
 //                                                                   bytesDone,
 //                                                                   bytesToCopyInOneCall,
 //                                                                   inputsz );
@@ -1001,21 +998,21 @@ namespace Ferris
         preallocate_with_fallocate( false ),
         preallocate_with_ftruncate( false ),
         InputInMemoryMappedMode( 
-            isTrue( getEDBString( FDB_GENERAL, COPY_INPUT_IN_MMAP_MODE_BY_DEFAULT, "0" ))),
+            isTrue( getConfigString( FDB_GENERAL, COPY_INPUT_IN_MMAP_MODE_BY_DEFAULT, "0" ))),
         AutoInputInMemoryMappedModeSize(
             Util::convertByteString(
-                getEDBString( FDB_GENERAL, COPY_INPUT_IN_MMAP_MODE_FOR_OBJECTS_LARGER_THAN, "0" ))),
+                getConfigString( FDB_GENERAL, COPY_INPUT_IN_MMAP_MODE_FOR_OBJECTS_LARGER_THAN, "0" ))),
         OutputInMemoryMappedMode(
-            isTrue( getEDBString( FDB_GENERAL, COPY_OUTPUT_IN_MMAP_MODE_BY_DEFAULT, "0" ))),
+            isTrue( getConfigString( FDB_GENERAL, COPY_OUTPUT_IN_MMAP_MODE_BY_DEFAULT, "0" ))),
         AutoOutputInMemoryMappedModeSize(
             Util::convertByteString(
-                getEDBString( FDB_GENERAL, COPY_OUTPUT_IN_MMAP_MODE_FOR_OBJECTS_LARGER_THAN, "0" ))),
+                getConfigString( FDB_GENERAL, COPY_OUTPUT_IN_MMAP_MODE_FOR_OBJECTS_LARGER_THAN, "0" ))),
         m_useSendfileIfPossible(
             Util::convertByteString(
-                getEDBString( FDB_GENERAL, USE_SENDFILE_IF_POSSIBLE, "0" ))),
+                getConfigString( FDB_GENERAL, USE_SENDFILE_IF_POSSIBLE, "0" ))),
         m_sendfileChunkSize(
             Util::convertByteString(
-                getEDBString( FDB_GENERAL, SENDFILE_CHUNK_SIZE, "262144" ))),
+                getConfigString( FDB_GENERAL, SENDFILE_CHUNK_SIZE, "262144" ))),
         TotalBytesCopied( 0 ),
         TotalBytesToCopy( 0 )
 //         OutputInDirectMode( false ),
@@ -2556,7 +2553,7 @@ namespace Ferris
         if( ExplicitSELinuxContext ) cp->setExplicitSELinuxContext( ExplicitSELinuxContext );
         if( CloneSELinuxContext )    cp->setCloneSELinuxContext( CloneSELinuxContext );
         {
-            bool p = isTrue( getEDBString( FDB_GENERAL, CFG_PRECALCULATE_FOR_COPY_K, CFG_PRECALCULATE_FOR_COPY_DEFAULT ) );
+            bool p = isTrue( getConfigString( FDB_GENERAL, CFG_PRECALCULATE_FOR_COPY_K, CFG_PRECALCULATE_FOR_COPY_DEFAULT ) );
             if( DontPrecacheSourceSize )
                 p = false;
             if( PrecacheSourceSize )

@@ -277,12 +277,12 @@ int main( int argc, char** argv )
                         }
                     }
 
-                    sigc::connection hdrcon;
+                    boost::signals2::connection hdrcon;
                     
                     if( OutputHeadersOnFD )
                     {
-                        hdrcon = c->getContextEvent_Headers_Received_Sig().connect(
-                            sigc::ptr_fun( OutputHeadersOnFD_cb ) );
+                        hdrcon = c->getContextEvent_Headers_Received_Sig()
+                            .connect( &OutputHeadersOnFD_cb );
                     }
 
                     /*

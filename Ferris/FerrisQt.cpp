@@ -344,7 +344,7 @@ namespace Ferris
     /********************************************************************************/
     /********************************************************************************/
     /********************************************************************************/
-    void OnGenericStreamClosed( FerrisLoki::Handlable* a );
+    void OnGenericStreamClosed( Handlable* a );
 
     template<
         typename _CharT,
@@ -481,10 +481,10 @@ namespace Ferris
             }
         virtual ref_count_t Release()
             {
-//                cerr << "StreamToQIODevice_streambuf::Release() ref_count:" << this->ref_count << endl;
+//                cerr << "StreamToQIODevice_streambuf::Release() ref_count:" << this->getReferenceCount() << endl;
                 if( !m_streamAutoClosing )
                 {
-                    if( this->ref_count == 3 && m_iodev && m_iodev->getUserHasStream() )
+                    if( this->getReferenceCount() == 3 && m_iodev && m_iodev->getUserHasStream() )
                     {
                         cerr << "STREAM IS CLOSING AUTOMATICALLY!" << endl;
                         LG_QIO_I << "STREAM IS CLOSING AUTOMATICALLY!" << endl;
@@ -516,11 +516,7 @@ class  StreamToQIODevice_stringstream
         public stringstream_methods<_CharT, _Traits, io_ferris_stream_traits< _CharT, _Traits > >
 {
     typedef StreamToQIODevice_streambuf<_CharT, _Traits, _Alloc> ss_impl_t;
-    typedef Loki::SmartPtr<  ss_impl_t,
-                             FerrisLoki::FerrisExRefCounted,
-                             Loki::DisallowConversion,
-                             FerrisLoki::FerrisExSmartPointerChecker,
-                             FerrisLoki::FerrisExSmartPtrStorage > ss_t;
+    typedef boost::intrusive_ptr< ss_impl_t > ss_t;
     ss_t ss;
     typedef Ferris_commonstream<_CharT, _Traits> _CS;
     typedef io_ferris_stream_traits< _CharT, _Traits > _FerrisStreamTraits;
@@ -819,7 +815,7 @@ public:
         m_stream.rdbuf()->setDev( this );
 
         m_stream.getCloseSig().connect(
-            sigc::mem_fun(*this, &_Self::OnStreamClosed ) ); 
+            boost::bind( &_Self::OnStreamClosed, this, _1, _2 ) ); 
     }
 
     StreamToQIODeviceImpl::~StreamToQIODeviceImpl()
@@ -1054,7 +1050,7 @@ public:
         emit readChannelFinished();
         cerr << "StreamToQIODeviceImpl::writingComplete() 5" << endl;
 #undef emit
-        getWritingCompleteSig().emit( 0 );
+        getWritingCompleteSig()( 0 );
     }
 
     void
@@ -1234,7 +1230,7 @@ public:
         if( m_iodev )
         {
             LG_QIO_D << "StreamToQIODevice_streambuf::handleWrite() m_iodev:" << m_iodev
-                     << " rc:" << this->ref_count
+                     << " rc:" << this->getReferenceCount()
                      << " user-has-stream:" << m_iodev->getUserHasStream()
                      << endl;
             m_iodev->dataWritten();
@@ -1260,7 +1256,7 @@ public:
                     }
                 }
         };
-        typedef Loki::SingletonHolder< QAppHolder, Loki::CreateUsingNew, Loki::NoDestroy  > QAppSingleton;
+        typedef FerrisSingletonAlways< QAppHolder > QAppSingleton;
 
 
 
@@ -1296,7 +1292,7 @@ public:
             v = false;
             installQTMsgHandler();
             Main::processAllPendingEvents();
-            QAppSingleton::Instance();
+            QAppSingleton::instance();
         }
     }
     
@@ -1330,11 +1326,11 @@ public:
                 m_qmanager = ret;
             }
             
-            if( isTrue( getEDBString( FDB_GENERAL, "curl-use-proxy", "" )))
+            if( isTrue( getConfigString( FDB_GENERAL, "curl-use-proxy", "" )))
             {
-                std::string proxyname = getEDBString( FDB_GENERAL, "curl-use-proxy-name", "" );
-                int         proxyport = toint( getEDBString( FDB_GENERAL, "curl-use-proxy-port", "3128" ));
-                std::string proxyuserpass = getEDBString( FDB_GENERAL, "curl-use-proxy-userpass", "" );
+                std::string proxyname = getConfigString( FDB_GENERAL, "curl-use-proxy-name", "" );
+                int         proxyport = toint( getConfigString( FDB_GENERAL, "curl-use-proxy-port", "3128" ));
+                std::string proxyuserpass = getConfigString( FDB_GENERAL, "curl-use-proxy-userpass", "" );
                 stringlist_t t = Util::parseSeperatedList( proxyuserpass, ':' );
                 std::string user = "";
                 std::string pass = "";
@@ -1583,11 +1579,7 @@ class  StreamFromQIODevice_stringstream
 {
 //    typedef StreamFromQIODevice_streambuf<_CharT, _Traits, _Alloc> ss_impl_t;
     typedef StreamFromQIODevice_streambuf ss_impl_t;
-    typedef Loki::SmartPtr<  ss_impl_t,
-                             FerrisLoki::FerrisExRefCounted,
-                             Loki::DisallowConversion,
-                             FerrisLoki::FerrisExSmartPointerChecker,
-                             FerrisLoki::FerrisExSmartPtrStorage > ss_t;
+    typedef boost::intrusive_ptr<  ss_impl_t > ss_t;
     ss_t ss;
     typedef Ferris_commonstream<_CharT, _Traits> _CS;
     typedef io_ferris_stream_traits< _CharT, _Traits > _FerrisStreamTraits;

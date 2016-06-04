@@ -49,7 +49,6 @@
 
 #include <string.h>
 #include <gobject/gvaluecollector.h>
-#include <sigc++/bind.h>
 #include <unistd.h>
 
 #include <map>
@@ -540,12 +539,12 @@ namespace FerrisUI
             {}
         
             int ref_count;
-            sigc::connection ExistsConnection;
-//            sigc::connection CreatedConnection;
-            sigc::connection ChangedConnection;
-            sigc::connection MedallionUpdatedConnection;
-            sigc::connection DeletedConnection;
-            sigc::connection MovedConnection;
+            boost::signals2::connection ExistsConnection;
+//            boost::signals2::connection CreatedConnection;
+            boost::signals2::connection ChangedConnection;
+            boost::signals2::connection MedallionUpdatedConnection;
+            boost::signals2::connection DeletedConnection;
+            boost::signals2::connection MovedConnection;
         };
         struct SignalCollectionCreation
         {
@@ -555,7 +554,7 @@ namespace FerrisUI
             {}
         
             int ref_count;
-            sigc::connection CreatedConnection;
+            boost::signals2::connection CreatedConnection;
         };
         
         struct ContextCompare : private less<string>
@@ -1346,7 +1345,7 @@ getFerrisIconNamePixbuf( fh_context c )
                                                      desired_width,
                                                      desired_height,
                                                      interp_type );
-        gdk_pixbuf_unref( pb );
+        g_object_unref( pb );
         pb = scaled;
             
         iter = cache.insert( make_pair( iconpath, pb ) ).first;
@@ -2166,7 +2165,7 @@ namespace FerrisUI
         }
         gtk_tree_path_free( path );
 
-        getClearedSig().emit( this );
+        getClearedSig()( this );
         m_ContextIterators.clear();
         LG_GTKFERRIS_D << " clear(complete) parent:" << parentc->getURL()
                        << " removeCount:" << removeCount << endl;
@@ -2222,7 +2221,7 @@ namespace FerrisUI
 
         if( (m_contextsDone % 100) == 0 )
         {
-            getDiskReadProgressSig().emit( c, m_contextsDone, m_subContextCountGuess );
+            getDiskReadProgressSig()( c, m_contextsDone, m_subContextCountGuess );
         }
 
 //        EnsureMonitoringSubContextCreationEvents( subc );
@@ -2241,7 +2240,7 @@ namespace FerrisUI
          * Add all the data to the gtk model
          */
         m_contextsDone = 0;
-        getStartReadingSig().emit( c );
+        getStartReadingSig()( c );
         GtkTreePath* path = gtk_tree_path_new_first();
         LG_GTKFERRIS_D << "FerrisTreeModel_Impl::populateModelFromContext(2) isRoot:" << isRoot << endl;
         if( !isRoot )
@@ -2289,7 +2288,7 @@ namespace FerrisUI
 //            cerr << "ADDING ENTRIES,DONE" << endl;
         }
         gtk_tree_path_free( path );
-        getStopReadingSig().emit( c );
+        getStopReadingSig()( c );
         LG_GTKFERRIS_D << "populateModelFromContext(done) url:" << c->getURL()
                        << " totalItems:" << totalItems
                        << endl;
@@ -2315,13 +2314,13 @@ namespace FerrisUI
                        << endl;
 
         /* Read the disk and propergate */
-        getStartReadingDiskSig().emit( c );
-        sigc::connection DiskReadConnection =
+        getStartReadingDiskSig()( c );
+        boost::signals2::connection DiskReadConnection =
             c->getNamingEvent_Exists_Sig().connect(
-                sigc::mem_fun( *this, &_Self::OnExistsDiskRead ));
+                boost::bind( &_Self::OnExistsDiskRead, this, _1, _2, _3, _4 ));
         c->read( force );
         DiskReadConnection.disconnect();
-        getStopReadingDiskSig().emit( c );
+        getStopReadingDiskSig()( c );
 
         /*
          * We never bootstrap shortcut the name column because it could be any size
@@ -2354,7 +2353,7 @@ namespace FerrisUI
         /*
          * filter the view
          */
-        getFilterStartedSig().emit( c );
+        getFilterStartedSig()( c );
         if( !m_filterString.empty() )
         {
             fh_context filter = Factory::MakeFilter( m_filterString );
@@ -2377,7 +2376,7 @@ namespace FerrisUI
         /*
          * Sort the view
          */
-        getSortStartedSig().emit( c );
+        getSortStartedSig()( c );
         if( m_sortingString.length() )
         {
             c->read();
@@ -2461,7 +2460,7 @@ namespace FerrisUI
         if( !sigs.ref_count )
         {
             sigs.CreatedConnection = c->getNamingEvent_Created_Sig().
-                connect( sigc::mem_fun( *this, &_Self::OnCreated ));
+                connect( boost::bind( &_Self::OnCreated, this, _1, _2, _3, _4 ));
             sigs.ref_count++;
         }
     }
@@ -2485,20 +2484,20 @@ namespace FerrisUI
                            << endl;
 
             sigs.ChangedConnection = c->getNamingEvent_Changed_Sig()
-                .connect( sigc::mem_fun( *this, &_Self::OnChanged ));
+                .connect( boost::bind( &_Self::OnChanged, this, _1, _2, _3 ));
 
             EnsureMonitoringSubContextCreationEvents( c, true );
 //             sigs.CreatedConnection = c->getNamingEvent_Created_Sig().
-//                 connect( sigc::mem_fun( *this, &_Self::OnCreated ));
+//                 connect( boost::bind( &_Self::OnCreated, this ));
 
             sigs.DeletedConnection = c->getNamingEvent_Deleted_Sig().
-                connect( sigc::mem_fun( *this, &_Self::OnDeleted ));
+                connect( boost::bind( &_Self::OnDeleted, this, _1, _2, _3 ));
 
             sigs.MovedConnection = c->getNamingEvent_Moved_Sig()
-                .connect( sigc::mem_fun( *this, &_Self::OnMoved ));
+                .connect( boost::bind( &_Self::OnMoved, this, _1, _2, _3 ));
             
 //             sigs.ChangedConnection = c->getNamingEvent_Exists_Sig().
-//                 connect( sigc::mem_fun( *this, &_Self::OnExists ));
+//                 connect( boost::bind( &_Self::OnExists, this ));
         }
         
         sigs.ref_count++;
@@ -2730,7 +2729,7 @@ namespace FerrisUI
                            << " url:" << c->getURL()
                            << " path:" << tostr(path)
                            << endl;
-            getRemovingContextSig().emit( c );
+            getRemovingContextSig()( c );
             gtk_tree_model_row_deleted( getGtkModel(), path );
             gtk_tree_path_free( path );
         }
@@ -2882,7 +2881,7 @@ namespace FerrisUI
             LG_GTKFERRIS_D << "FerrisTreeModel_Impl::UpdateColumnNames(getting ea-names-union-view)" << endl;
             addEAToSet( unionset,  getStrAttr( rc, "recommended-ea-union-view", "" ));
             LG_GTKFERRIS_D << "FerrisTreeModel_Impl::UpdateColumnNames(getting fixed additions)" << endl;
-            addEAToSet( unionset,  getEDBString( FDB_GENERAL,
+            addEAToSet( unionset,  getConfigString( FDB_GENERAL,
                                                  CFG_ATTRIBUTES_ALWAYS_IN_UI_MODEL_K,
                                                  CFG_ATTRIBUTES_ALWAYS_IN_UI_MODEL_DEFAULT ));
             unionset.insert( treeicon_pixbuf_cn );
@@ -3147,11 +3146,11 @@ namespace FerrisUI
         ++m_contextsDone;
         if( (m_contextsDone % m_addingContextSignalModulas) == 0 )
         {
-            getAddingContextProgressSig().emit( *ci, m_contextsDone, m_subContextCountGuess );
+            getAddingContextProgressSig()( *ci, m_contextsDone, m_subContextCountGuess );
         }
         
 
-        getAddingContextSig().emit( *ci, m_contextsDone, m_subContextCountGuess );
+        getAddingContextSig()( *ci, m_contextsDone, m_subContextCountGuess );
 
 //         LG_GTKFERRIS_D << "FerrisTreeModel_Impl::add(post signal) c:" << (*ci)->getURL() << endl;
         cerr << "WATCH INSERT add() context:" << (*ci)->getURL()
@@ -3163,7 +3162,7 @@ namespace FerrisUI
 
 
         getSignalCollection( *ci ).MedallionUpdatedConnection
-            = (*ci)->getNamingEvent_MedallionUpdated_Sig().connect( sigc::mem_fun( *this, &_Self::OnMedallionUpdated ) );
+            = (*ci)->getNamingEvent_MedallionUpdated_Sig().connect( boost::bind( &_Self::OnMedallionUpdated, this, _1 ) );
 
         EnsureMonitoringSubContextCreationEvents( *ci );
         

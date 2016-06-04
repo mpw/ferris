@@ -136,8 +136,6 @@ namespace Ferris
      * path.
      */
     class FERRISEXP_API OutOfProcNotificationEngine
-        :
-        public sigc::trackable
     {
         typedef OutOfProcNotificationEngine _Self;
         
@@ -355,7 +353,7 @@ namespace Ferris
         /*** singals ***************/
         /***************************/
 
-        typedef sigc::signal1< void, std::string > MedallionUpdated_Sig_t;
+        typedef boost::signals2::signal< void ( std::string ) > MedallionUpdated_Sig_t;
         MedallionUpdated_Sig_t& getMedallionUpdated_Sig();
 
         

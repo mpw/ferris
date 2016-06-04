@@ -2,11 +2,7 @@ if HAVE_LIBEXIF
 
 plugindir = $(libdir)/ferris/plugins/eagenerators
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
+INCLUDES = -I$(top_srcdir)/plugins/eagenerators         \
 	@LIBEXIF_CFLAGS@	                        \
 	@LIBJPEG_CFLAGS@	                        \
 	@EPEG_CFLAGS@                                   \

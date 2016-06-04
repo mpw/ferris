@@ -12,8 +12,8 @@ EXTRA_DIST = $(SHELL_FILES)
 
 
 INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib                                               \
-	@STLPORT_CFLAGS@                                \
-	@SIGC_CFLAGS@                                   \
+	                                \
+	                                   \
 	-I. 						\
 	-I$(srcdir) -I$(top_srcdir) -I$(top_srcdir)/src	\
 	-I$(top_builddir)				\
@@ -23,5 +23,5 @@ INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib                            
 
 ferriscdexe_SOURCES = ferriscdexe.cpp
 ferriscdexe_LDADD = -lpopt @LIBFERRIS_LA@ 
-ferriscdexe_LDFLAGS = $(GLIB_LIBS) @SIGC_LIBS@
+ferriscdexe_LDFLAGS = $(GLIB_LIBS) 
 

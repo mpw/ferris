@@ -140,7 +140,7 @@ void test_signal_stream()
 //        getCloseSig( ss_outer ).connect( slot( &test_signal_stream_cb ) );
         {
             fh_stringstream ss = ss_outer;
-            ss.getCloseSig().connect( sigc::ptr_fun( &test_signal_stream_cb ) );
+            ss.getCloseSig().connect( &test_signal_stream_cb );
             cerr << "About to let 'ss' go out of scope." << endl;
         }
         
@@ -411,7 +411,7 @@ fh_iostream make_datastream()
 
     cerr << " =========== make_datastream() create ds." << endl;
     fh_iostream ds = Factory::MakeMemoryIOStream( d, strlen(d)+1 );
-    ds.getCloseSig().connect( sigc::ptr_fun( &test_datastream_cb ) );
+    ds.getCloseSig().connect( &test_datastream_cb );
 
     
     ds.clear();

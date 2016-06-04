@@ -70,7 +70,7 @@ namespace FerrisUI
         GtkTreeViewColumn* w_cols[C_COLUMN_COUNT];
         GtkWidget*         w_baseWidget;
 
-        sigc::connection   m_ctxConnection;
+        boost::signals2::connection   m_ctxConnection;
 
         void update_model( fh_medallion& med, GtkTreeIter* piter, fh_emblem parent_em );
         void update_all_emblems_in_partial_order_rec( GtkTreeModel* model, GtkTreeIter* iter,

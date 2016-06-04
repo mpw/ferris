@@ -53,36 +53,12 @@ namespace lucene
         class Hits;
     };
     typedef search::Hits* l_Hits;
-    typedef Loki::SmartPtr< search::Query, 
-                            Loki::RefCounted, 
-                            Loki::DisallowConversion, 
-                            FerrisLoki::FerrisExSmartPointerChecker, 
-                            Loki::DefaultSPStorage >  l_Query;
-typedef Loki::SmartPtr< search::TermQuery, 
-                        Loki::RefCounted, 
-                        Loki::AllowConversion, 
-                        FerrisLoki::FerrisExSmartPointerChecker, 
-                        Loki::DefaultSPStorage >  l_TermQuery;
-typedef Loki::SmartPtr< search::BooleanQuery, 
-                        Loki::RefCounted, 
-                        Loki::DisallowConversion, 
-                        FerrisLoki::FerrisExSmartPointerChecker, 
-                        Loki::DefaultSPStorage >  l_BooleanQuery;
-typedef Loki::SmartPtr< index::IndexWriter, 
-                        Loki::RefCounted, 
-                        Loki::AllowConversion, 
-                        FerrisLoki::FerrisExSmartPointerChecker, 
-                        Loki::DefaultSPStorage >  l_IndexWriter;
-typedef Loki::SmartPtr< index::IndexReader, 
-                        Loki::RefCounted, 
-                        Loki::AllowConversion, 
-                        FerrisLoki::FerrisExSmartPointerChecker, 
-                        Loki::DefaultSPStorage >  l_IndexReader;
-typedef Loki::SmartPtr< index::Term, 
-                        Loki::RefCounted, 
-                        Loki::AllowConversion, 
-                        FerrisLoki::FerrisExSmartPointerChecker, 
-                        Loki::DefaultSPStorage >  l_Term;
+    typedef boost::shared_ptr< search::Query >        l_Query;
+    typedef boost::shared_ptr< search::TermQuery >    l_TermQuery;
+    typedef boost::shared_ptr< search::BooleanQuery > l_BooleanQuery;
+    typedef boost::shared_ptr< index::IndexWriter >   l_IndexWriter;
+    typedef boost::shared_ptr< index::IndexReader >   l_IndexReader;
+    typedef boost::shared_ptr< index::Term >          l_Term;
 
 
 };

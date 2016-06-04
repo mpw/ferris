@@ -162,7 +162,7 @@ GModuleMatchedEAGeneratorFactory::ensureGModuleIsLoaded()
             ss  << "Error, unable to open module file: "
                 << g_module_error ()
                 << endl;
-//            cerr << tostr(ss) << endl;
+            cerr << tostr(ss) << endl;
             LG_PLUGIN_I << tostr(ss) << endl;
             Throw_GModuleOpenFailed( tostr(ss), 0 );
         }

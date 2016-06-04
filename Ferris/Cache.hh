@@ -34,10 +34,6 @@
 #include <Ferris/HiddenSymbolSupport.hh>
 
 #include <Ferris/TypeDecl.hh>
-#include <FerrisLoki/Extensions.hh>
-
-#include <sigc++/sigc++.h>
-#include <sigc++/slot.h>
 
 #include <glib.h>
 
@@ -57,15 +53,16 @@ namespace Ferris
         :
         public Handlable 
     {
+      public:
         typedef Handlable _Base;
-
-        int getNumberOfCachesWeAreIn()
+      protected:
+        int getNumberOfCachesWeAreIn() const
             {
                 return 1;
             }
         
     public:
-        typedef sigc::signal1< void, CacheHandlable* > OnlyInCacheSignal_t;
+        typedef boost::signals2::signal< void ( CacheHandlable* ) > OnlyInCacheSignal_t;
         OnlyInCacheSignal_t OnlyInCacheSignal;
         OnlyInCacheSignal_t& getOnlyInCacheSignal()
             {
@@ -78,17 +75,23 @@ namespace Ferris
             {
             }
     
-        virtual ref_count_t AddRef()
+        virtual counter_type AddRef() const
             {
+//                std::cerr << "cache handlable AddRef() rc:" << getReferenceCount() << std::endl;
+                
+//LOKI                
                 return _Base::AddRef();
             }
     
-        virtual ref_count_t Release()
+        virtual counter_type Release() const
             {
                 ref_count_t ret = _Base::Release();
+//                std::cerr << "cache handlable Release() rc:" << ret << std::endl;
                 if( ret == getNumberOfCachesWeAreIn() )
                 {
-                    getOnlyInCacheSignal().emit( this );
+//                    std::cerr << "cache handlable FIRE FIRE FIRE Release() rc:" << ret << std::endl;
+                    CacheHandlable* thisp = (CacheHandlable*)this;
+                    thisp->getOnlyInCacheSignal()( thisp );
                 }
                 return ret;
             }
@@ -107,15 +110,13 @@ namespace Ferris
      */
     template< class Key, class Value >
     class FERRISEXP_API Cache
-        :
-        public sigc::trackable
     {
         typedef Cache<Key,Value> _Self;
     
         typedef std::map< Key, Value > m_t;
         m_t m;
 
-        typedef std::list< FerrisLoki::Handlable* > m_collectable_t;
+        typedef std::list< Handlable* > m_collectable_t;
         m_collectable_t m_collectable;
 
         // when to start reaping collectable items
@@ -199,7 +200,7 @@ namespace Ferris
                     
                     for( int i=0; i<count; i++ )
                     {
-                        FerrisLoki::Handlable* h = m_collectable.front();
+                        Handlable* h = m_collectable.front();
                         m_collectable.pop_front();
 
 //                         cerr << "cache<> m_collectable.size:" << m_collectable.size()
@@ -218,7 +219,7 @@ namespace Ferris
                         typedef typename m_t::iterator iterator;
                         for( iterator mi = m.begin(); mi!=m.end(); )
                         {
-                            FerrisLoki::Handlable* mih = GetImpl(mi->second);
+                            Handlable* mih = GetImpl(mi->second);
                             if( mih == h )
                             {
                                 iterator delme = mi;
@@ -261,7 +262,7 @@ namespace Ferris
                         for( m_collectable_t::iterator ci = m_collectable.begin();
                              ci != m_collectable.end(); ++ci )
                         {
-                            if( *ci == dynamic_cast<FerrisLoki::Handlable*>(GetImpl(mi->second)))
+                            if( *ci == dynamic_cast<Handlable*>(GetImpl(mi->second)))
                             {
                                 m_collectable.erase( ci );
                                 break;
@@ -285,7 +286,7 @@ namespace Ferris
                 
                 maybe_collect();
                 reconnectTimer();
-                v->getOnlyInCacheSignal().connect( mem_fun( *this, &_Self::OnGenericCloseSignal ) );
+                v->getOnlyInCacheSignal().connect( boost::bind( &_Self::OnGenericCloseSignal, this, _1 ) );
                 m[ k ] = v;
             }
 
@@ -294,7 +295,7 @@ namespace Ferris
                 if( !isBound(v) )
                     return;
                 
-                v->getOnlyInCacheSignal().connect( mem_fun( *this, &_Self::OnGenericCloseSignal ) );
+                v->getOnlyInCacheSignal().connect( boost::bind( &_Self::OnGenericCloseSignal, this, _1 ) );
                 m[ k ] = v;
             }
 

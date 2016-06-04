@@ -225,9 +225,12 @@ public:
         }
 };
 
-typedef Loki::SingletonHolder<
-    Loki::Factory< SheetCreator, std::string > >
-SheetCreatorFactory;
+
+
+typedef ::Ferris::FerrisSingletonAlways<
+    FerrisFactory< std::string, SheetCreator > > SheetCreatorFactory;
+
+
 
 template < class Base,class Sub >
 struct MakeObject
@@ -239,7 +242,7 @@ stringset_t Plugins;
 template< class T >
 bool Register( const std::string& n )
 {
-    bool b = SheetCreatorFactory::Instance().Register( n, &MakeObject<SheetCreator,T>::Create );
+    bool b = SheetCreatorFactory::instance().Register( n, boost::factory<T*>() );
     Plugins.insert( n );
     return b;
 }
@@ -560,7 +563,7 @@ int main( int argc, const char** argv )
             selection.push_back( c );
         }
 
-        SheetCreator* creator = SheetCreatorFactory::Instance().CreateObject( PluginName );
+        SheetCreator* creator = SheetCreatorFactory::instance().Create( PluginName );
         creator->setSheetID( ImplicitSheetID );
         
         for( ctxlist_t::const_iterator ci = selection.begin(); ci != selection.end(); ++ci )

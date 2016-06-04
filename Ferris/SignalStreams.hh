@@ -42,15 +42,9 @@
 #include <iostream>
 #include <sstream>
 #include <map>
-#include <AssocVector.h>
 
 #include <FerrisHandle.hh>
 #include <TypeDecl.hh>
-
-#include <SmartPtr.h>
-#include <Functor.h>
-
-#include <sigc++/sigc++.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -222,8 +216,9 @@ private:
             COMPRESS_BZIP2 = 1<<2
         };
 
-        typedef sigc::signal4< void, fh_context, fh_context, int, int >
+        typedef boost::signals2::signal<void (fh_context, fh_context, int, int)>
         ConvertToCompressedChunkContextProgress_Sig_t;
+        
         FERRISEXP_API ConvertToCompressedChunkContextProgress_Sig_t&
         getNullConvertToCompressedChunkContextProgress_Sig();
 

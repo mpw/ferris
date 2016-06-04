@@ -34,7 +34,6 @@
 // Note that for OSX this block has to be before config.h or the Qt headers complain.
 /////
 #define restrict 
-#include <sigc++/sigc++.h>
 #include <QtCore/QObject>
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
@@ -63,7 +62,6 @@
 #include <Ferris_private.hh>
 #include <xfsutil.hh>
 
-#include <sigc++/sigc++.h>
 #include <pwd.h>
 #include <grp.h>
 #include <sys/types.h>
@@ -770,7 +768,7 @@ namespace Ferris
         }
 
         {
-            string dotferrisPath = Shell::getHomeDirPath_nochecks() + "/.ferris";
+            string dotferrisPath = getDotFerrisPath();
 //             CERR << "isDir():" << ret->isDir()
 //                  << " is-native:" << ret->getIsNativeContext()
 //                  << " rdn:" << rdn
@@ -3180,9 +3178,9 @@ static void setExistsSubDir_Cache( Context*c, time_t c_ctime, bool hasSubContext
     fh_stringstream keyss;
     keyss << "exists-subdir-" << Util::replace_all( c->getURL(), '/', '-' );
 
-    setEDBString( FDB_CACHE, tostr(keyss), tostr( hasSubContext ));
+    setConfigString( FDB_CACHE, tostr(keyss), tostr( hasSubContext ));
     keyss << "-ctime";
-    setEDBString( FDB_CACHE, tostr(keyss), tostr( c_ctime ));
+    setConfigString( FDB_CACHE, tostr(keyss), tostr( c_ctime ));
 }
 
 static int getExistsSubDir_Cache( Context*c, time_t c_ctime )
@@ -3192,9 +3190,9 @@ static int getExistsSubDir_Cache( Context*c, time_t c_ctime )
 
     try
     {
-        int ret   = toint(getEDBString( FDB_CACHE, tostr(keyss), "0", true, true ));
+        int ret   = toint(getConfigString( FDB_CACHE, tostr(keyss), "0", true ));
         keyss << "-ctime";
-        time_t ct = toType<time_t>(getEDBString( FDB_CACHE, tostr(keyss), "0", true, true ));
+        time_t ct = toType<time_t>(getConfigString( FDB_CACHE, tostr(keyss), "0", true ));
 
         /* If the time the cache was created is still fresh then return cache */
         if( ct >= c_ctime )
@@ -4616,19 +4614,25 @@ NativeContext::setupFAM()
         typedef NativeContext NC;
         const FamReq_t& R = FamReq;
 
+        // R->getSig<Fampp::FamppChangedEvent>().connect(boost::bind( &NC::OnFamppChangedEvent, this,
+        //                                                            boost::arg<1>(),boost::arg<2>(),boost::arg<3>()));
         
+#define CONNECTSIG( EV, METH )  \
+        R->getSig<Fampp::EV>().connect(boost::bind( &NC::METH, this,   \
+            boost::arg<1>(),boost::arg<2>(),boost::arg<3>()))
+    
 //        LG_NATIVE_D << "Registering change event for:" << getDirPath() << endl;
-        R->getSig<Fampp::FamppChangedEvent>().connect(mem_fun( *this, &NC::OnFamppChangedEvent));
-        R->getSig<Fampp::FamppDeletedEvent>().connect(mem_fun( *this, &NC::OnFamppDeletedEvent));
-        R->getSig<Fampp::FamppStartExecutingEvent>().connect(mem_fun( *this, &NC::OnFamppStartExecutingEvent));
-        R->getSig<Fampp::FamppStopExecutingEvent>().connect(mem_fun( *this, &NC::OnFamppStopExecutingEvent));
-        R->getSig<Fampp::FamppCreatedEvent>().connect(mem_fun( *this, &NC::OnFamppCreatedEvent));
-        R->getSig<Fampp::FamppMovedEvent>().connect(mem_fun( *this, &NC::OnFamppMovedEvent));
-        R->getSig<Fampp::FamppAcknowledgeEvent>().connect(mem_fun( *this, &NC::OnFamppAcknowledgeEvent));
-        R->getSig<Fampp::FamppExistsEvent>().connect(mem_fun( *this, &NC::OnFamppExistsEvent));
-        R->getSig<Fampp::FamppEndExistEvent>().connect(mem_fun( *this, &NC::OnFamppEndExistEvent));
+        CONNECTSIG( FamppChangedEvent,        OnFamppChangedEvent );
+        CONNECTSIG( FamppDeletedEvent,        OnFamppDeletedEvent );
+        CONNECTSIG( FamppStartExecutingEvent, OnFamppStartExecutingEvent );
+        CONNECTSIG( FamppStopExecutingEvent,  OnFamppStopExecutingEvent );
+        CONNECTSIG( FamppCreatedEvent,        OnFamppCreatedEvent );
+        CONNECTSIG( FamppMovedEvent,          OnFamppMovedEvent );
+        CONNECTSIG( FamppAcknowledgeEvent,    OnFamppAcknowledgeEvent );
+        CONNECTSIG( FamppExistsEvent,         OnFamppExistsEvent );
+        CONNECTSIG( FamppEndExistEvent,       OnFamppEndExistEvent );
+#undef CONNECTSIG        
 
-        
         LG_NATIVE_D << "end famreq... rc:" << FamReq->getReferenceCount() << endl;
         LG_NATIVE_D << "Setup fam...done." << endl;
         LG_NATIVE_I << "Setup fam...done." << endl;
@@ -4697,7 +4701,7 @@ NativeContext::OnFamppStartExecutingEvent( string fqfilename, Fampp::fh_fampp_re
 {
     string filename = OnFamppEvent(fqfilename, req, ev );
 
-    Emit_Start_Execute( 0, filename, filename, 0 );
+    Emit_Start_Execute( 0, filename, filename );
 }
 
 void
@@ -4705,7 +4709,7 @@ NativeContext::OnFamppStopExecutingEvent( string fqfilename, Fampp::fh_fampp_req
 {
     string filename = OnFamppEvent( fqfilename, req, ev );
 
-    Emit_Stop_Execute( 0, filename, filename, 0 );
+    Emit_Stop_Execute( 0, filename, filename );
 }
 
 void
@@ -4721,7 +4725,7 @@ NativeContext::OnFamppMovedEvent( string fqfilename, Fampp::fh_fampp_req req, Fa
 {
     string filename = OnFamppEvent( fqfilename, req, ev );
     LG_NATIVE_D << "NativeContext::OnFamppMovedEvent() fqfilename:" << fqfilename << endl;
-    Emit_Moved( 0, "", filename, 0 );
+    Emit_Moved( 0, "", filename );
 }
 
 void
@@ -4794,7 +4798,8 @@ NativeContext::OnFamppEndExistEvent( string fqfilename, Fampp::fh_fampp_req req,
                     
             typedef NativeContext NC;
             const FamReq_t& R = FamReq;
-            R->getSig<Fampp::FamppChangedEvent>().connect(mem_fun( *this, &NC::OnFamppChangedEvent));
+            R->getSig<Fampp::FamppChangedEvent>().connect(boost::bind( &NC::OnFamppChangedEvent, this,
+                                                              boost::arg<1>(),boost::arg<2>(),boost::arg<3>()));
             FamppChangedEventConnected = true;
         }
 #endif

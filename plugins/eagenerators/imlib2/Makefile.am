@@ -2,13 +2,7 @@ if HAVE_IMLIB2
 
 plugindir = $(libdir)/ferris/plugins/eagenerators
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@IMLIB_CFLAGS@					\
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/eagenerators @IMLIB_CFLAGS@ @CFLAGS@
 
 plugin_LTLIBRARIES = libimlib2.la 
 libimlib2_la_SOURCES = libimlib2.cpp

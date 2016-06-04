@@ -42,6 +42,8 @@ using namespace std;
 
 namespace Ferris
 {
+    using boost::lambda::_1;
+    using boost::lambda::_2;
 
     extern "C"
     {
@@ -502,7 +504,7 @@ namespace Ferris
         //            std::exception)
         //     {
         //         fh_stringstream ret = real_getIOStream( m );
-        //         ret->getCloseSig().connect( sigc::bind( sigc::mem_fun(*this, &_Self::OnStreamClosed ), m )); 
+        //         ret->getCloseSig().connect( boost::bind( &_Self::OnStreamClosed, this, _1, _2, m )); 
         //         return ret;
         //     }
         fh_istream
@@ -568,7 +570,7 @@ namespace Ferris
                     cerr << "Using old, non streaming upload because of scaling..." << endl;
                     fh_stringstream ret = real_getIOStream( m );
                     ret->getCloseSig().connect(
-                        sigc::bind( sigc::mem_fun(*this, &_Self::OnStreamClosed ), m )); 
+                        boost::bind( &_Self::OnStreamClosed, this, _1, _2, m )); 
                     return ret;
                 }
                 
@@ -588,7 +590,7 @@ namespace Ferris
 
                 fh_iostream ret = wu->getUploadIOStream( ContentLength, title, desc );
                 ret->getCloseSig().connect(
-                    sigc::bind( sigc::mem_fun(*this, &_Self::OnStreamingWriteClosed ), m )); 
+                    boost::bind( &_Self::OnStreamingWriteClosed, this, _1, _2, m )); 
                 return ret;
             }
         
@@ -740,7 +742,7 @@ namespace Ferris
                    std::exception)
         {
             fh_stringstream ret = real_getIOStream( m );
-            ret->getCloseSig().connect( sigc::bind( sigc::mem_fun(*this, &_Self::OnStreamClosed ), m )); 
+            ret->getCloseSig().connect( boost::bind( &_Self::OnStreamClosed, this, _1, _2, m )); 
             return ret;
         }
         

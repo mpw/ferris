@@ -56,15 +56,15 @@ void SaveData()
 {
     try
     {
-        setEDBString( FDB_GENERAL,
+        setConfigString( FDB_GENERAL,
                       CFG_THUMBNAILS_MAX_DESIRED_WIDTH_OR_HEIGHT_K,
                       tostr((int)gtk_range_get_value(GTK_RANGE(w_max_width_or_height))),
-                      true, true );
+                      true );
 
-        setEDBString( FDB_GENERAL,
+        setConfigString( FDB_GENERAL,
                       CFG_THUMBNAILS_JPEG_IMG_QUALITY_K,
                       tostr((int)gtk_range_get_value(GTK_RANGE(w_jpeg_iq))),
-                      true, true );
+                      true );
     }
     catch( exception& e )
     {
@@ -76,7 +76,7 @@ void LoadData()
 {
     string t;
     
-    t = getEDBString( FDB_GENERAL,
+    t = getConfigString( FDB_GENERAL,
                       CFG_THUMBNAILS_MAX_DESIRED_WIDTH_OR_HEIGHT_K,
                       CFG_THUMBNAILS_MAX_DESIRED_WIDTH_OR_HEIGHT_DEFAULT );
     gtk_range_set_value ( GTK_RANGE(w_max_width_or_height), toint( t ) );
@@ -84,7 +84,7 @@ void LoadData()
 
 
 
-    t = getEDBString( FDB_GENERAL,
+    t = getConfigString( FDB_GENERAL,
                       CFG_THUMBNAILS_JPEG_IMG_QUALITY_K,
                       CFG_THUMBNAILS_JPEG_IMG_QUALITY_DEFAULT );
     gtk_range_set_value ( GTK_RANGE(w_jpeg_iq), toint( t ) );

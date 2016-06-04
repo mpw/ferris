@@ -57,8 +57,8 @@ namespace Ferris
     
     class FERRISEXP_DLLLOCAL Ferris_DOMNodeList
         :
-        public DOMNodeList,
-        public Handlable
+        public Handlable,
+        public DOMNodeList
     {
         typedef std::vector< DOMNode* > m_col_t;
         m_col_t m_col;
@@ -82,8 +82,8 @@ namespace Ferris
         
     class FERRISEXP_DLLLOCAL Ferris_DOMNamedNodeMap
         :
-        public DOMNamedNodeMap,
-        public Handlable
+        public Handlable,
+        public DOMNamedNodeMap
     {
         typedef std::map< std::string, DOMNode* > m_nodes_t;
         mutable m_nodes_t m_nodes;
@@ -118,8 +118,8 @@ namespace Ferris
 
     class FERRISEXP_DLLLOCAL Ferris_DOMElement
         :
-        public DOMElement,
         public Handlable,
+        public DOMElement,
         public Ferris_DOM_NamespaceImplier
     {
         Ferris_DOMDocument* m_doc;

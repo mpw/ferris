@@ -5,14 +5,7 @@ plugin_LTLIBRARIES = libftxidxxapian.la libftxidxxapian_factory.la
 libftxidxxapian_la_SOURCES = libftxidxxapian.cpp
 libftxidxxapian_factory_la_SOURCES = libftxidxxapian_factory.cpp
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I..                                            \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	-I/usr/local/lib                                \
-	@XAPIAN_CFLAGS@                                    \
-	@CFLAGS@
+INCLUDES = @XAPIAN_CFLAGS@ @CFLAGS@
 
 libftxidxxapian_la_LDFLAGS = @XAPIAN_LIBS@      \
 	libferrisxapianeashared.la            \

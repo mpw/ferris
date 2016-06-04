@@ -194,13 +194,13 @@ namespace Ferris
                 }
             }
 
-        virtual ref_count_t AddRef()
+        virtual counter_type AddRef()
             {
                 exif_data_ref( m_ed );
                 return CacheHandlable::AddRef();
             }
     
-        virtual ref_count_t Release()
+        virtual counter_type Release()
             {
                 exif_data_unref( m_ed );
                 return CacheHandlable::Release();
@@ -1181,7 +1181,7 @@ exif_tag_from_string (const char *string)
         epeg_size_get(im, &w, &h);
 
         int    MaxDesiredWidthOrHeight = toint(
-            getEDBString(
+            getConfigString(
                 FDB_GENERAL,
                 CFG_THUMBNAILS_MAX_DESIRED_WIDTH_OR_HEIGHT_K,
                 CFG_THUMBNAILS_MAX_DESIRED_WIDTH_OR_HEIGHT_DEFAULT ));
@@ -1220,7 +1220,7 @@ exif_tag_from_string (const char *string)
         int            bufsz = 0;
         unsigned char*   buf = 0;
         epeg_quality_set(
-            im, toint( getEDBString( FDB_GENERAL,
+            im, toint( getConfigString( FDB_GENERAL,
                                      CFG_THUMBNAILS_JPEG_IMG_QUALITY_K,
                                      CFG_THUMBNAILS_JPEG_IMG_QUALITY_DEFAULT )));
         epeg_decode_colorspace_set     ( im, EPEG_RGBA8 ); //EPEG_ARGB32 );

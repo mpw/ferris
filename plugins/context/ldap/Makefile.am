@@ -7,14 +7,7 @@ libferrisldap_factory_la_LIBADD  = @LIBFERRIS_PLUGIN_FACTORY_LIBADD@
 libferrisldap_factory_la_LDFLAGS = @LIBFERRIS_PLUGIN_LT_LINE@
 libferrisldap_la_SOURCES         = libferrisldap.cpp
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@LDAP_CFLAGS@                                   \
-	@GLIB_CFLAGS@                                   \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/context @LDAP_CFLAGS@ @GLIB_CFLAGS@ @CFLAGS@
 
 libferrisldap_la_LDFLAGS =                               \
 	@GLIB_LIBS@                                      \

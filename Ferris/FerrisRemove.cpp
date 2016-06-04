@@ -167,7 +167,7 @@ namespace Ferris
         {
             string msg = "attempt to remove root entry denied!";
             cerr << msg << endl;
-            getSkippingSignal().emit( *this, getTargetDescription(ctx->getURL()), msg );
+            getSkippingSignal()( *this, getTargetDescription(ctx->getURL()), msg );
             return;
         }
         removeObject( ctx->getParent(), ctx->getDirName(), ctx->getURL() );
@@ -185,18 +185,18 @@ namespace Ferris
         {
             if( !parent->isSubContextBound( rdn ) )
             {
-                getSkippingSignal().emit( *this,
-                                          getTargetDescription(p),
-                                          "Not existant object" );
+                getSkippingSignal()( *this,
+                                     getTargetDescription(p),
+                                     "Not existant object" );
                 return;
             }
         }
 
         if( Interactive )
         {
-            if( ! getAskRemoveSignal().emit( *this,
-                                             getTargetContext(p),
-                                             getTargetDescription(p) ))
+            if( ! getAskRemoveSignal()( *this,
+                                        getTargetContext(p),
+                                        getTargetDescription(p) ))
             {
                 return;
             }
@@ -204,9 +204,9 @@ namespace Ferris
             
         if( Verbose )
         {
-            getRemoveVerboseSignal().emit( *this,
-                                           getTargetContext(p),
-                                           getTargetDescription(p) );
+            getRemoveVerboseSignal()( *this,
+                                      getTargetContext(p),
+                                      getTargetDescription(p) );
         }
         parent->remove( rdn );
     }
@@ -229,9 +229,9 @@ namespace Ferris
         {
             if( Force )
             {
-                getSkippingSignal().emit( *this,
-                                          getTargetDescription(p),
-                                          "Not existant object" );
+                getSkippingSignal()( *this,
+                                     getTargetDescription(p),
+                                     "Not existant object" );
                 return;
             }
         }
@@ -248,7 +248,7 @@ namespace Ferris
 //         {
 //             if( !c->isSubContextBound( rdn ) )
 //             {
-//                 getSkippingSignal().emit( *this,
+//                 getSkippingSignal()( *this,
 //                                           getTargetDescription(p),
 //                                           "Not existant object" );
 //                 return;
@@ -263,7 +263,7 @@ namespace Ferris
 // //             if(!( c == 'y' || c == 'Y' ))
 // //                 return;
 
-//             if( ! getAskRemoveSignal().emit( *this,
+//             if( ! getAskRemoveSignal()( *this,
 //                                              getTargetContext(p),
 //                                              getTargetDescription(p) ))
 //             {
@@ -274,7 +274,7 @@ namespace Ferris
 //         if( Verbose )
 //         {
 // //            cout << "removing " << p << endl;
-//             getRemoveVerboseSignal().emit( *this,
+//             getRemoveVerboseSignal()( *this,
 //                                            getTargetContext(p),
 //                                            getTargetDescription(p) );
 //         }
@@ -293,9 +293,9 @@ namespace Ferris
         LastRecursiveContext(0),
         hadUserInteraction( false )
     {
-        getRemoveVerboseSignal().connect( sigc::mem_fun( *this, &_Self::OnRemoveVerbose ));
-        getSkippingSignal().connect(      sigc::mem_fun( *this, &_Self::OnSkipping ));
-        getAskRemoveSignal().connect(     sigc::mem_fun( *this, &_Self::OnAskRemove ));
+        getRemoveVerboseSignal().connect( boost::bind( &_Self::OnRemoveVerbose, this, _1,_2,_3 ));
+        getSkippingSignal().connect(      boost::bind( &_Self::OnSkipping, this, _1,_2,_3 ));
+        getAskRemoveSignal().connect( boost::bind( &_Self::OnAskRemove, this, _1,_2,_3 ));
     }
 
     FerrisRm::~FerrisRm()

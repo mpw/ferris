@@ -177,7 +177,7 @@ void put( GtkTreeStore* ts, GtkTreeIter& giter, fh_emblem em )
                         C_EMBLEM_DLONG,             em->getDigitalLongitude(),
                         C_EMBLEM_DRANGE,            em->getZoomRange(),
                         -1 );
-    em->getIconName_Changed_Sig().connect( sigc::ptr_fun( tv_iconName_changed ) );
+    em->getIconName_Changed_Sig().connect( &tv_iconName_changed );
 }
 
 /**
@@ -260,7 +260,7 @@ LoadData_makeAllChildren( GtkTreeIter piter, fh_emblem parent_em )
     for( emblems_t::iterator ei = el.begin(); ei != el.end(); ++ei )
     {
         fh_emblem em = *ei;
-        em->getAddedChild_Sig().connect( sigc::ptr_fun( OnEmblemChildAdded ) );
+        em->getAddedChild_Sig().connect( &OnEmblemChildAdded );
 
         GtkTreeIter giter = appendNewBlankItem( &piter );
         put( w_treemodel, giter, em );
@@ -303,7 +303,7 @@ void on_gtk_row_expanded_cb ( GtkTreeView *treeview,
             
 //            cerr << "on_gtk_row_expanded_cb() child:" << child->getName() << endl;
             
-            child->getAddedChild_Sig().connect( sigc::ptr_fun( OnEmblemChildAdded ) );
+            child->getAddedChild_Sig().connect( &OnEmblemChildAdded );
             GtkTreeIter giter = appendNewBlankItem( piter );
             put( w_treemodel, giter, child );
 
@@ -331,7 +331,7 @@ void LoadData()
     for( emblems_t::iterator ei = el.begin(); ei != el.end(); ++ei )
     {
         fh_emblem em = *ei;
-        em->getAddedChild_Sig().connect( sigc::ptr_fun( OnEmblemChildAdded ) );
+        em->getAddedChild_Sig().connect( &OnEmblemChildAdded );
 
         if( em->getParents().empty() )
         {
@@ -456,7 +456,7 @@ new_cb( GtkButton *button, gpointer )
     GtkTreeIter iter = appendNewBlankItem();
 
     fh_cemblem em = et->createColdEmblem( "new emblem" );
-    em->getAddedChild_Sig().connect( sigc::ptr_fun( OnEmblemChildAdded ) );
+    em->getAddedChild_Sig().connect( &OnEmblemChildAdded );
     put( w_treemodel, iter, em );
     
     GtkTreePath* path      = gtk_tree_model_get_path( tm, &iter );
@@ -925,7 +925,7 @@ createIconPageEntry( fh_emblem em )
 
     gtk_signal_connect(GTK_OBJECT( w_icon ), "clicked", GTK_SIGNAL_FUNC(iconpage_changeicon_cb), GetImpl(em) );
 
-    em->getIconName_Changed_Sig().connect( sigc::bind( sigc::ptr_fun( iconpage_iconName_changed ), w_icon ) );
+    em->getIconName_Changed_Sig().connect( boost::bind( &iconpage_iconName_changed, _1, _2, _3, w_icon ) );
 }
 
 /********************************************************************************/

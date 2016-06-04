@@ -9,13 +9,7 @@ libferrisbibtex_factory_la_LIBADD  = @LIBFERRIS_PLUGIN_FACTORY_LIBADD@
 libferrisbibtex_factory_la_LDFLAGS = @LIBFERRIS_PLUGIN_LT_LINE@
 libferrisbibtex_la_SOURCES         = libferrisbibtex.cpp
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@LIBBTPARSE_CFLAGS@                             \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/context @LIBBTPARSE_CFLAGS@ @CFLAGS@
 
 libferrisbibtex_la_LDFLAGS =                         \
 	@LIBBTPARSE_LIBS@                            \

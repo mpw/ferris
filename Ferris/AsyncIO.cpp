@@ -295,7 +295,7 @@ namespace Ferris
                  * Emit signal (m_msg and m_stringmap are assumed to be valid at this point)
                  */
                 fh_xstreamcol h = this;
-                getMessageArrivedSig().emit( h );
+                getMessageArrivedSig()( h );
             }
             catch( XMLParse& e )
             {

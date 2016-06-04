@@ -120,7 +120,7 @@ int main( int argc, char** argv )
 
         if( Verbose )
         {
-            createdHandler.connect( sigc::ptr_fun( verboseDirMade ));
+            createdHandler.connect( &verboseDirMade );
         }
         
         while( const char* tmpCSTR = poptGetArg(optCon) )

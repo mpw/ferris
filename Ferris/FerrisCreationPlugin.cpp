@@ -29,7 +29,6 @@
 
 #include <FerrisCreationPlugin.hh>
 #include <config.h>
-#include <Functor.h>
 
 using namespace std;
 
@@ -249,8 +248,7 @@ namespace Ferris
                                bool requiresNativeKernelDrive )
     {
         typedef pmap_t::iterator itert;
-        typedef Loki::Functor< fh_context,
-            LOKI_TYPELIST_2( fh_context, fh_context ) > Perform_t;
+        typedef boost::function< fh_context ( fh_context, fh_context ) > Perform_t;
         static CreateObjects_t CreateObjects;
 
         if( CreateObjects.empty() )
@@ -308,7 +306,7 @@ namespace Ferris
 //             }
             
             m[ ferristype ] = Context::SubContextCreator(
-                Perform_t( CreateObjects[ d.libname ], &SubCreate_CustomType::create ),
+                boost::bind( &SubCreate_CustomType::create, CreateObjects[ d.libname ], _1, _2 ),
                 d.xsd,
                 d.simpleTypes );
         }

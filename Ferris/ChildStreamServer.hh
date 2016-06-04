@@ -39,7 +39,6 @@
 #include <Ferris/Ferris.hh>
 #include <Ferris/Runner.hh>
 
-#include <Functor.h>
 
 namespace Ferris
 {
@@ -63,13 +62,13 @@ namespace Ferris
         
         void addChild( fh_runner r );
 
-        typedef sigc::signal4< void, ChildStreamServer*, fh_runner, int, int > ChildCompleteSig_t;
+        typedef boost::signals2::signal< void ( ChildStreamServer*, fh_runner, int, int ) > ChildCompleteSig_t;
         ChildCompleteSig_t& getChildCompleteSig();
         
-        typedef Loki::Functor< void,
-                               LOKI_TYPELIST_3( fh_childserv,
-                                                fh_runner,
-                                                int /* exit status */ ) > ChildDiedFunctor_t;
+        typedef boost::function< void (
+            fh_childserv,
+            fh_runner,
+            int /* exit status */ ) > ChildDiedFunctor_t;
         typedef std::list< ChildDiedFunctor_t > ChildDiedFunctors_t;
         ChildDiedFunctors_t m_ChildDiedFunctors;
         void addDiedFunctor( ChildDiedFunctor_t f );

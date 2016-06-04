@@ -39,9 +39,6 @@
 #include <Configuration_private.hh>
 #include <FerrisBackup.hh>
 
-#include <Singleton.h>
-#include <Factory.h>
-#include <Functor.h>
 
 #include <iomanip>
 
@@ -110,9 +107,8 @@ namespace Ferris
             static string getClassName()
                 { return "Filesystem"; }
         };
-        bool Lexicon_Filesystem::reged = LexiconFactory::Instance().
-        Register( Lexicon_Filesystem::getClassName(),
-                  &MakeObject<Lexicon,Lexicon_Filesystem>::Create );
+        bool Lexicon_Filesystem::reged = LexiconFactory::instance()
+            [Lexicon_Filesystem::getClassName()] = boost::factory<Lexicon_Filesystem*>();
         bool Lexicon_Filesystem::regedx = appendToLexiconClassNames(
             Lexicon_Filesystem::getClassName() );
 

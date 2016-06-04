@@ -41,9 +41,6 @@
 #include <Configuration_private.hh>
 #include <FerrisBackup.hh>
 
-#include <Singleton.h>
-#include <Factory.h>
-#include <Functor.h>
 
 #include <STLdb4/stldb4.hh>
 
@@ -89,15 +86,14 @@ namespace Ferris
             static string getClassName()
                 { return "Uncompressed (db4 hash)"; }
         };
-        bool Lexicon_Uncompressed::reged = LexiconFactory::Instance().
-        Register( Lexicon_Uncompressed::getClassName(),
-                  &MakeObject<Lexicon,Lexicon_Uncompressed>::Create );
+        bool Lexicon_Uncompressed::reged = LexiconFactory::instance()
+            [Lexicon_Uncompressed::getClassName()] = boost::factory<Lexicon_Uncompressed*>();
         bool Lexicon_Uncompressed::regedx = appendToLexiconClassNames(
             Lexicon_Uncompressed::getClassName() );
 
 
-        static bool rg = LexiconFactory::Instance().
-        Register( "Uncompressed", &MakeObject<Lexicon,Lexicon_Uncompressed>::Create );
+        static bool rg = LexiconFactory::instance()
+            ["Uncompressed"] = boost::factory<Lexicon_Uncompressed*>();
         static bool rx = appendToLexiconAliasNames( "Uncompressed" );
 
 
@@ -226,15 +222,15 @@ namespace Ferris
             static string getClassName()
                 { return "Uncompressed (db4 hash)"; }
         };
-        bool ReverseLexicon_Uncompressed::reged = ReverseLexiconFactory::Instance().
-        Register( ReverseLexicon_Uncompressed::getClassName(),
-                  &MakeObject<ReverseLexicon,ReverseLexicon_Uncompressed>::Create );
+        bool ReverseLexicon_Uncompressed::reged = ReverseLexiconFactory::instance()
+                        [ ReverseLexicon_Uncompressed::getClassName() ]
+                        = boost::factory<ReverseLexicon_Uncompressed*>();
         bool ReverseLexicon_Uncompressed::regedx = appendToReverseLexiconClassNames(
             ReverseLexicon_Uncompressed::getClassName() );
 
-        static bool rlx_reged = ReverseLexiconFactory::Instance().
-        Register( "Uncompressed",
-                  &MakeObject<ReverseLexicon,ReverseLexicon_Uncompressed>::Create );
+        static bool rlx_reged = ReverseLexiconFactory::instance()
+                        [ "Uncompressed" ]
+                        = boost::factory<ReverseLexicon_Uncompressed*>();
         static bool rlx_regedx = appendToReverseLexiconClassNames( "Uncompressed" );
         
         

@@ -49,6 +49,9 @@
 
 namespace Ferris
 {
+    using boost::lambda::_1;
+    using boost::lambda::_2;
+
     namespace Facebook
     {
 
@@ -514,10 +517,10 @@ namespace Ferris
 
         Facebook::Facebook()
         {
-            m_username   = getEDBString( DBNAME, CFG_FACEBOOK_USERNAME_K,    CFG_FACEBOOK_USERNAME_DEF );
-            m_sessionKey = getEDBString( DBNAME, CFG_FACEBOOK_SESSION_KEY_K, CFG_FACEBOOK_SESSION_KEY_DEF );
-            m_sessionSecret = getEDBString( DBNAME, CFG_FACEBOOK_SESSION_SECRET_K, CFG_FACEBOOK_SESSION_SECRET_DEF );
-            m_uid = getEDBString( DBNAME, CFG_FACEBOOK_UID_K, CFG_FACEBOOK_UID_DEF );
+            m_username   = getConfigString( DBNAME, CFG_FACEBOOK_USERNAME_K,    CFG_FACEBOOK_USERNAME_DEF );
+            m_sessionKey = getConfigString( DBNAME, CFG_FACEBOOK_SESSION_KEY_K, CFG_FACEBOOK_SESSION_KEY_DEF );
+            m_sessionSecret = getConfigString( DBNAME, CFG_FACEBOOK_SESSION_SECRET_K, CFG_FACEBOOK_SESSION_SECRET_DEF );
+            m_uid = getConfigString( DBNAME, CFG_FACEBOOK_UID_K, CFG_FACEBOOK_UID_DEF );
             m_apiKey = getStrSubCtx( "~/.ferris/facebook-api-key.txt", "" );
             m_apiSecret = getStrSubCtx( "~/.ferris/facebook-api-secret.txt", "" );
         }
@@ -938,9 +941,9 @@ namespace Ferris
             m_uid           = getChildElementText( e, "uid" );
             if( !m_sessionKey.empty() )
             {
-                setEDBString( DBNAME, CFG_FACEBOOK_SESSION_KEY_K, m_sessionKey );
-                setEDBString( DBNAME, CFG_FACEBOOK_SESSION_SECRET_K, m_sessionSecret );
-                setEDBString( DBNAME, CFG_FACEBOOK_UID_K, m_uid );
+                setConfigString( DBNAME, CFG_FACEBOOK_SESSION_KEY_K, m_sessionKey );
+                setConfigString( DBNAME, CFG_FACEBOOK_SESSION_SECRET_K, m_sessionSecret );
+                setConfigString( DBNAME, CFG_FACEBOOK_UID_K, m_uid );
             
             }
             return m_sessionKey;
@@ -995,14 +998,14 @@ namespace Ferris
         long
         Upload::getMaxDesiredWidthOrHeight()
         {
-            long ret = toint(getEDBString( FDB_GENERAL, "facebook-max-desired-width-or-height", "0" ));
+            long ret = toint(getConfigString( FDB_GENERAL, "facebook-max-desired-width-or-height", "0" ));
             return ret;
         }
 
         void
         Upload::setMaxDesiredWidthOrHeight( long v )
         {
-            setEDBString( FDB_GENERAL, "facebook-max-desired-width-or-height", tostr(v) );
+            setConfigString( FDB_GENERAL, "facebook-max-desired-width-or-height", tostr(v) );
         }
         
         
@@ -1051,7 +1054,7 @@ namespace Ferris
                 cerr << "Using old, non streaming upload because of scaling..." << endl;
                 fh_stringstream ret;
                 ret->getCloseSig().connect(
-                    sigc::bind( sigc::mem_fun(*this, &_Self::OnStreamClosed ), ContentType )); 
+                    boost::bind( &_Self::OnStreamClosed, this, _1, _2, ContentType )); 
                 return ret;
             }
             

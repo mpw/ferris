@@ -696,7 +696,7 @@ namespace Ferris
                     // an ingress filesystem where new files are always created (like copied
                     // from a digital camera to there) and there is never any need to smush.
                     //
-                    static const string smushLeaderRegexString = getEDBString( FDB_GENERAL,
+                    static const string smushLeaderRegexString = getConfigString( FDB_GENERAL,
                                                                                CFG_RDF_GLOBAL_SMUSH_GROUP_LEADER_K,
                                                                                CFG_RDF_GLOBAL_SMUSH_GROUP_LEADER_DEFAULT );
                     if( !smushLeaderRegexString.empty() )

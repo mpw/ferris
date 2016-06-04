@@ -35,10 +35,6 @@
 #include <Configuration_private.hh>
 #include <PluginOutOfProcNotificationEngine.hh>
 
-#include <sigc++/sigc++.h>
-#include <sigc++/slot.h>
-#include <sigc++/bind.h>
-
 #include <errno.h>
 
 #include <map>
@@ -282,8 +278,8 @@ namespace Ferris
             {
                 fh_stringstream ret = real_getIOStream();
                 ret->getCloseSig().connect(
-                    sigc::bind(
-                        sigc::mem_fun( *this, &CommonDBContext::OnStreamClosed ), m )); 
+                    boost::bind( &CommonDBContext::OnStreamClosed,
+                                 this, _1, _2, m )); 
 
                 LG_COMMONDB_D << "priv_getIOStream() url:" << this->getURL()
                               << " tellp:" << ret->tellp()

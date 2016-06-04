@@ -32,9 +32,9 @@
 
 #include <TypeDecl.hh>
 #include <Ferris.hh>
-#include <Functor.h>
-#include <AssocVector.h>
 #include "Ferris/FerrisStdHashMap.hh"
+
+#include <boost/type_index.hpp>
 
 #ifndef _ALREADY_INCLUDED_FERRIS_ATTRIBUTE_H_
 #define _ALREADY_INCLUDED_FERRIS_ATTRIBUTE_H_
@@ -213,16 +213,14 @@ namespace Ferris
         
     public:
 
-        typedef Loki::Functor< fh_istream,
-                               LOKI_TYPELIST_3( Context*,
-                                           const std::string&,
-                                           EA_Atom* ) > GetIStream_Func_t;
+        typedef boost::function<
+            fh_istream ( Context*, const std::string&, EA_Atom* ) > GetIStream_Func_t;
 
         EA_Atom_ReadOnly( GetIStream_Func_t f );
         template <typename PointerToObj, typename PointerToMemFn>
         inline EA_Atom_ReadOnly( const PointerToObj& pObj, PointerToMemFn pMemFn )
             :
-            GetIStream_Func( GetIStream_Func_t( pObj, pMemFn ) )
+            GetIStream_Func( boost::bind( pMemFn, pObj, _1, _2, _3 ) )
             {
             }
 
@@ -256,11 +254,11 @@ namespace Ferris
 
     public:
         
-        typedef Loki::Functor< fh_stringstream&,
-                               LOKI_TYPELIST_4( Context*,
-                                                const std::string&,
-                                                EA_Atom*,
-                                                fh_stringstream& ) > GetIStream_PassedInStream_Func_t;
+        typedef boost::function< fh_stringstream&
+                               ( Context*,
+                                 const std::string&,
+                                 EA_Atom*,
+                                 fh_stringstream& ) > GetIStream_PassedInStream_Func_t;
         
         EA_Atom_ReadOnly_PassedInStream( GetIStream_PassedInStream_Func_t f );
         template <typename PointerToObj, typename PointerToMemFn>
@@ -304,8 +302,8 @@ namespace Ferris
         typedef EA_Atom_ReadWrite_Base _Self;
         
     public:
-        typedef Loki::Functor< void,
-                                 LOKI_TYPELIST_4( Context*,
+        typedef boost::function< void
+                                 ( Context*,
                                              const std::string&,
                                              EA_Atom*,
                                              fh_istream ) > IOStreamClosed_Func_t;
@@ -354,7 +352,6 @@ namespace Ferris
     
     class FERRISEXP_API EA_Atom_ReadWrite
         :
-        public sigc::trackable,
         public EA_Atom_ReadWrite_Base< EA_Atom_ReadOnly >
     {
         typedef EA_Atom_ReadWrite _Self;
@@ -368,8 +365,8 @@ namespace Ferris
         typedef RWBase_t::IOStreamClosed_Func_t IOStreamClosed_Func_t;
         typedef RWBase_t::GetIStream_Func_t GetIStream_Func_t;
 
-        typedef Loki::Functor< fh_iostream,
-                                 LOKI_TYPELIST_3( Context*,
+        typedef boost::function< fh_iostream
+                                 ( Context*,
                                              const std::string&,
                                              EA_Atom* ) > GetIOStream_Func_t;
 
@@ -383,11 +380,11 @@ namespace Ferris
                                   const PointerToObj_o& pObj_o, PointerToMemFn_o pMemFn_o,
                                   const PointerToObj_c& pObj_c, PointerToMemFn_c pMemFn_c )
             :
-            GetIOStream_Func( GetIOStream_Func_t( pObj_o, pMemFn_o ) ),
+            GetIOStream_Func( boost::bind( pMemFn_o, pObj_o, _1, _2, _3 ) ),
 //             RWBase_t( GetIStream_Func_t( pObj_i, pMemFn_i),
 //                       IOStreamClosed_Func_t( pObj_c, pMemFn_c ) )
             RWBase_t( pObj_i, pMemFn_i,
-                      IOStreamClosed_Func_t( pObj_c, pMemFn_c ) )
+                      boost::bind( pMemFn_c, pObj_c, _1, _2, _3, _4 ))
             {
             }
 
@@ -418,7 +415,6 @@ namespace Ferris
     
     class FERRISEXP_API EA_Atom_ReadWrite_PassedInStream
         :
-        public sigc::trackable,
         public EA_Atom_ReadWrite_Base< EA_Atom_ReadOnly_PassedInStream >
     {
         typedef EA_Atom_ReadWrite_PassedInStream _Self;
@@ -427,8 +423,8 @@ namespace Ferris
 
     public:
 
-        typedef Loki::Functor< void,
-                                 LOKI_TYPELIST_4( Context*,
+        typedef boost::function< void
+                                 ( Context*,
                                              const std::string&,
                                              EA_Atom*,
                                              fh_istream ) > IOStreamClosed_Func_t;
@@ -535,8 +531,9 @@ namespace Ferris
             _Base(
                 f_i,
                 f_io,
-                IOStreamClosed_Func_t( this, &_Self::nullclosed ) )
-            {}
+                IOStreamClosed_Func_t( boost::bind( &_Self::nullclosed, this, _1,_2,_3,_4 )))
+            {
+            }
         
         virtual fh_iostream getIOStream( Context* c,
                                          const std::string& rdn,
@@ -622,13 +619,14 @@ namespace Ferris
 
     class FERRISEXP_API AttributeProxy
         :
-        public Attribute,
-        public Handlable
+        public Handlable,
+        public Attribute
     {
         EA_Atom* atom;
-
+      public:
+        typedef unsigned int ref_count_t;
     protected:
-
+        
         enum
         {
             HIGH_RC = 100
@@ -646,7 +644,9 @@ namespace Ferris
     public:
 
         AttributeProxy( fh_context c, EA_Atom* atom, const std::string& aName );
-
+        virtual ~AttributeProxy();
+        void testCLEAN();
+        
         virtual ref_count_t AddRef();
         virtual ref_count_t Release();
 
@@ -737,38 +737,49 @@ namespace Ferris
                                      addToREA,
                                      XSDBasic_t( sct | FXDC_READONLY ) );
             }
+
+            // addAttribute( attr, this,
+            //               &Context::getFerrisLinkTargetAbsoluteStream,
+            //               FXD_URL, false );
+        
         template <typename PointerToObj, typename PointerToMemFn>
         inline bool addAttribute( const std::string& rdn,
                                   const PointerToObj& pObj, PointerToMemFn pMemFn,
                                   XSDBasic_t sct = XSD_UNKNOWN,
                                    bool addToREA = false )
             {
+        // typedef boost::function<
+        //     fh_istream ( Context*, const std::string&, EA_Atom* ) > GetIStream_Func_t;
+                
                 typedef EA_Atom_ReadOnly::GetIStream_Func_t Functor_t;
+                Functor_t f = boost::bind(pMemFn, pObj, boost::arg<1>(), boost::arg<2>(), boost::arg<3>());
+//                EA_Atom_ReadOnly* tmp = new EA_Atom_ReadOnly( f );
+                
                 return setAttribute( rdn,
-                                     new EA_Atom_ReadOnly( Functor_t( pObj, pMemFn )),
+                                     new EA_Atom_ReadOnly( f ),
                                      addToREA,
                                      XSDBasic_t( sct | FXDC_READONLY ) );
             }
-        template
-        <
-            typename T1,
-            template <class> class OP1,
-            class CP1,
-            template <class> class KP1,
-            template <class> class SP1,
-            typename PointerToMemFn_i
-        >
-        inline bool addAttribute( const std::string& rdn,
-                                  Loki::SmartPtr<T1, OP1, CP1, KP1, SP1> pObj_i, PointerToMemFn_i pMemFn_i,
-                                  XSDBasic_t sct = XSD_UNKNOWN,
-                                   bool addToREA = false )
-            {
-                typedef EA_Atom_ReadOnly::GetIStream_Func_t Functor_t;
-                return setAttribute( rdn,
-                                     new EA_Atom_ReadOnly( Functor_t( GetImpl(pObj_i), pMemFn_i )),
-                                     addToREA,
-                                     XSDBasic_t( sct | FXDC_READONLY ) );
-            }
+        // template
+        // <
+        //     typename T1,
+        //     template <class> class OP1,
+        //     class CP1,
+        //     template <class> class KP1,
+        //     template <class> class SP1,
+        //     typename PointerToMemFn_i
+        // >
+        // inline bool addAttribute( const std::string& rdn,
+        //                           Loki::SmartPtr<T1, OP1, CP1, KP1, SP1> pObj_i, PointerToMemFn_i pMemFn_i,
+        //                           XSDBasic_t sct = XSD_UNKNOWN,
+        //                            bool addToREA = false )
+        //     {
+        //         typedef EA_Atom_ReadOnly::GetIStream_Func_t Functor_t;
+        //         return setAttribute( rdn,
+        //                              new EA_Atom_ReadOnly( Functor_t( GetImpl(pObj_i), pMemFn_i )),
+        //                              addToREA,
+        //                              XSDBasic_t( sct | FXDC_READONLY ) );
+        //     }
 
         
         inline bool addAttribute( const std::string& rdn,
@@ -796,12 +807,13 @@ namespace Ferris
                 typedef EA_Atom_ReadOnly::GetIStream_Func_t       Fi;
                 typedef EA_Atom_ReadWrite::GetIOStream_Func_t     Fo;
                 typedef EA_Atom_ReadWrite::IOStreamClosed_Func_t  Fc;
+
+                Fi fi = boost::bind(pMemFn_i, pObj_i, boost::arg<1>(), boost::arg<2>(), boost::arg<3>());
+                Fo fo = boost::bind(pMemFn_o, pObj_o, boost::arg<1>(), boost::arg<2>(), boost::arg<3>());
+                Fc fc = boost::bind(pMemFn_c, pObj_c, boost::arg<1>(), boost::arg<2>(), boost::arg<3>(), boost::arg<4>());
+                
                 return setAttribute( rdn,
-                                     new EA_Atom_ReadWrite(
-                                         Fi( pObj_i, pMemFn_i ),
-                                         Fo( pObj_o, pMemFn_o ),
-                                         Fc( pObj_c, pMemFn_c )
-                                         ),
+                                     new EA_Atom_ReadWrite( fi, fo, fc ),
                                      addToREA,
                                      sct );
             }
@@ -816,41 +828,30 @@ namespace Ferris
         template
         <
             typename T1,
-            template <class> class OP1,
-            class CP1,
-            template <class> class KP1,
-            template <class> class SP1,
             typename T2,
-            template <class> class OP2,
-            class CP2,
-            template <class> class KP2,
-            template <class> class SP2,
             typename T3,
-            template <class> class OP3,
-            class CP3,
-            template <class> class KP3,
-            template <class> class SP3,
             typename PointerToMemFn_i,
             typename PointerToMemFn_o,
             typename PointerToMemFn_c
         >
         inline bool addAttribute(
             const std::string& rdn,
-            Loki::SmartPtr<T1, OP1, CP1, KP1, SP1> pObj_i, PointerToMemFn_i pMemFn_i,
-            Loki::SmartPtr<T2, OP2, CP2, KP2, SP2> pObj_o, PointerToMemFn_o pMemFn_o,
-            Loki::SmartPtr<T3, OP3, CP3, KP3, SP3> pObj_c, PointerToMemFn_c pMemFn_c,
+            boost::intrusive_ptr<T1> pObj_i, PointerToMemFn_i pMemFn_i,
+            boost::intrusive_ptr<T2> pObj_o, PointerToMemFn_o pMemFn_o,
+            boost::intrusive_ptr<T3> pObj_c, PointerToMemFn_c pMemFn_c,
             XSDBasic_t sct = XSD_UNKNOWN,
             bool addToREA = false )
             {
                 typedef EA_Atom_ReadOnly::GetIStream_Func_t       Fi;
                 typedef EA_Atom_ReadWrite::GetIOStream_Func_t     Fo;
                 typedef EA_Atom_ReadWrite::IOStreamClosed_Func_t  Fc;
+
+                Fi fi = boost::bind(pMemFn_i, pObj_i.get(), boost::arg<1>(), boost::arg<2>(), boost::arg<3>());
+                Fo fo = boost::bind(pMemFn_o, pObj_o.get(), boost::arg<1>(), boost::arg<2>(), boost::arg<3>());
+                Fc fc = boost::bind(pMemFn_c, pObj_c.get(), boost::arg<1>(), boost::arg<2>(), boost::arg<3>(), boost::arg<4>());
+                
                 return setAttribute( rdn,
-                                     new EA_Atom_ReadWrite(
-                                         Fi( GetImpl(pObj_i), pMemFn_i ),
-                                         Fo( GetImpl(pObj_o), pMemFn_o ),
-                                         Fc( GetImpl(pObj_c), pMemFn_c )
-                                         ),
+                                     new EA_Atom_ReadWrite( fi, fo, fc ),
                                      addToREA,
                                      sct );
             }
@@ -968,12 +969,12 @@ namespace Ferris
         Attributes_t Attributes;
         Attributes_t& getAttributes();
 
-        typedef std::list< Loki::TypeInfo > TypeInfos_t;
-        Loki::TypeInfo getDeepestTypeInfo();
+        typedef std::list< boost::typeindex::type_index > TypeInfos_t;
+        boost::typeindex::type_index getDeepestTypeInfo();
         TypeInfos_t getTypeInfos();
         virtual void getTypeInfos( TypeInfos_t& l )
             {
-                l.push_back( typeid( _Self ) );
+                l.push_back( boost::typeindex::type_id<_Self>() );
             }
 
         bool getStateLessAttrs_cache_isRAW;

@@ -116,6 +116,7 @@ namespace FerrisUI
         public Handlable
     {
         typedef MenuFromFilesystem _Self;
+        typedef Handlable _Base;
 
         fh_context m_ctx;
         GtkWidget* m_topmenu;
@@ -163,7 +164,7 @@ namespace FerrisUI
         
     public:
 
-        typedef Loki::Functor< void, LOKI_TYPELIST_3( MenuFromFilesystem*, fh_context, GtkMenuItem* ) > Callback_t;
+        typedef boost::function< void ( MenuFromFilesystem*, fh_context, GtkMenuItem* ) > Callback_t;
         
         /**
          * Make a menu filesystem. Set c to the base of the menu tree.

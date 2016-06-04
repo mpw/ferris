@@ -153,16 +153,18 @@ int main( int argc, const char** argv )
         /************************************************************/
 
 
-        typedef Loki::SmartPtr< SyncDelayer, 
-            Loki::RefLinked, 
-            Loki::DisallowConversion, 
-            FerrisLoki::FerrisExSmartPointerChecker, 
-            Loki::DefaultSPStorage >  fh_SyncDelayer;
+        // typedef Loki::SmartPtr< SyncDelayer, 
+        //     Loki::RefLinked, 
+        //     Loki::DisallowConversion, 
+        //     FerrisLoki::FerrisExSmartPointerChecker, 
+        //     Loki::DefaultSPStorage >  fh_SyncDelayer;
+        typedef shared_ptr< SyncDelayer > fh_SyncDelayer;
         
         fh_SyncDelayer syncd = 0;
         if( UseSyncDelayer )
         {
-            syncd = new SyncDelayer();
+            fh_SyncDelayer t( new SyncDelayer());
+            syncd = t;
         }
         
         for( srcs_t::iterator iter = srcs.begin(); iter != srcs.end(); ++iter )

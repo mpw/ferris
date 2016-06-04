@@ -2,13 +2,7 @@ if HAVE_STRIGI
 
 plugindir = $(libdir)/ferris/plugins/eagenerators
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@STRIGI_CFLAGS@	                        \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/eagenerators @STRIGI_CFLAGS@ @CFLAGS@
 
 plugin_LTLIBRARIES = libferrisstrigi.la 
 libferrisstrigi_la_SOURCES = libferrisstrigi.cpp

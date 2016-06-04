@@ -51,8 +51,6 @@ namespace FerrisUI
 {
 
     class FERRISEXP_API ContextPropertiesEditor
-        :
-        public sigc::trackable
     {
         typedef ContextPropertiesEditor _Self;
         

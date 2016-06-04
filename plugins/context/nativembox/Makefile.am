@@ -9,13 +9,7 @@ libnativembox_factory_la_LIBADD  = @LIBFERRIS_PLUGIN_FACTORY_LIBADD@
 libnativembox_factory_la_LDFLAGS = @LIBFERRIS_PLUGIN_LT_LINE@
 libnativembox_la_SOURCES = libnativembox.cpp
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	$(GNOME_INCLUDEDIR)                             \
-	@CFLAGS@
+INCLUDES = $(GNOME_INCLUDEDIR) -I$(top_srcdir)/plugins/context  @CFLAGS@
 
 mbox_SOURCES = mbox.cpp
 mbox_LDADD   = -lpopt @LIBFERRIS_LA@ 

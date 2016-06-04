@@ -150,9 +150,9 @@ namespace FerrisUI
     void
     FerrisRm_SignalHandler::attach()
     {
-        frm->getRemoveVerboseSignal().connect( sigc::mem_fun( *this, &_Self::OnRemoveVerbose ));
-        frm->getSkippingSignal().connect( sigc::mem_fun( *this, &_Self::OnSkipping ));
-        frm->getAskRemoveSignal().connect( sigc::mem_fun( *this, &_Self::OnAskRemove ));
+        frm->getRemoveVerboseSignal().connect( boost::bind( &_Self::OnRemoveVerbose, this, _1, _2, _3 ));
+        frm->getSkippingSignal().connect(      boost::bind( &_Self::OnSkipping, this, _1, _2, _3 ));
+        frm->getAskRemoveSignal().connect(     boost::bind( &_Self::OnAskRemove, this, _1, _2, _3 ));
     }
 
     FerrisRm_SignalHandler::FerrisRm_SignalHandler( GTK_TreeWalkClient* twc, FerrisRm* frm )

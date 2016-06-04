@@ -29,7 +29,9 @@
 ******************************************************************************/
 
 %{
-   #include <config.h>
+    
+#include <config.h>
+    
 %}
 
 
@@ -38,7 +40,9 @@
 
 
 
-%include "loki-smartptr.i"
+%include <intrusive_ptr.i>
+%include <shared_ptr.i>
+ //%include "loki-smartptr.i"
 %include "perlmain.i"
 %include "typemaps.i"
 %include "perl_std_list.i"

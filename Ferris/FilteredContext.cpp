@@ -35,15 +35,13 @@
 using namespace std;
 
 #include <string>
-#include <Singleton.h>
-#include <Factory.h>
-#include <Functor.h>
 #include <SM.hh>
 #include <Resolver_private.hh>
 #include <Ferris_private.hh>
 #include <SignalStreams.hh>
 #include <General.hh>
 #include <FerrisBoost.hh>
+#include <Enamel.hh>
 
 namespace Ferris
 {
@@ -81,12 +79,17 @@ namespace Ferris
                                     const std::string eaname,
                                     std::string& val )
     {
+        // cerr << "getEAStringOrFalse(top)" << endl;
+        // cerr << "getEAStringOrFalse(c)" << (void*)GetImpl(c) << endl;
+        // cerr << "getEAStringOrFalse(cpath)" << c->getDirPath() << endl;
         try
         {
             if( !isBound(c) )
                 return false;
             
             fh_attribute a = c->getAttribute( eaname );
+            // cerr << "getEAStringOrFalse(ea)" << eaname << endl;
+            // cerr << "getEAStringOrFalse(a)" << (void*)GetImpl(a) << endl;
             fh_istream ss  = a->getIStream();
             getline( ss, val );
             return !ss.fail();
@@ -258,7 +261,7 @@ namespace Ferris
             {
             }
 
-        typedef Loki::AssocVector< string, fh_matcher > FunctionTable_t;
+        typedef std::map< string, fh_matcher > FunctionTable_t;
         mutable FunctionTable_t FunctionTable;
         inline FunctionTable_t& getFunctionTable() const
             {
@@ -1029,19 +1032,13 @@ namespace Ferris
 
 
 
-//     typedef Loki::SingletonHolder<
-//         Loki::Factory<
-//         FilteredContextNameSpace::BinaryOperationBase,
-//         string,
-//         FilteredContextNameSpace::BinaryOperationBase* (*)()
-//         >
-//     >
-//     OpFactory;
-    typedef Loki::SingletonHolder<
-        Loki::Factory< FilteredContextNameSpace::BinaryOperationBase, string >,
-        Loki::CreateUsingNew, Loki::NoDestroy >
-        OpFactory;
-
+    // typedef Loki::SingletonHolder<
+    //     Loki::Factory< FilteredContextNameSpace::BinaryOperationBase, string >,
+    //     Loki::CreateUsingNew, Loki::NoDestroy >
+    //     OpFactory;
+    typedef boost::function< FilteredContextNameSpace::BinaryOperationBase*() > OpFactory_base;
+    typedef ::Ferris::FerrisSingletonAlways<
+        std::map< string, OpFactory_base > > OpFactory;
 
     namespace FilteredContextNameSpace
     {
@@ -1269,7 +1266,7 @@ FerrisException_CodeState( __FILE__ ,  __LINE__ , __PRETTY_FUNCTION__ ), \
                 :
                 L(0), R(0)
                 {
-                    OpFactory::Instance().Register( TypeID, &MakeObject<TypeClass>::Create );
+                    OpFactory::instance()[ TypeID ] = boost::factory<TypeClass*>();
                 }
     
 
@@ -1709,7 +1706,7 @@ FerrisException_CodeState( __FILE__ ,  __LINE__ , __PRETTY_FUNCTION__ ), \
         LG_FILTERPARSE_D << " token:" << token << endl;
     
         FilteredContextNameSpace::BinaryOperationBase* bo =
-            OpFactory::Instance().CreateObject( token );
+            OpFactory::instance()[ token ]();
 
         LG_FILTERPARSE_D << " filter:" << filter->getDirPath() << endl;
 //         filter->dumpAttributeNames();
@@ -2077,7 +2074,7 @@ FerrisException_CodeState( __FILE__ ,  __LINE__ , __PRETTY_FUNCTION__ ), \
     void
     FilteredContext::OnDeleted( NamingEvent_Deleted* ev, string olddn, string newdn )
     {
-        Emit_Deleted( ev, newdn, olddn, 0 );
+        Emit_Deleted( ev, newdn, olddn );
         Remove( ev->getSource()->getSubContext( olddn ) );
     }
 

@@ -7,13 +7,7 @@ libipc_factory_la_LIBADD  = @LIBFERRIS_PLUGIN_FACTORY_LIBADD@
 libipc_factory_la_LDFLAGS = @LIBFERRIS_PLUGIN_LT_LINE@
 libipc_la_SOURCES         = libipc.cpp
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@IPC_CONTEXT_CFLAGS@                            \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/context @IPC_CONTEXT_CFLAGS@ @CFLAGS@
 
 libipc_la_LDFLAGS =                                     \
 	@GLIB_LIBS@                                     \

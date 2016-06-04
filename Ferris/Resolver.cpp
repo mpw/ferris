@@ -166,6 +166,7 @@ namespace Ferris
 
                     implname.replace( implname.find(ending), ending.length(), LIBRARY_EXTENSION() );
                     LG_PLUGIN_I << "Linking in implementaion of:" << implname << endl;
+//                    cerr << "Linking in implementaion of:" << implname << endl;
 
                     ghandle = g_module_open ( implname.c_str(), G_MODULE_BIND_LAZY);
                     if (!ghandle)
@@ -454,7 +455,7 @@ namespace Ferris
 //                  <<  " ref_count:" << obj->ref_count
 //                  << endl;
 
-            obj->ref_count = ImplementationDetail::MAX_REF_COUNT;
+            obj->setRefCounterToHigh();
 
 //             cerr << "Adding2 to RootContextCache ContextClassName:" << ContextClassName
 //                  << " ctx:" << GetImpl(obj)
@@ -1166,7 +1167,7 @@ namespace Ferris
         string SystemPluginDir = makeFerrisPluginPath( "context" );
 
         // FIXME:
-//    LG_PLUGIN_D << "ensureGModuleFactoriesLoaded()" << endl;
+        LG_PLUGIN_D << "ensureGModuleFactoriesLoaded() virgin:" << virgin << endl;
 
         if( virgin )
         {
@@ -1180,6 +1181,7 @@ namespace Ferris
             if ((d = opendir ( SystemPluginDir.c_str() )) == NULL)
             {
                 LG_PLUGIN_ER << "Can not open system plugin dir :" << SystemPluginDir << endl;
+                cerr << "Can not open system plugin dir :" << SystemPluginDir << endl;
                 return;
             }
             while ((e = readdir (d)) != NULL)
@@ -1189,6 +1191,8 @@ namespace Ferris
             }
             closedir (d);
 
+            LG_PLUGIN_D << "ensureGModuleFactoriesLoaded() found: " << pluginlist.size()
+                        << " at dir:" << SystemPluginDir << endl; 
 
             for( stringlist_t::iterator pi = pluginlist.begin();
                  pi != pluginlist.end(); ++pi )
@@ -1308,6 +1312,53 @@ namespace Ferris
         return ret;
     }
 
+    inline bool getEAStringOrFalseX( const fh_context& c,
+                                    const std::string eaname,
+                                    std::string& val )
+    {
+        cerr << "getEAStringOrFalseX(top)" << endl;
+        cerr << "getEAStringOrFalse(c)" << (void*)GetImpl(c) << endl;
+        cerr << "getEAStringOrFalse(cpath)" << c->getDirPath() << endl;
+        try
+        {
+//            if( !isBound(c) )
+//                return false;
+            
+            fh_attribute a = c->getAttribute( eaname );
+            // cerr << "getEAStringOrFalse(ea)" << eaname << endl;
+            // cerr << "getEAStringOrFalse(a)" << (void*)GetImpl(a) << endl;
+            // fh_istream ss  = a->getIStream();
+            // getline( ss, val );
+            // return !ss.fail();
+        }
+        catch(...)
+        {
+        }
+        return false;
+    }
+    
+    struct FERRISEXP_DLLLOCAL matcher_endswithX
+    {
+        std::string eaname;
+        std::string value;
+
+        matcher_endswithX( const std::string& eaname,
+                          const std::string& value )
+            :
+            eaname( eaname ),
+            value( value )
+            {}
+
+        bool operator()( fh_context c )
+            {
+                string s;
+                fh_attribute a = c->getAttribute( eaname );
+//                return getEAStringOrFalseX( c, eaname, s );
+//                    && ends_with( s, value );
+                return false;
+            }
+    };
+    
     /**
      * Core of findOverMounter which was abstracted to a private method so that
      * the main public findOverMounter() method can choose which ordering to
@@ -1342,12 +1393,36 @@ namespace Ferris
                 return 0;
             }
         }
+
+//         cerr << "RootContextFactory::TryDropper(AAA)" << endl;
+//         {
+//             // fh_matcher mm = Factory::MakeEndsWithMatcher("name","sqlite");
+//             // mm( ctx );
+
+// //            matcher_endswithX mm("name","sqlite");
+// //            mm( ctx );
+
+//             cerr << "TEST1(c)" << (void*)GetImpl(ctx) << endl;
+//             cerr << "TEST2(cpath)" << ctx->getDirPath() << endl;
+//             cerr << "TEST2(cname)" << ctx->getDirName() << endl;
+//             cerr << "TEST2(crc1)" << ctx->getReferenceCount() << endl;
+//             fh_attribute a = ctx->getAttribute( "name" );
+//             cerr << "TEST2(crc2)" << ctx->getReferenceCount() << endl;
+//             cerr << "TEST2(   a)" << a->getReferenceCount() << endl;
+//             cerr << "TEST2(   a)" << GetImpl(a) << endl;
+//             a->testCLEAN();
+//             cerr << "TEST3(   a)" << a->getReferenceCount() << endl;
+//             a->Release();
+//             cerr << "TEST4()" << endl;
+//         }
+//         cerr << "RootContextFactory::TryDropper(BBB)" << endl;
+        
         
         fh_ommatchers m = dropper->GetOverMountMatchers( this );
 
-//         cerr << "RootContextFactory::TryDropper() name:" << dropperName
-//              << " number of matchers:" << m.size()
-//              << endl;
+         // cerr << "RootContextFactory::TryDropper() name:" << dropperName
+         //      << " number of matchers:" << m.size()
+         //      << endl;
         
         for( fh_ommatchers::iterator mat_iter = m.begin();
              mat_iter != m.end(); mat_iter++ )
@@ -2349,142 +2424,6 @@ namespace Ferris
     }
 
 
-//     namespace Factory
-//     {
-
-//         fh_context Resolve( ConfigLocation cl, std::string extrapath )
-//         {
-//             fh_stringstream ss;
-//             switch( cl )
-//             {
-//             case CONFIGLOC_EVENTBIND:
-//                 ss << "~/.ferris/eventbind" << extrapath;
-//                 break;
-            
-//             case CONFIGLOC_MIMEBIND:
-//                 ss << "~/.ferris/mimebind" << extrapath;
-//                 break;
-            
-//             case CONFIGLOC_APPS:
-//                 ss << "~/.ferris/apps" << extrapath;
-//                 break;
-            
-//             case CONFIGLOC_ICONS:
-//                 ss << "~/.ferris/icons" << extrapath;
-//                 break;
-//             }
-
-//             if( tostr(ss).length() )
-//             {
-//                 return ::Ferris::Resolve( tostr(ss) );
-//             }
-        
-//             ss << "Unknown config location:" << (int)cl << endl;
-//             Throw_UnknownConfigLocation( tostr(ss), 0 );
-//         }
-    
-//         fh_context ResolveMime( std::string majort, std::string minort )
-//         {
-//             fh_stringstream ss;
-//             ss << "/" << majort << "/" << minort;
-//             return Resolve( CONFIGLOC_MIMEBIND, tostr(ss) );
-//         }
-
-//         fh_context ResolveIcon( std::string s )
-//         {
-//             fh_stringstream ss;
-//             ss << "/" << s;
-//             return Resolve( CONFIGLOC_ICONS, tostr(ss) );
-//         }
-    
-    
-//     };
-
-
-
-
-
-// fh_context Resolve( const std::string& module,
-//                     const std::string& root,
-//                     const std::string& path )
-// {
-//     return RootContextFactory( module, root, path ).resolveContext();
-// }
-
-// static fh_context getDotFerris()
-// {
-//     fh_stringstream rss;
-//     rss << Shell::getHomeDirPath_nochecks() << "/.ferris";
-//     cerr << "getDotFerris() rss:" << tostr(rss) << endl;
-//     return Resolve( "Native", "/", tostr(rss) );
-// }
-
-// static void unlinkDotFerrisFile( const std::string& s )
-// {
-//     fh_stringstream rss;
-//     rss << Shell::getHomeDirPath_nochecks() << "/.ferris/" << s;
-//     cerr << "unlink() :" << tostr(rss) << endl;
-//     unlink( tostr(rss).c_str() );
-// }
-
-// const string MEDALLION_TEMP_NAME = "medallion_temp.xml";
-
-// fh_context fromMedallion( std::string medstr )
-// {
-//     fh_context dfc = getDotFerris();
-
-//     LG_FACTORY_D << "fromMedallion(string) medstr:" << medstr << endl;
-//     LG_FACTORY_D << "dfc path:" << dfc->getDirPath() << endl;
-    
-//     fh_mdcontext md = new f_mdcontext();
-//     md->setAttr( "CreateObjectType", "File" );
-//     unlinkDotFerrisFile( MEDALLION_TEMP_NAME );
-//     fh_context medc = dfc->createSubContext( MEDALLION_TEMP_NAME, md );
-
-//     LG_FACTORY_D << "medc path:" << medc->getDirPath() << endl;
-    
-//     {
-//         fh_iostream tcss = medc->getIOStream();
-//         tcss << medstr;
-//     }
-
-//     return fromMedallion( medc );
-// }
-
-// fh_context fromMedallion( fh_context c )
-// {
-//     LG_FACTORY_D << "fromMedallion(c) c.path:" << c->getDirPath() << endl;
-
-//     string s;
-
-//     while( c->getDirName() != "medallion" )
-//     {
-//         c = c->getSubContext( "medallion" );
-//     }
-    
-
-//     string rccName = getStrAttr( c, "medrootcontext", "");
-//     string root    = getStrAttr( c, "medroot", "");
-//     string path    = getStrAttr( c, "medpath", "");
-    
-//     LG_FACTORY_D << "rootcontext:" << rccName << endl;
-//     LG_FACTORY_D << "       root:" << root << endl;
-//     LG_FACTORY_D << "       path:" << path << endl;
-//     sleep(3);
-
-//     return Resolve( rccName, root, path );
-    
-                                   
-// //     string s;
-// //     fh_istream iss = c->getIStream();
-// //     fh_stringstream ss;
-
-// //     std::copy( std::istreambuf_iterator<char>(iss),
-// //                std::istreambuf_iterator<char>(),
-// //                std::ostreambuf_iterator<char>(ss));
-
-// //     return fromMedallion( tostr(ss) );
-// }
 
 
 /*******************************************************************************/
@@ -2648,7 +2587,7 @@ namespace Ferris
         // see if the user has settings to not expand this URL
         if( !DisableExpansion )
         {
-            if( isTrue( getEDBString( FDB_GENERAL,
+            if( isTrue( getConfigString( FDB_GENERAL,
                                       CFG_GLOB_SKIP_FILE_URLS_K,
                                       CFG_GLOB_SKIP_FILE_URLS_DEFAULT )))
             {
@@ -2677,7 +2616,7 @@ namespace Ferris
                 sl_v = false;
                 stringlist_t sl;
                 
-                string d = getEDBString( FDB_GENERAL,
+                string d = getConfigString( FDB_GENERAL,
                                          CFG_GLOB_SKIP_REGEX_LIST_K,
                                          CFG_GLOB_SKIP_REGEX_LIST_DEFAULT );
                 LG_GLOB_D << "expandShellGlobs() disable regex:" << d << endl;

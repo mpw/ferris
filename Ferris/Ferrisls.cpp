@@ -749,7 +749,8 @@ namespace Ferris
         typedef Ferrisls_display _Self;
     
         SigCol[c].ExistsConnection
-            = c->getNamingEvent_Exists_Sig() .connect(sigc::mem_fun( *this, &_Self::OnExists ));
+            = c->getNamingEvent_Exists_Sig().connect(boost::bind( &_Self::OnExists, this,
+                                                         boost::arg<1>(),boost::arg<2>(),boost::arg<3>(),boost::arg<4>()));
 
 //     cerr << "Ferrisls_display::AttachSignals() MonitorCreate:" << MonitorCreate
 //          << " this:" << (void*)this
@@ -759,18 +760,24 @@ namespace Ferris
         if( MonitorCreate )
         {
             SigCol[c].CreatedConnection
-                = c->getNamingEvent_Created_Sig().connect(sigc::mem_fun( *this, &_Self::OnCreated ));
+                = c->getNamingEvent_Created_Sig().connect(
+                    boost::bind( &_Self::OnCreated, this,
+                                 boost::arg<1>(),boost::arg<2>(),boost::arg<3>(),boost::arg<4>()));
         }
         if( MonitorDelete )
         {
             SigCol[c].DeletedConnection
-                = c->getNamingEvent_Deleted_Sig().connect(sigc::mem_fun( *this, &_Self::OnDeleted ));
+                = c->getNamingEvent_Deleted_Sig().connect(
+                    boost::bind( &_Self::OnDeleted, this,
+                                 boost::arg<1>(),boost::arg<2>(),boost::arg<3>()));
         }
         if( MonitorChanged )
         {
 //            cerr << "Connecting changed handler. url:" << c->getURL() << endl;
             SigCol[c].ChangedConnection
-                = c->getNamingEvent_Changed_Sig().connect(sigc::mem_fun( *this, &_Self::OnChanged ));
+                = c->getNamingEvent_Changed_Sig().connect(
+                    boost::bind( &_Self::OnChanged, this,
+                                 boost::arg<1>(),boost::arg<2>(),boost::arg<3>()));
         }
     }
 
@@ -1906,11 +1913,11 @@ Ferrisls::Ferrisls()
             {
                 if( Display->ShouldEnterContext( rctx ) )
                 {
-                    getEnteringContext_Sig().emit( *this, rctx );
+                    getEnteringContext_Sig()( *this, rctx );
                     Display->EnteringContext( rctx );
                     Display->ShowAttributes( rctx );
                     Display->LeavingContext( rctx );
-                    getLeavingContext_Sig().emit( *this, rctx );
+                    getLeavingContext_Sig()( *this, rctx );
                 }
             }
             else
@@ -1920,19 +1927,20 @@ Ferrisls::Ferrisls()
                 if( !Display->ShouldEnterContext( rctx ) )
                     return;
                 
-                getDiskReadStarted_Sig().emit( *this, rctx );
+                getDiskReadStarted_Sig()( *this, rctx );
                 OnExistsDiskReadContextsProcessed = 0;
-                sigc::connection DiskReadConnection =
+                boost::signals2::connection DiskReadConnection =
                     rctx->getNamingEvent_Exists_Sig().connect(
-                        sigc::mem_fun( *this, &_Self::OnExistsDiskRead ));
+                        boost::bind( &_Self::OnExistsDiskRead, this,
+                                     boost::arg<1>(),boost::arg<2>(),boost::arg<3>(),boost::arg<4>()));
                 LG_CTXREC_D << "Ferrisls::operator()...calling read()" << endl;
                 rctx->read();
                 DiskReadConnection.disconnect();
-                getDiskReadDone_Sig().emit( *this, rctx );
+                getDiskReadDone_Sig()( *this, rctx );
 
                 /* We should only fire this when we know
                  * we are able to read the context */
-                getEnteringContext_Sig().emit( *this, rctx );
+                getEnteringContext_Sig()( *this, rctx );
                 Display->EnteringContext( rctx );
                 fh_context original_rtx = rctx;
                 
@@ -1952,7 +1960,7 @@ Ferrisls::Ferrisls()
                      * We have to read the base context before we drop our handle
                      * to it
                      */
-                    getFilterStarted_Sig().emit( *this );
+                    getFilterStarted_Sig()( *this );
                     rctx->read();
                     rctx = fc;
                 }
@@ -1966,7 +1974,7 @@ Ferrisls::Ferrisls()
                     
                     rctx->read();
                     fh_sorter sorter = Factory::MakeSorter( SortString );
-                    getSortStarted_Sig().emit( *this );
+                    getSortStarted_Sig()( *this );
                     fh_context sc    = Factory::MakeSortedContext( rctx, sorter );
 
 //                         if( DEBUG )
@@ -1986,7 +1994,7 @@ Ferrisls::Ferrisls()
                     
 
                 Display->AttachSignals( rctx );
-                getContextPropergationStarted_Sig().emit( *this, rctx );
+                getContextPropergationStarted_Sig()( *this, rctx );
 
 //                 cerr << "Ferrisls.cpp dumping out contexts.:" << endl;
 //                 rctx->dumpOutItems();
@@ -2001,7 +2009,7 @@ Ferrisls::Ferrisls()
                     MaybeRecurse( original_rtx );
                 }
                 Display->LeavingContext( rctx );
-                getLeavingContext_Sig().emit( *this, rctx );
+                getLeavingContext_Sig()( *this, rctx );
             }
         }
         catch( FerrisNotReadableAsContext& e )
@@ -2091,7 +2099,7 @@ Ferrisls::Ferrisls()
 
         if( (OnExistsDiskReadContextsProcessed % 20) == 0 )
         {
-            getDiskReadProgress_Sig().emit( *this, c, OnExistsDiskReadContextsProcessed );
+            getDiskReadProgress_Sig()( *this, c, OnExistsDiskReadContextsProcessed );
 //         cerr << "Ferrisls::OnExistsDiskRead() context:" << subc->getDirPath() << endl;
 //         cerr << "Ferrisls::OnExistsDiskRead() n:"<< OnExistsDiskReadContextsProcessed << endl;
         }

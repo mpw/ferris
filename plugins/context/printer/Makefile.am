@@ -9,14 +9,7 @@ mocimpls.cpp: $(MOC_DEP_SRCS)
 
 plugindir = $(libdir)/ferris/plugins/context
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	-I/usr/local/lib                                \
-	@QPRINTER_CFLAGS@                                  \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/context @QPRINTER_CFLAGS@ @CFLAGS@
 
 plugin_LTLIBRARIES = libferrisprinter.la libferrisprinter_factory.la
 

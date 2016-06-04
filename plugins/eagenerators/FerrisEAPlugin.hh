@@ -36,11 +36,6 @@
 #include <Attribute.hh>
 #include <Attribute_private.hh>
 #include <SignalStreams.hh>
-#include <sigc++/sigc++.h>
-#ifdef SIGC_CXX_NAMESPACES
-using namespace SigC;
-#endif
-#define SIGCXX_SIGNAL_SYSTEM_H 1
 
 #include <fstream>
 #include <Ferris_private.hh>

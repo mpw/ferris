@@ -5,14 +5,7 @@ plugin_LTLIBRARIES = libftxidxodbc.la libftxidxodbc_factory.la
 libftxidxodbc_la_SOURCES = libftxidxodbc.cpp ODBCIndexHelper_private.hh
 libftxidxodbc_factory_la_SOURCES = libftxidxodbc_factory.cpp
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I..                                            \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	-I/usr/local/lib                                \
-	@DTL_CFLAGS@                                    \
-	@CFLAGS@
+INCLUDES = @DTL_CFLAGS@ @CFLAGS@
 
 libftxidxodbc_la_LDFLAGS = @GLIB_LIBS@    \
 	@DTL_LIBS@                        \

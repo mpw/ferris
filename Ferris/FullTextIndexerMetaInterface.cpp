@@ -47,7 +47,7 @@ namespace Ferris
     {
         using namespace ::STLdb4;
         static const string DB_FULLTEXT  = "full-text-index-config.db";
-        static const string FULLTEXTROOT = "~/.ferris/full-text-index";
+        static const string FULLTEXTROOT = getDotFerrisPath() + "full-text-index";
         static const char* CFG_IDX_DBNAME_K = "cfg-idx-dbname";
         
         class FERRISEXP_DLLLOCAL MetaFullTextIndexerInterfacePriv
@@ -558,8 +558,7 @@ namespace Ferris
                                                          true, true );
                 
                 ensureFulltextIndexPluginFactoriesAreLoaded();
-                fh_idx idx = MetaFullTextIndexerInterfaceFactory::Instance().
-                    CreateObject( index_classname );
+                fh_idx idx = MetaFullTextIndexerInterfaceFactory::instance()[index_classname]();
                 idx->private_initialize( basepath );
                 idx->LocalCommonConstruction();
                 idx->CommonConstruction();
@@ -613,25 +612,34 @@ namespace Ferris
                     }
                 }
             }
+
+            cerr << ".......................1" << endl;
             
             ensureFulltextIndexPluginFactoriesAreLoaded();
-            fh_idx idx = MetaFullTextIndexerInterfaceFactory::Instance().
-                CreateObject( index_classname );
+            fh_idx idx = MetaFullTextIndexerInterfaceFactory::instance()[index_classname]();
             idx->P->m_base = c;
+            cerr << ".......................2" << endl;
             idx->CreateIndexBeforeConfig( c, caseSensitive, dropStopWords, stemMode,
                                           lex_class, md );
+            cerr << ".......................3" << endl;
             
             idx->P->ensureConfigFileCreated();
+            cerr << ".......................31" << endl;
             idx->setConfig( IDXMGR_INDEX_CLASS_K,         index_classname );
+            cerr << ".......................32" << endl;
             idx->setConfig( IDXMGR_CASESEN_CLASS_K,       tostr(caseSensitive));
             idx->setConfig( IDXMGR_DROPSTOPWORDS_CLASS_K, tostr(dropStopWords));
             idx->setConfig( IDXMGR_STEMMER_CLASS_K,       tostr(stemMode));
             
+            cerr << ".......................34" << endl;
             idx->CreateIndex( c, caseSensitive, dropStopWords, stemMode,
                               lex_class, md );
+            cerr << ".......................35" << endl;
 
             idx->LocalCommonConstruction();
+            cerr << ".......................36" << endl;
             idx->CommonConstruction();
+            cerr << ".......................37" << endl;
             return idx;
         }
         
@@ -659,8 +667,7 @@ namespace Ferris
             std::string libname = AUTOTOOLS_CONFIG_LIBDIR + "/ferris/plugins/fulltextindexers/"
                 + implnameraw;
 
-            typedef ::Loki::Functor< MetaFullTextIndexerInterface*,
-                ::Loki::NullType > CreateFunc_t;
+            typedef boost::function< MetaFullTextIndexerInterface* () > CreateFunc_t;
             MetaFullTextIndexerInterface* (*CreateFuncPtr)();
                 
             typedef map< std::string, CreateFunc_t > cache_t;

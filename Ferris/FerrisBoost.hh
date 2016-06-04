@@ -33,7 +33,8 @@
 #include <boost/regex.hpp>
 #include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/lambda/lambda.hpp>
-using namespace boost::lambda;
+namespace bl = boost::lambda;
+//using namespace boost::lambda;
 
 #include <Ferris/TypeDecl.hh>
 #include <string>

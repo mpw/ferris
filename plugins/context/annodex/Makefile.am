@@ -8,14 +8,7 @@ libferrisannodex_factory_la_LIBADD  = @LIBFERRIS_PLUGIN_FACTORY_LIBADD@
 libferrisannodex_factory_la_LDFLAGS = @LIBFERRIS_PLUGIN_LT_LINE@
 libferrisannodex_la_SOURCES         = libferrisannodex.cpp 
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@ANNODEX_CFLAGS@                                \
-	@CMML_CFLAGS@                                   \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/context @ANNODEX_CFLAGS@ @CMML_CFLAGS@ @CFLAGS@
 
 libferrisannodex_la_LDFLAGS =                           \
 	@ANNODEX_LIBS@                                  \

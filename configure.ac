@@ -1,8 +1,11 @@
 PACKAGE=libferris
 AC_INIT(libferris, 2.0.0)
-LIBFERRIS_MAJOR=`echo $VERSION | sed 's/^\([[0-9]]\)*\..*/\1/g'`
-LIBFERRIS_MINOR=$(echo $VERSION | sed 's/^[[0-9]]*\.\([[0-9]]\)*\..*/\1/g')
-LIBFERRIS_BETA=$(echo $VERSION | sed 's/^[[0-9]]*\.[[0-9]]*\.\([[0-9]]*\).*/\1/g')
+LIBFERRIS_MAJOR=2
+LIBFERRIS_MINOR=0
+LIBFERRIS_BETA=0
+dnl LIBFERRIS_MAJOR=`echo $VERSION | sed 's/^\([[0-9]]\)*\..*/\1/g'`
+dnl LIBFERRIS_MINOR=$(echo $VERSION | sed 's/^[[0-9]]*\.\([[0-9]]\)*\..*/\1/g')
+dnl LIBFERRIS_BETA=$(echo $VERSION | sed 's/^[[0-9]]*\.[[0-9]]*\.\([[0-9]]*\).*/\1/g')
 FERRIS_VERSION=$LIBFERRIS_MAJOR.$LIBFERRIS_MINOR.$LIBFERRIS_BETA
 LIBFERRIS_FULLV=$FERRIS_VERSION
 
@@ -167,16 +170,6 @@ fi
 
 
 
-AC_ARG_ENABLE(stlport-stlport-nocustomio,
-  [AS_HELP_STRING([--enable-stlport-nocustomio], [compile with _STLP_NO_CUSTOM_IO where you can (default=yes)])],
-[],[enable_stlport_nocustomio=yes])
-
-if test x$enable_stlport_nocustomio = xyes; then
-	echo setting _STLP_NO_CUSTOM_IO to on...
-	FERRIS_CF=" $FERRIS_CF -D_STLP_NO_CUSTOM_IO "; 
-else
-	echo not using _STLP_NO_CUSTOM_IO...
-fi
 
 
 
@@ -249,14 +242,6 @@ dnl  	AC_DEFINE(HAVE_FCA)
 dnl  	AC_DEFINE(BUILD_FCA)
 dnl fi
 
-
-###############################################################################
-###############################################################################
-###############################################################################
-# Test for stlport 4.5
-###############################################################################
-
-AM_FERRIS_STLPORT_OPTIONAL( 4.5.0 )
 
 
 ###############################################################################
@@ -894,18 +879,8 @@ AC_DEFINE_UNQUOTED(MIMETYPE_DIRECTORY, "$MIMETYPE_DIRECTORY", [] )
 ###############################################################################
 ###############################################################################
 
-AM_FERRIS_LOKI( 2.2.0 )
 AM_FERRIS_STREAMS( 0.4.0 )
-AM_FERRIS_SIGC2( 2.0.0 )
 
-###############################################################################
-###############################################################################
-###############################################################################
-# Check if we should add Signal6<> templates because the current 
-# sigc++ 1.2 doesn't have it
-###############################################################################
-
-AC_DEFINE(SIGCXX_HAS_LESS_THAN_FIVE_SIGNAL_ARGS_AS_MAX,1, [] )
 
 ###############################################################################
 ###############################################################################
@@ -1041,9 +1016,9 @@ if test x$enable_xapian != xno; then
 	AC_PATH_GENERIC( XAPIAN, "0.8.3", [ have_xapianinit=yes ], [have_xapianinit=no] )
 
 	CXXFLAGS_cache=$CXXFLAGS
-	CXXFLAGS=" $STLPORT_CFLAGS $CXXFLAGS $XAPIAN_CFLAGS $XAPIAN_CXXFLAGS "
+	CXXFLAGS="  $CXXFLAGS $XAPIAN_CFLAGS $XAPIAN_CXXFLAGS "
 	LDFLAGS_cache=$LDFLAGS
-	LDFLAGS=" $STLPORT_LIBS $LDFLAGS $XAPIAN_LIBS "
+	LDFLAGS="  $LDFLAGS $XAPIAN_LIBS "
 
 	AC_TRY_LINK([
 		#include <xapian.h>
@@ -2981,6 +2956,40 @@ AM_CONDITIONAL(HAVE_GTK2, test "$have_gtk2" = yes)
 have_gimp=no
 AM_CONDITIONAL(HAVE_GIMP, test "$have_gimp" = yes)
 
+###############################################################################
+###############################################################################
+###############################################################################
+# Test for libglade
+###############################################################################
+
+package=libglade-2.0
+version=2.0.1
+PKG_CHECK_MODULES(GLADE, $package >= $version,
+[
+  have_glade=yes;
+  AC_DEFINE([HAVE_GLADE], [], [Used by some of the graphical tools to generate the UI at run time])
+
+],
+[
+  have_glade=no
+  echo "latest version of $package not found, only building console clients. "
+])
+AM_CONDITIONAL(HAVE_GLADE, test x"$have_glade" = xyes)
+AC_SUBST(GLADE_CFLAGS)
+AC_SUBST(GLADE_LIBS)
+
+
+have_xalan_glade=no
+if test x${have_xalan} = xyes; then
+  if test x${have_glade} = xyes; then
+    have_xalan_glade=yes
+  fi
+fi
+AM_CONDITIONAL(HAVE_XALAN_GLADE, test x"$have_xalan_glade" = xyes)
+
+
+###############################################################################
+
 dnl Checks for header files.
 dnl AC_CHECK_HEADERS(fam.hh famstatic.h,,AC_MSG_ERROR([ERROR: fam++ must be installed.]); exit)
 
@@ -3596,8 +3605,8 @@ AC_ARG_ENABLE(lucene,
 
 if test x$enable_gcj != xno; then
 
-	CXXFLAGS=" $CXXFLAGS $STLPORT_CFLAGS $STLPORT_IO64_CFLAGS "
-	LDFLAGS=" $LDFLAGS $STLPORT_LIBS -lgcj "
+	CXXFLAGS=" $CXXFLAGS  $STLPORT_IO64_CFLAGS "
+	LDFLAGS=" $LDFLAGS  -lgcj "
 
 	AC_TRY_LINK([
 		#include <gcj/cni.h>
@@ -3733,8 +3742,8 @@ if test x$enable_evolution != xno; then
 EVOLUTION_CFLAGS=" `pkg-config libebook-1.2 camel-1.2 camel-provider-1.2 evolution-data-server-1.2 --cflags ` "
 EVOLUTION_LIBS="   `pkg-config libebook-1.2 camel-1.2 camel-provider-1.2 evolution-data-server-1.2 --libs `  "
 
-CXXFLAGS=" $CXXFLAGS $STLPORT_CFLAGS $STLPORT_IO64_CFLAGS $EVOLUTION_CFLAGS "
-LDFLAGS=" $LDFLAGS $STLPORT_LIBS $EVOLUTION_LIBS "
+CXXFLAGS=" $CXXFLAGS  $STLPORT_IO64_CFLAGS $EVOLUTION_CFLAGS "
+LDFLAGS=" $LDFLAGS  $EVOLUTION_LIBS "
 
 EVOLUTION_BUG__EXTRA_HEADERS_TO_PREINCLUDE=
  
@@ -4734,12 +4743,13 @@ AC_DEFINE_UNQUOTED(FERRIS_CREATION_PLUGIN_DIR, std::string("$FERRIS_CREATION_PLU
 
 dnl SMALLOBJCXXFLAGS="-DMAX_SMALL_OBJECT_SIZE=64 -DDEFAULT_CHUNK_SIZE=4096"
 # this fails to compile! -DLOKI_MAX_SMALL_OBJECT_SIZE=0
+INCLUDEPATHS="-I$(top_builddir)/lib -I$(top_srcdir)/lib -I. -I$(srcdir) -I$(top_srcdir) -I$(top_srcdir)/src -I$(top_builddir) -I$(includedir) -I/usr/local/include "
 SMALLOBJCXXFLAGS="-DMAX_SMALL_OBJECT_SIZE=0 -DDEFAULT_CHUNK_SIZE=4096"
 FERRIS_CF=" $FERRIS_CF -I${absolute_srcdir} -I${absolute_srcdir}/Ferris $XML4C_CFLAGS $XALAN_CFLAGS "
-CFLAGS=" $KDE4_LINK_CFLAGS_PREFIX $STLPORT_CFLAGS $SIGC_CFLAGS $LOKI_CFLAGS $CFLAGS -I/usr/include/xfs $FERRIS_CF $STLDB4_CFLAGS $SMALLOBJCXXFLAGS "
-CXXFLAGS=" $KDE4_LINK_CFLAGS_PREFIX $STLPORT_CFLAGS $SIGC_CFLAGS $SMALLOBJCXXFLAGS $LOKI_CFLAGS $CXXFLAGS -I/usr/include/xfs $FERRIS_CF $GLIB_CFLAGS $OPENSSL_CFLAGS $STLDB4_CFLAGS  $QT_CFLAGS $QTNETWORK_CFLAGS  -std=c++11 "
-dnl LDFLAGS=" $LDFLAGS $STLPORT_LDFLAGS $SIGC_LDFLAGS $XML4C_LIBS $XALAN_LIBS $QT_LIBS $QTNETWORK_LIBS " 
-LDFLAGS_APP=" $LDFLAGS $STLPORT_LDFLAGS $SIGC_LDFLAGS $XML4C_LIBS $XALAN_LIBS $QT_LIBS $QTNETWORK_LIBS " 
+CFLAGS=" $KDE4_LINK_CFLAGS_PREFIX $CFLAGS -I/usr/include/xfs $FERRIS_CF $STLDB4_CFLAGS $SMALLOBJCXXFLAGS $INCLUDEPATHS "
+CXXFLAGS=" $KDE4_LINK_CFLAGS_PREFIX $CXXFLAGS -I/usr/include/xfs $FERRIS_CF $GLIB_CFLAGS $OPENSSL_CFLAGS $STLDB4_CFLAGS  $QT_CFLAGS $QTNETWORK_CFLAGS  -std=c++11 $INCLUDEPATHS "
+dnl LDFLAGS=" $LDFLAGS $XML4C_LIBS $XALAN_LIBS $QT_LIBS $QTNETWORK_LIBS " 
+LDFLAGS_APP=" $LDFLAGS $XML4C_LIBS $XALAN_LIBS $QT_LIBS $QTNETWORK_LIBS " 
 
 AC_ARG_ENABLE(quickerlinking,
   [AS_HELP_STRING([--enable-quickerlinking], [developer option: do not optimize linked objects, faster link, slower startup (default=no)])],
@@ -4939,9 +4949,9 @@ fi
 AC_SUBST(FERRIS_IOSIZE_WARNING)
 
 
-CLIENT_APP_CFLAGS="$STLPORT_CFLAGS $BOOST_CFLAGS $GLIB_CFLAGS $LOKI_CFLAGS $FSTREAM_CFLAGS $FAMPP2_CFLAGS $XML4C_CFLAGS $XALAN_CFLAGS $DB4_CFLAGS $GNOMEVFS_CFLAGS $LIBFILE_CFLAGS $EFSD_CFLAGS $QT_CFLAGS $QTNETWORK_CFLAGS $KDE_CFLAGS $OPENSSL_CFLAGS $LIBZ_CFLAGS $BZIP2_CFLAGS $STLDB4_CFLAGS $SIGC_CFLAGS -I/usr/local/include/Ferris $SOPRANO_CFLAGS $GPGME_CFLAGS  "
+CLIENT_APP_CFLAGS=" $BOOST_CFLAGS $GLIB_CFLAGS  $FSTREAM_CFLAGS $FAMPP2_CFLAGS $XML4C_CFLAGS $XALAN_CFLAGS $DB4_CFLAGS $GNOMEVFS_CFLAGS $LIBFILE_CFLAGS $EFSD_CFLAGS $QT_CFLAGS $QTNETWORK_CFLAGS $KDE_CFLAGS $OPENSSL_CFLAGS $LIBZ_CFLAGS $BZIP2_CFLAGS $STLDB4_CFLAGS  -I/usr/local/include/Ferris $SOPRANO_CFLAGS $GPGME_CFLAGS  "
 
-CLIENT_APP_LIBS="-lfam $FAMPP2_LIBS -lcrypto -lssl $BOOST_LIBS $LOKI_LIBS $FSTREAM_LIBS $XML4C_LIBS $XALAN_LIBS $STLPORT_LIBS $DB4_LIBS $GNOMEVFS_LIBS $LIBFILE_LIBS $EFSD_LIBS $QT_LIBS $QTNETWORK_LIBS $KDE_LIBS $LIBCAP_LIBS $OPENSSL_LIBS $LIBZ_LIBS $BZIP2_LIBS $STLDB4_LIBS $SIGC_LIBS $SOPRANO_LIBS -lpopt -lferris $GPGME_LIBS "
+CLIENT_APP_LIBS="-lfam $FAMPP2_LIBS -lcrypto -lssl $BOOST_LIBS $LOKI_LIBS $FSTREAM_LIBS $XML4C_LIBS $XALAN_LIBS  $DB4_LIBS $GNOMEVFS_LIBS $LIBFILE_LIBS $EFSD_LIBS $QT_LIBS $QTNETWORK_LIBS $KDE_LIBS $LIBCAP_LIBS $OPENSSL_LIBS $LIBZ_LIBS $BZIP2_LIBS $STLDB4_LIBS $SOPRANO_LIBS -lpopt -lferris $GPGME_LIBS "
 AC_SUBST(CLIENT_APP_CFLAGS)
 AC_SUBST(CLIENT_APP_LIBS)
 REQUIREMENTS=stldb4
@@ -4961,6 +4971,12 @@ AC_SUBST(CLIENTXSLT_APP_CFLAGS)
 AC_SUBST(CLIENTXSLT_APP_LIBS)
 REQUIREMENTSXSLT=
 AC_SUBST(REQUIREMENTSXSLT)
+
+#
+# Testing
+#
+AC_DEFINE( FERRIS_USER_NAME_NOBODY, "nobody" )
+
 
 #
 # All done.
@@ -5052,6 +5068,7 @@ apps/tools/Makefile
 apps/rest/Makefile
 apps/yuibrowser/Makefile
 apps/yuibrowser/images/Makefile
+apps/fcreate/Makefile
 appsui/Makefile
 appsui/gfcopy/Makefile
 appsui/gfrm/Makefile
@@ -5060,6 +5077,7 @@ appsui/gfdl/Makefile
 appsui/gfproperties/Makefile
 appsui/gfindex/Makefile
 appsui/volumemanager/Makefile
+appsui/gfcreate/Makefile
 tests/Makefile
 tests/contextiostream/Makefile
 tests/runner/Makefile
@@ -5270,6 +5288,7 @@ dot-ferris/sane/dot-discovered/gray-100/options/Makefile
 dot-ferris/sane/dot-discovered/gray-300/options/Makefile
 dot-ferris/sane/dot-discovered/gray-600/options/Makefile
 dot-ferris/sane/dot-discovered/gray-base/options/Makefile
+dot-ferris/ferriscreate/Makefile
 media/Makefile
 media/icons/Makefile
 media/xslt/Makefile
@@ -5311,6 +5330,12 @@ exposures/plasma/Makefile
 exposures/perl/Makefile
 exposures/kio/Makefile
 patches/Makefile
+testsuite/Makefile
+testsuite/config/Makefile
+testsuite/ferris.test/Makefile
+testsuite/sampledata/Makefile
+testsuite/sampledata/create_fulltextindex/Makefile
+testsuite/expected_output/Makefile
 ferris-config
 ferris.pc
 ferrisui.pc

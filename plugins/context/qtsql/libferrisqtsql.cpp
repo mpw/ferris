@@ -47,6 +47,9 @@ using namespace std;
 
 namespace Ferris
 {
+    using boost::lambda::_1;
+    using boost::lambda::_2;
+    
     extern "C"
     {
         FERRISEXP_EXPORT fh_context Brew( RootContextFactory* rf )
@@ -902,7 +905,7 @@ namespace Ferris
          {
                 LG_QTSQL_D << "priv_FillCreateSubContextSchemaParts()" << endl;
                 m["table"] = SubContextCreator(
-                    SubContextCreator::Perform_t( this, &_Self::SubCreateTable),
+                    boost::bind( &_Self::SubCreateTable, this, _1, _2 ),
 /**/                "	<elementType name=\"table\">\n"
 /**/                "		<elementType name=\"name\" default=\"newtable\">\n"
 /**/                "			<dataTypeRef name=\"string\"/>\n"
@@ -913,7 +916,7 @@ namespace Ferris
 /**/                "	</elementType>\n");
 
                 m["queryview"] = SubContextCreator(
-                        SubContextCreator::Perform_t( this, &_Self::SubCreateQV),
+                    boost::bind( &_Self::SubCreateQV, this, _1, _2 ),
 /**/                "	<elementType name=\"queryview\">\n"
 /**/                "		<elementType name=\"name\" default=\"newqtable\">\n"
 /**/                "			<dataTypeRef name=\"string\"/>\n"

@@ -41,7 +41,6 @@ namespace Ferris
         class FERRISEXP_API CacheManagerContextStateInTime
         {
         public:
-            FerrisLoki::Handlable::ref_count_t ref_count;
             gint32 NumberOfSubContexts;
             gint32 ItemsSz;
             bool isReClaimable;

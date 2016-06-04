@@ -35,8 +35,7 @@
 
 namespace Ferris
 {
-    typedef Loki::Functor< fh_istream,
-                           LOKI_TYPELIST_2( fh_runner, fh_istream ) > Runner_AsyncIOFunctor_t;
+    typedef boost::function< fh_istream ( fh_runner, fh_istream ) > Runner_AsyncIOFunctor_t;
 };
 
 #endif

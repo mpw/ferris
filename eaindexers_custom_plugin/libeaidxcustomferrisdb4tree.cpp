@@ -899,9 +899,8 @@ namespace Ferris
 
             if( !m_attributeNameMap )
             {
-                m_attributeNameMap = LexiconFactory::Instance().
-                    CreateObject( attributeNameLexiconClass );
-                    
+                m_attributeNameMap = LexiconFactory::instance()[ attributeNameLexiconClass ]();
+                
                 m_attributeNameMap->setPathManager( this );
                 m_attributeNameMap->setFileName( "attributemap.lexicon.db" );
                 m_attributeNameMap->setIndex( 0 );
@@ -1406,7 +1405,7 @@ namespace Ferris
                 if( signalWindow > 5 )
                 {
                     signalWindow = 0;
-                    di->getProgressSig().emit( c, attributesDone, totalAttributes );
+                    di->getProgressSig()( c, attributesDone, totalAttributes );
                 }
                 ++attributesDone;
                 ++signalWindow;

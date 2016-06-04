@@ -596,7 +596,7 @@ namespace Ferris
             m_stdoutAsyncHandler->release();
             m_stdoutAsyncHandler->attach( getStdOutFd() );
             m_stdoutAsyncHandler->setFunctor(
-                AsyncIOHandler::AsyncIOFunctor_t( this, &_Self::stdoutAsyncFunctor ));
+                AsyncIOHandler::AsyncIOFunctor_t( boost::bind(&_Self::stdoutAsyncFunctor, this, _1, _2)));
         }
     }
 

@@ -40,10 +40,9 @@ namespace Ferris
         source = s;
     }
     
-    NamingEvent::NamingEvent( fh_context _s, sigc::trackable* _uobj )
+    NamingEvent::NamingEvent( fh_context _s )
         :
-        source(_s),
-        uobj(_uobj)
+        source(_s)
     {
     }
     
@@ -58,60 +57,60 @@ namespace Ferris
     /********************************************************************************/
     /********************************************************************************/
 
-    NamingEvent_Changed::NamingEvent_Changed( fh_context _s, sigc::trackable* _uobj )
+    NamingEvent_Changed::NamingEvent_Changed( fh_context _s )
         :
-        NamingEvent( _s, _uobj )
+        NamingEvent( _s )
     {
     }
     
 
-    NamingEvent_Deleted::NamingEvent_Deleted( fh_context _s, sigc::trackable* _uobj )
+    NamingEvent_Deleted::NamingEvent_Deleted( fh_context _s )
         :
-        NamingEvent( _s, _uobj )
+        NamingEvent( _s )
     {
     }
     
 
-    NamingEvent_Start_Execute::NamingEvent_Start_Execute( fh_context _s, sigc::trackable* _uobj )
+    NamingEvent_Start_Execute::NamingEvent_Start_Execute( fh_context _s )
         :
-        NamingEvent( _s, _uobj )
+        NamingEvent( _s )
     {
     }
 
-    NamingEvent_Stop_Execute::NamingEvent_Stop_Execute( fh_context _s, sigc::trackable* _uobj )
+    NamingEvent_Stop_Execute::NamingEvent_Stop_Execute( fh_context _s )
         :
-        NamingEvent( _s, _uobj )
+        NamingEvent( _s )
     {
     }
 
-    NamingEvent_Created::NamingEvent_Created( fh_context _s, sigc::trackable* _uobj )
+    NamingEvent_Created::NamingEvent_Created( fh_context _s )
         :
-        NamingEvent( _s, _uobj )
+        NamingEvent( _s )
     {
     }
 
-    NamingEvent_Moved::NamingEvent_Moved( fh_context _s, sigc::trackable* _uobj )
+    NamingEvent_Moved::NamingEvent_Moved( fh_context _s )
         :
-        NamingEvent( _s, _uobj )
+        NamingEvent( _s )
     {
     }
 
 
-    NamingEvent_Exists::NamingEvent_Exists( fh_context _s, sigc::trackable* _uobj )
+    NamingEvent_Exists::NamingEvent_Exists( fh_context _s )
         :
-        NamingEvent( _s, _uobj )
+        NamingEvent( _s )
     {
     }
 
-    NamingEvent_Start_Reading_Context::NamingEvent_Start_Reading_Context( fh_context _s, sigc::trackable* _uobj )
+    NamingEvent_Start_Reading_Context::NamingEvent_Start_Reading_Context( fh_context _s )
         :
-        NamingEvent( _s, _uobj )
+        NamingEvent( _s )
     {
     }
 
-    NamingEvent_Stop_Reading_Context::NamingEvent_Stop_Reading_Context( fh_context _s, sigc::trackable* _uobj )
+    NamingEvent_Stop_Reading_Context::NamingEvent_Stop_Reading_Context( fh_context _s )
         :
-        NamingEvent( _s, _uobj )
+        NamingEvent( _s )
     {
     }
 

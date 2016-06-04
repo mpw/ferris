@@ -2,13 +2,7 @@ if HAVE_FSPOT
 
 plugindir = $(libdir)/ferris/plugins/eagenerators
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@FSPOT_CFLAGS@	                        \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/eagenerators @FSPOT_CFLAGS@ @CFLAGS@
 
 plugin_LTLIBRARIES = libferrisfspot.la 
 libferrisfspot_la_SOURCES = libferrisfspot.cpp

@@ -226,7 +226,8 @@ namespace Ferris
              m_eventSource = 0;
         }
 
-        m_runner = getUpdateRunnerSig().emit( this, m_runner );
+        fh_SubprocessButtonAndLabel bal( this );
+        m_runner = (*UpdateRunnerSig( bal, m_runner ));
         if( !m_runner )
         {
             gtk_label_set_label( m_label, "internal error" );

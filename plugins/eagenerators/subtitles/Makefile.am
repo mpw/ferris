@@ -1,12 +1,7 @@
 
 plugindir = $(libdir)/ferris/plugins/eagenerators
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/eagenerators	@CFLAGS@
 
 plugin_LTLIBRARIES = libferrissubtitles.la 
 libferrissubtitles_la_SOURCES = libferrissubtitles.cpp

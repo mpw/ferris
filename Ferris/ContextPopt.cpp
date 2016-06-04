@@ -161,11 +161,11 @@ namespace Ferris
     {
 //        setc = GetImpl(c);
         Upcast( setc, c );
-        typedef Loki::SingletonHolder<
-            Private::ContextPopTableCollector
-            > ContextPopTableCollector_t;
+//        typedef Loki::SingletonHolder< Private::ContextPopTableCollector > ContextPopTableCollector_t;
+        typedef FerrisSingleton< Private::ContextPopTableCollector > ContextPopTableCollector_t;;
         
-        return ContextPopTableCollector_t::Instance().getTable( c );
+        
+        return ContextPopTableCollector_t::instance().getTable( c );
     }
 
     

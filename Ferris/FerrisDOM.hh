@@ -119,16 +119,20 @@ namespace Ferris
         // Data
         StoredType pointee_;
     };
-    typedef Loki::SmartPtr< DOMDocument,
-                            Loki::RefLinked, 
-                            Loki::DisallowConversion,
-                            FerrisLoki::FerrisExSmartPointerChecker,
-                            FerrisXercesDOMSmartPtrStorage > fh_domdoc;
-    typedef Loki::SmartPtr< XMLCh,
-                            Loki::RefLinked, 
-                            Loki::AllowConversion,
-                            FerrisLoki::FerrisExSmartPointerChecker,
-                            FerrisLoki::FerrisExArraySmartPtrStorage > fh_xmlch;
+//LOKI    
+    // typedef Loki::SmartPtr< DOMDocument,
+    //                         Loki::RefLinked, 
+    //                         Loki::DisallowConversion,
+    //                         FerrisLoki::FerrisExSmartPointerChecker,
+    //                         FerrisXercesDOMSmartPtrStorage > fh_domdoc;
+    typedef boost::shared_ptr<DOMDocument> fh_domdoc;
+    
+    // typedef Loki::SmartPtr< XMLCh,
+    //                         Loki::RefLinked, 
+    //                         Loki::AllowConversion,
+    //                         FerrisLoki::FerrisExSmartPointerChecker,
+    //                         FerrisLoki::FerrisExArraySmartPtrStorage > fh_xmlch;
+    typedef boost::shared_ptr<XMLCh> fh_xmlch;
 
     
     /********************************************************************************/
@@ -359,6 +363,7 @@ FerrisException_CodeState( __FILE__ ,  __LINE__ , __PRETTY_FUNCTION__ ), \
     
     FERRISEXP_API fh_stringstream tostream( fh_domdoc doc, bool gFormatPrettyPrint = true );
     FERRISEXP_API fh_stringstream tostream( DOMNode& n, bool gFormatPrettyPrint = true );
+    FERRISEXP_API fh_stringstream tostream( DOMDocument* doc, bool gFormatPrettyPrint = true );
     
     FERRISEXP_API std::string tostr( const XMLCh* xc );
     FERRISEXP_API std::string XMLToString( const XMLCh* xc, const std::string def = "" );

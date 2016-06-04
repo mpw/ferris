@@ -37,10 +37,13 @@
 
 #include <glib.h>
 
-#include <sigc++/sigc++.h>
-#include <SmartPtr.h>
+#include <boost/smart_ptr/intrusive_ref_counter.hpp>
+#include <boost/intrusive_ptr.hpp>
+#include <boost/function.hpp>
+#include <boost/signals2.hpp>
+#include <boost/lambda/bind.hpp>
+#include <boost/container/detail/singleton.hpp>
 
-#include <FerrisLoki/Extensions.hh>
 
 
 namespace Ferris

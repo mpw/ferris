@@ -232,8 +232,7 @@ namespace Ferris
     void
     ChainedViewContext::setIsChainedViewContextRoot()
     {
-        ref_count++;
-        
+        AddRef();
     }
     
     void
@@ -248,14 +247,14 @@ namespace Ferris
 
         LG_SORT_I << "SetupEventConnections() c:" << c->getURL() << endl;
         
-        c->getNamingEvent_Deleted_Sig().connect(sigc::mem_fun( *this, &ChainedViewContext::OnDeleted));
-        c->getNamingEvent_Exists_Sig().connect(sigc::mem_fun( *this, &ChainedViewContext::OnExists));
-        c->getNamingEvent_Created_Sig().connect(sigc::mem_fun( *this, &ChainedViewContext::OnCreated));
-        c->getNamingEvent_Changed_Sig().connect(sigc::mem_fun( *this, &ChainedViewContext::OnChanged));
+        c->getNamingEvent_Deleted_Sig().connect(boost::bind( &ChainedViewContext::OnDeleted, this,_1,_2,_3));
+        c->getNamingEvent_Exists_Sig().connect(boost::bind(  &ChainedViewContext::OnExists,  this,_1,_2,_3,_4));
+        c->getNamingEvent_Created_Sig().connect(boost::bind( &ChainedViewContext::OnCreated, this,_1,_2,_3,_4));
+        c->getNamingEvent_Changed_Sig().connect(boost::bind( &ChainedViewContext::OnChanged, this,_1,_2,_3));
         c->getNamingEvent_Start_Reading_Context_Sig().connect(
-            sigc::mem_fun( *this, &ChainedViewContext::OnStartReading));
+            boost::bind( &ChainedViewContext::OnStartReading, this, _1 ));
         c->getNamingEvent_Stop_Reading_Context_Sig().connect(
-            sigc::mem_fun( *this, &ChainedViewContext::OnStopReading));
+            boost::bind( &ChainedViewContext::OnStopReading, this, _1 ));
     }
 
     void
@@ -274,7 +273,7 @@ namespace Ferris
     void
     ChainedViewContext::OnDeleted( NamingEvent_Deleted* ev, string olddn, string newdn )
     {
-//        Emit_Deleted( ev, newdn, olddn, 0 );
+//        Emit_Deleted( ev, newdn, olddn );
 //        Remove( ev->getSource()->getSubContext( olddn ) );
         Remove( olddn );
     }
@@ -313,7 +312,7 @@ namespace Ferris
 //                      << endl;
 //         }
         
-// //    Emit_Exists( ev, newdn, olddn, 0 );
+// //    Emit_Exists( ev, newdn, olddn );
     }
 
     void
@@ -337,7 +336,7 @@ namespace Ferris
     {
         LG_CTX_D << "ChainedViewContext::OnChanged old:" << olddn << " new:" << newdn
                  << " earl:" << getURL() << endl;
-        Emit_Changed( ev, getURL(), getURL(), 0 );
+        Emit_Changed( ev, getURL(), getURL() );
     }
     
 
@@ -601,8 +600,8 @@ namespace Ferris
     Handlable::ref_count_t
     ChainedViewContext::AddRef()
     {
-        if( ref_count >= ImplementationDetail::MAX_REF_COUNT )
-            return ref_count;
+        if( getReferenceCount() >= ImplementationDetail::MAX_REF_COUNT )
+            return getReferenceCount();
         return Handlable::AddRef();
     }
     
@@ -612,8 +611,8 @@ namespace Ferris
     Handlable::ref_count_t
     ChainedViewContext::Release()
     {
-        if( ref_count >= ImplementationDetail::MAX_REF_COUNT )
-            return ref_count;
+        if( getReferenceCount() >= ImplementationDetail::MAX_REF_COUNT )
+            return getReferenceCount();
         return Handlable::Release();
     }
 

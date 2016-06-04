@@ -2,13 +2,7 @@ if HAVE_MEDIAINFO
 
 plugindir = $(libdir)/ferris/plugins/eagenerators
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@MEDIAINFO_CFLAGS@	                        \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/eagenerators @MEDIAINFO_CFLAGS@ @CFLAGS@
 
 plugin_LTLIBRARIES = libferrismediainfo.la 
 libferrismediainfo_la_SOURCES = libferrismediainfo.cpp

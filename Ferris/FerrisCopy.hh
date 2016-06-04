@@ -37,7 +37,6 @@
 #include <Ferris/FerrisBackup.hh>
 
 #include <errno.h>
-#include <sigc++/sigc++.h>
 
 #include <string>
 
@@ -61,9 +60,9 @@ namespace Ferris
     /******************************************************************************/
 
     class FERRISEXP_API ContextPopTableCollector
-            :
-            public basic_PopTableCollector,
-            public Handlable
+        :
+        public Handlable,
+        public basic_PopTableCollector
     {
         fh_cp cp;
 
@@ -157,42 +156,42 @@ namespace Ferris
         
     public:
         
-        typedef sigc::signal5< void,
+        typedef boost::signals2::signal< void (
                                FerrisCopy&,     // thisobj,
                                fh_context,      // src,
                                fh_context,      // dst,
                                std::string,          // srcDescription,
                                std::string           // dstDescription
-                               > CopyVerboseSignal_t;
+            ) > CopyVerboseSignal_t;
         
         CopyVerboseSignal_t& getCopyVerboseSignal();
         
-        typedef sigc::signal3< void,
+        typedef boost::signals2::signal< void (
                                FerrisCopy&,     // thisobj,
                                std::string,          // srcDescription,
                                std::string           // reason
-                               > SkippingContextSignal_t;
+            ) > SkippingContextSignal_t;
     
         SkippingContextSignal_t& getSkippingContextSignal();
 
-        typedef sigc::signal5< bool,
+        typedef boost::signals2::signal< bool (
                                FerrisCopy&,     // thisobj,
                                fh_context,      // src
                                fh_context,      // dst
                                std::string,          // srcDescription,
                                std::string           // dstDescription
-                               > AskReplaceContextSignal_t;
+            ) > AskReplaceContextSignal_t;
 
         AskReplaceContextSignal_t& getAskReplaceContextSignal();
 
-        typedef sigc::signal6< bool,
+        typedef boost::signals2::signal< bool (
                                FerrisCopy&,     // thisobj,
                                fh_context,      // src
                                fh_context,      // dst
                                std::string,     // srcDescription,
                                std::string,     // dstDescription
                                fh_attribute     // dst attr
-                               > AskReplaceAttributeSignal_t;
+            ) > AskReplaceAttributeSignal_t;
 
         AskReplaceAttributeSignal_t& getAskReplaceAttributeSignal();
 
@@ -231,26 +230,26 @@ namespace Ferris
         
     public:
         
-        typedef sigc::signal4< void,
+        typedef boost::signals2::signal< void (
                                FerrisCopy&,     // this
                                std::streamsize, // CurrentPosition
                                std::streamsize, // BlockSize
                                std::streamsize  // FinalSize (may be -1)
-                               > CopyPorgressSignal_t;
+            ) > CopyPorgressSignal_t;
 
-        typedef sigc::signal4< void,
+        typedef boost::signals2::signal< void (
                                FerrisCopy&,     // this
                                std::streamsize, // CurrentPosition
                                std::streamsize, // BlockSize
                                std::streamsize  // FinalSize (may be -1)
-                               > CopyStartSignal_t;
+            ) > CopyStartSignal_t;
 
-        typedef sigc::signal4< void,
+        typedef boost::signals2::signal< void (
                                FerrisCopy&,     // this
                                std::streamsize, // CurrentPosition
                                std::streamsize, // BlockSize
                                std::streamsize  // FinalSize (may be -1)
-                               > CopyEndSignal_t;
+            ) > CopyEndSignal_t;
     
         CopyPorgressSignal_t& getCopyPorgressSignal();
         CopyStartSignal_t& getCopyStartSignal();
@@ -278,8 +277,8 @@ namespace Ferris
                           << " oss is good():"<< oss->good()
                           << std::endl;
 
-                getCopyStartSignal().emit( *this, CurrentPosition,
-                                           BlockSize, FinalSize );
+                getCopyStartSignal()( *this, CurrentPosition,
+                                      BlockSize, FinalSize );
 
                 char buffer[ BlockSize + 1 ];
                 errno = 0;
@@ -336,10 +335,10 @@ namespace Ferris
                     LG_COPY_D << " oss is good():"<< oss->good() << std::endl;
                     LG_COPY_D << " oss is state:"<< oss->rdstate() << std::endl;
 
-                    getCopyPorgressSignal().emit( *this,
-                                                  CurrentPosition,
-                                                  BlockSize,
-                                                  FinalSize );
+                    getCopyPorgressSignal()( *this,
+                                             CurrentPosition,
+                                             BlockSize,
+                                             FinalSize );
                 }
 
                 oss << std::flush;
@@ -381,8 +380,8 @@ namespace Ferris
 //             Throw_CopyFailed( tostr(ss), this );
 //         }
 
-                getCopyEndSignal().emit( *this, CurrentPosition,
-                                         BlockSize, FinalSize );
+                getCopyEndSignal()( *this, CurrentPosition,
+                                    BlockSize, FinalSize );
         
                 return oss;
             }
@@ -469,13 +468,13 @@ namespace Ferris
          * setup as per standard options like -Z, -a etc. ie, signal is the
          * last thing to see the destination file.
          */
-        typedef sigc::signal5< void,
+        typedef boost::signals2::signal< void (
                                FerrisCopy*,     // thisobj,
                                fh_context,      // src,
                                fh_context,      // dst,
                                std::string,     // srcDescription,
                                std::string      // dstDescription
-                               > m_AttributeUpdater_t;
+            ) > m_AttributeUpdater_t;
         
     private:
         m_AttributeUpdater_t m_AttributeUpdater;

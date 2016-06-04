@@ -87,7 +87,7 @@ namespace Ferris
      */
     namespace Shell
     {
-        typedef sigc::signal1< void, fh_context > ContextCreated_Sig_t;
+        typedef boost::signals2::signal< void ( fh_context ) > ContextCreated_Sig_t;
         FERRISEXP_API ContextCreated_Sig_t& getNullContextCreated_Sig();
 
         /**

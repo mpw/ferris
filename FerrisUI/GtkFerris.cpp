@@ -309,7 +309,7 @@ namespace FerrisUI
                                                          desired_width,
                                                          desired_height,
                                                          interp_type );
-            gdk_pixbuf_unref( pb );
+            g_object_unref( pb );
             unknown_pb = scaled;
         }
         
@@ -331,7 +331,7 @@ namespace FerrisUI
                                                              desired_height,
                                                              interp_type );
                 cache[ em ] = scaled;
-                gdk_pixbuf_unref( pb );
+                g_object_unref( pb );
             }
         }
         
@@ -364,8 +364,7 @@ namespace FerrisUI
 
         fh_etagere et = Factory::getEtagere();
         et->getEmblemCreated_Sig().connect(
-            sigc::bind(
-                sigc::ptr_fun( getEmblemListViewPixbuf_Update ), &emblemPixbufs ));
+            boost::bind( &getEmblemListViewPixbuf_Update, _1, _2, &emblemPixbufs ));
         
         return emblemPixbufs[ em ];
     }
@@ -1777,13 +1776,13 @@ GtkProgressBinder::GtkProgressBinder(
     gtk_progress_configure( GTK_PROGRESS(w), 0, 0, size );
 
     ctx->getNamingEvent_Start_Reading_Context_Sig().connect(
-        sigc::mem_fun( *this, &GtkProgressBinder::read_start ));
+        boost::bind( &GtkProgressBinder::read_start, this, _1 ));
 
     ctx->getNamingEvent_Stop_Reading_Context_Sig().connect(
-        sigc::mem_fun( *this, &GtkProgressBinder::read_stop ));
+        boost::bind( &GtkProgressBinder::read_stop, this, _1 ));
         
     conn = ctx->getNamingEvent_Exists_Sig().connect(
-        sigc::mem_fun( *this, &GtkProgressBinder::naming_exists ));
+        boost::bind( &GtkProgressBinder::naming_exists, this, _1, _2, _3, _4 ));
 
     
 }
@@ -1996,7 +1995,7 @@ namespace FerrisUI
              << " pb:" << toVoid( pb )
              << endl;
         gtk_image_set_from_pixbuf( im, pb );
-        gdk_pixbuf_unref( pb );
+        g_object_unref( pb );
     }
 
     GtkImage* setImageFromRGBAAttribute( GtkImage* im,

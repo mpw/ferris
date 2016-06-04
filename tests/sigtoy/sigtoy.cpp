@@ -27,110 +27,112 @@
 *******************************************************************************
 *******************************************************************************
 ******************************************************************************/
-#include "config.h"
 
 #include <string>
 #include <iostream>
-
-
-#include <sigc++/sigc++.h>
-#include <sigc++/slot.h>
-
 using namespace std;
 
+// #include "config.h"
 
-class Grunt : public sigc::trackable
-{
-    string name;
+
+
+// #include <sigc++/sigc++.h>
+// #include <sigc++/slot.h>
+
+
+
+// class Grunt : public sigc::trackable
+// {
+//     string name;
     
-public:
-    Grunt( string s ) : name(s) 
-        {
-        }
+// public:
+//     Grunt( string s ) : name(s) 
+//         {
+//         }
 
-    typedef sigc::signal1< void, string > GruntSig;
-    GruntSig sig;
-    GruntSig& getSig() { return sig; }
+//     typedef sigc::signal1< void, string > GruntSig;
+//     GruntSig sig;
+//     GruntSig& getSig() { return sig; }
     
     
     
-};
+// };
 
-class Mux : public sigc::trackable
-{
-public:
+// class Mux : public sigc::trackable
+// {
+// public:
 
-    typedef sigc::signal1< void, string > MuxSig;
-    MuxSig sig;
-    MuxSig& getSig() { return sig; }
+//     typedef sigc::signal1< void, string > MuxSig;
+//     MuxSig sig;
+//     MuxSig& getSig() { return sig; }
 
 
-    void z_cb( string s )
-        {
-            cerr << "z_cb s:" << s << endl;
-            getSig().emit( s );
-        }
+//     void z_cb( string s )
+//         {
+//             cerr << "z_cb s:" << s << endl;
+//             getSig().emit( s );
+//         }
     
-    void monitor( Grunt* g )
-        {
-            g->getSig().connect( sigc::mem_fun( *this, &Mux::z_cb ) );
-        }
+//     void monitor( Grunt* g )
+//         {
+//             g->getSig().connect( sigc::mem_fun( *this, &Mux::z_cb ) );
+//         }
     
-};
+// };
 
 
-class Test : public sigc::trackable
-{
-public:
-    Test()
-        {
-            Grunt* g1 = new Grunt("Grunt 1");
-            Grunt* g2 = new Grunt("Grunt 2");
-            Mux* mux = new Mux();
+// class Test : public sigc::trackable
+// {
+// public:
+//     Test()
+//         {
+//             Grunt* g1 = new Grunt("Grunt 1");
+//             Grunt* g2 = new Grunt("Grunt 2");
+//             Mux* mux = new Mux();
 
-            mux->monitor( g1 );
-            mux->monitor( g2 );
+//             mux->monitor( g1 );
+//             mux->monitor( g2 );
             
-            mux->getSig().connect(sigc::mem_fun( *this, &Test::t_cb));
+//             mux->getSig().connect(sigc::mem_fun( *this, &Test::t_cb));
 
-            g1->getSig().emit("Grunt 1 ... sig1");
-            g1->getSig().emit("Grunt 2 ... sig2");
+//             g1->getSig().emit("Grunt 1 ... sig1");
+//             g1->getSig().emit("Grunt 2 ... sig2");
             
-        }
+//         }
 
-    void t_cb( string s )
-        {
-            cerr << "t_cb s:" << s << endl;
-        }
+//     void t_cb( string s )
+//         {
+//             cerr << "t_cb s:" << s << endl;
+//         }
     
     
-};
+// };
 
 
 
-class SelfKiller
-{
-public:
+// class SelfKiller
+// {
+// public:
 
-    void die()
-        {
-            delete this;
-        }
+//     void die()
+//         {
+//             delete this;
+//         }
     
 
-};
+// };
 
 
-class statout 
-{
-public:
-    statout()
-        {
-            cout << "hi" << endl;
-        }
-};
+// class statout 
+// {
+// public:
+//     statout()
+//         {
+//             cout << "hi" << endl;
+//         }
+// };
 
-static statout statoutobj;
+// static statout statoutobj;
 
 
 

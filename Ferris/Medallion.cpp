@@ -87,7 +87,7 @@ namespace Ferris
     class LazyOrAtExitFunction
     {
     public:
-        typedef Loki::Functor< void, LOKI_TYPELIST_1( bool ) > f_functor;
+        typedef boost::function< void ( bool ) > f_functor;
         static void add( const f_functor& f );
 
         // Dont use these...
@@ -206,7 +206,7 @@ namespace Ferris
 {
     const string EMBLEM_TOPLEVEL_SYSTEM_NAME = "libferris";
     
-    const string ETAGERE_ROOT = "~/.ferris/etagere";
+    const string ETAGERE_ROOT = getDotFerrisPath() + "etagere";
     const string DB_COLDEM  = "/cold-emblems.db";
 
     
@@ -541,7 +541,7 @@ namespace Ferris
     Emblem::setIconName( const std::string& v )
     {
         setDirty();
-        getIconName_Changed_Sig().emit( this, m_iconname, v );
+        getIconName_Changed_Sig()( this, m_iconname, v );
         m_iconname = v;
     }
 
@@ -549,7 +549,7 @@ namespace Ferris
     Emblem::setMenuSizedIconName( const std::string& v )
     {
         setDirty();
-        getMenuSizedIconName_Changed_Sig().emit( this, m_menuSizedIconName, v );
+        getMenuSizedIconName_Changed_Sig()( this, m_menuSizedIconName, v );
         m_menuSizedIconName = v;
     }
     
@@ -864,8 +864,8 @@ namespace Ferris
         
         setDirty();
         m_parents.insert( em->getID() );
-        getAddedParent_Sig().emit( this, em );
-        getAddedChild_Sig().emit( em, this );
+        getAddedParent_Sig()( this, em );
+        getAddedChild_Sig()( em, this );
         if( em == private_getAttributeRootEmblem( m_et ) ||
             em->isTransitiveChildOfEAOrderingRootEmblem() )
         {
@@ -888,8 +888,8 @@ namespace Ferris
 
         setDirty();
         m_children.insert( em->getID() );
-        getAddedChild_Sig().emit( this, em );
-        getAddedParent_Sig().emit( em, this );
+        getAddedChild_Sig()( this, em );
+        getAddedParent_Sig()( em, this );
     }
 
     void
@@ -1196,7 +1196,7 @@ namespace Ferris
     {
         if( path.empty() )
         {
-            m_basepath = ETAGERE_ROOT;
+            m_basepath = getDotFerrisPath() + "etagere";
         }
         LG_EMBLEM_D << "Etagere::Etagere() path:" << m_basepath << endl;
         loadAllEmblems();
@@ -1243,9 +1243,9 @@ namespace Ferris
         {
             LG_EMBLEM_D << "Etagere::sync() SyncDelayer exists, delaying sync()" << endl;
             cerr << "Etagere::sync() SyncDelayer exists, delaying sync()" << endl;
-            typedef Loki::Functor< void, LOKI_TYPELIST_2( Etagere*, SyncDelayer* ) > F;
+            typedef boost::function< void ( Etagere*, SyncDelayer* ) > F;
             F f( EtagereSync );
-            SyncDelayer::add( this, Loki::BindFirst( f, this ) );
+            SyncDelayer::add( this, boost::bind( f, this, _1 ) );
         }
     }
 
@@ -1293,8 +1293,8 @@ namespace Ferris
 
                 
                 eset.erase( em->getID() );
-                getEmblemCreated_Sig().emit( this, em );
-                getAddedChild_Sig().emit( this, em );
+                getEmblemCreated_Sig()( this, em );
+                getAddedChild_Sig()( this, em );
                 
                 return;
             }
@@ -1629,7 +1629,7 @@ namespace Ferris
     Etagere::setDirty()
     {
         m_isDirty = true;
-//         typedef Loki::Functor< void, LOKI_TYPELIST_2( Etagere*, bool ) > F;
+//         typedef boost::function< void ( Etagere*, bool ) > F;
 //         F f( EtagereSync );
 //         LazyOrAtExitFunction::add( Loki::BindFirst( f, this ) );
     }
@@ -2015,7 +2015,7 @@ namespace Ferris
 
         if( em->getParents().size() == 0 )
         {
-            getRemovedChild_Sig().emit( this, em );
+            getRemovedChild_Sig()( this, em );
         }
     }
     
@@ -2028,9 +2028,9 @@ namespace Ferris
         m_cemblemsByName.insert( make_pair( em->getName(), em ) );
 //        sync();
         LG_EMBLEM_D << "Etagere::createColdEmblem(about to fire) name:" << name << endl;
-        getEmblemCreated_Sig().emit( this, em );
+        getEmblemCreated_Sig()( this, em );
         LG_EMBLEM_D << "Etagere::createColdEmblem(fired) name:" << name << endl;
-        getAddedChild_Sig().emit( this, em );
+        getAddedChild_Sig()( this, em );
 
         // make sure the emblem caches this info
         em->getUniqueName();

@@ -47,7 +47,6 @@ using namespace boost;
 // guessComparisonOperatorFromData
 #include "FilteredContext_private.hh"
 
-#include <Functor.h>
 #include <gmodule.h>
 
 using namespace std;

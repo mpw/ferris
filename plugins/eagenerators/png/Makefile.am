@@ -1,14 +1,12 @@
+#    -I$(top_srcdir)/plugins/eagenerators
+
+
+
 if HAVE_LIBPNG
 
 plugindir = $(libdir)/ferris/plugins/eagenerators
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@LIBPNG_CFLAGS@	                                \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/eagenerators @LIBPNG_CFLAGS@ @CFLAGS@
 
 plugin_LTLIBRARIES = libferrispng.la 
 libferrispng_la_SOURCES = libferrispng.cpp

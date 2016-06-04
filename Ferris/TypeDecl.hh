@@ -38,7 +38,7 @@
 #include <list>
 #include <string>
 
-#include <FerrisLoki/Extensions.hh>
+#include <FerrisStreams/Streams.hh>
 #include <Ferris/Debug.hh>
 #include <Ferris/FerrisHandle.hh>
 #include <Ferris/FerrisSmartPointerChecker.hh>
@@ -54,20 +54,23 @@
  */
 namespace Ferris
 {
-    typedef Loki::SmartPtr< ::boost::regex, 
-                            Loki::RefLinked, 
-                            Loki::DisallowConversion, 
-                            FerrisLoki::FerrisExSmartPointerChecker, 
-                            Loki::DefaultSPStorage >  fh_rex;
+    // typedef Loki::SmartPtr< ::boost::regex, 
+    //                         Loki::RefLinked, 
+    //                         Loki::DisallowConversion, 
+    //                         FerrisLoki::FerrisExSmartPointerChecker, 
+    //                         Loki::DefaultSPStorage >  fh_rex;
+    typedef boost::shared_ptr< ::boost::regex > fh_rex;
+    
 
 struct RegexCollectionPriv;
     class FERRISEXP_API RegexCollection
     {
-        typedef Loki::SmartPtr< RegexCollectionPriv, 
-                                Loki::RefLinked, 
-                                Loki::AllowConversion, 
-                                FerrisLoki::FerrisExSmartPointerChecker, 
-                                Loki::DefaultSPStorage >  fh_pdata;
+        // typedef Loki::SmartPtr< RegexCollectionPriv, 
+        //                         Loki::RefLinked, 
+        //                         Loki::AllowConversion, 
+        //                         FerrisLoki::FerrisExSmartPointerChecker, 
+        //                         Loki::DefaultSPStorage >  fh_pdata;
+        typedef boost::shared_ptr< RegexCollectionPriv > fh_pdata;
         mutable fh_pdata m_priv;
 
     public:
@@ -101,25 +104,41 @@ struct RegexCollectionPriv;
         EnclosingClassName( const EnclosingClassName&  );            \
         EnclosingClassName& operator=( const EnclosingClassName&  )
 
+// #ifndef FERRIS_SMARTPTR
+// #define FERRIS_SMARTPTR( ClassName, HandleName )                        \
+//     typedef Loki::SmartPtr< ClassName,                                  \
+//                             FerrisLoki::FerrisExRefCounted,             \
+//                             Loki::DisallowConversion,                   \
+//                             FerrisLoki::FerrisExSmartPointerChecker,    \
+//                             FerrisLoki::FerrisExSmartPtrStorage >  HandleName;
+// #endif
+
 #ifndef FERRIS_SMARTPTR
-#define FERRIS_SMARTPTR( ClassName, HandleName )                        \
-    typedef Loki::SmartPtr< ClassName,                                  \
-                            FerrisLoki::FerrisExRefCounted,             \
-                            Loki::DisallowConversion,                   \
-                            FerrisLoki::FerrisExSmartPointerChecker,    \
-                            FerrisLoki::FerrisExSmartPtrStorage >  HandleName;
+#define FERRIS_SMARTPTR( ClassName, HandleName ) \
+    typedef boost::intrusive_ptr< ClassName > HandleName;
 #endif
+    
+
+    
+// #ifndef FERRIS_NIREF
+// #define FERRIS_NIREF( ClassName, HandleName )                        \
+//     typedef Loki::SmartPtr< ClassName,                               \
+//                             Loki::RefLinked,                         \
+//                             Loki::DisallowConversion,                \
+//                             FerrisLoki::FerrisExSmartPointerChecker, \
+//                             Loki::DefaultSPStorage >  HandleName
+// #endif
 
 #ifndef FERRIS_NIREF
-#define FERRIS_NIREF( ClassName, HandleName )                        \
-    typedef Loki::SmartPtr< ClassName,                               \
-                            Loki::RefLinked,                         \
-                            Loki::DisallowConversion,                \
-                            FerrisLoki::FerrisExSmartPointerChecker, \
-                            Loki::DefaultSPStorage >  HandleName
+#define FERRIS_NIREF( ClassName, HandleName ) \
+    typedef boost::shared_ptr< ClassName > HandleName
 #endif
 
-    class FERRISEXP_API Handlable : public FerrisLoki::Handlable 
+    // This is in Streams now for general use.
+#if 0    
+    class FERRISEXP_API Handlable
+        :
+        public ::Loki::Handlable
     {
     public:
         Handlable()
@@ -129,7 +148,8 @@ struct RegexCollectionPriv;
             {
             }
     };
-
+#endif
+    
 // #define FerrisRefCounted          FerrisLoki::FerrisExRefCounted
 // #define FerrisSmartPointerChecker FerrisLoki::FerrisExSmartPointerChecker
 // #define FerrisSmartPtrStorage     FerrisLoki::FerrisExSmartPtrStorage
@@ -261,26 +281,41 @@ struct RegexCollectionPriv;
         static void Swap(FerrisExRefCountedContext&)
             {}
     };
-    template <class T,
-              class CONVERTER,
-              template <class> class CHECKER>
-    inline bool isBound( const Loki::SmartPtr< T,
-                         ::Ferris::FerrisExRefCountedContext, 
-                         CONVERTER,
-                         CHECKER, 
-                         FerrisLoki::FerrisExSmartPtrStorage > & sp)
-    {
-        return GetImpl(sp) != 0 ;
-    }
+    // template <class T,
+    //           class CONVERTER,
+    //           template <class> class CHECKER>
+    // inline bool isBound( const Loki::SmartPtr< T,
+    //                      ::Ferris::FerrisExRefCountedContext, 
+    //                      CONVERTER,
+    //                      CHECKER, 
+    //                      FerrisLoki::FerrisExSmartPtrStorage > & sp)
+    // {
+    //     return GetImpl(sp) != 0 ;
+    // }
 
+    template <class T >
+    inline bool isBound( const boost::shared_ptr< T >& sp)
+    {
+        return sp.get() != 0 ;
+    }
+    template <class T >
+    inline bool isBound( const boost::intrusive_ptr< T >& sp)
+    {
+        return sp.get() != 0 ;
+    }
+    
     FERRIS_SMARTPTR( AttributeProxy,          fh_attribute );
+// #ifndef FERRIS_CTX_SMARTPTR
+// #define FERRIS_CTX_SMARTPTR( ClassName, HandleName )  \
+//     typedef Loki::SmartPtr< ClassName,            \
+//                             ::Ferris::FerrisExRefCountedContext, \
+//                             Loki::DisallowConversion,            \
+//                             FerrisLoki::FerrisExSmartPointerChecker,    \
+//                             FerrisLoki::FerrisExSmartPtrStorage >  HandleName;
+// #endif
 #ifndef FERRIS_CTX_SMARTPTR
 #define FERRIS_CTX_SMARTPTR( ClassName, HandleName )  \
-    typedef Loki::SmartPtr< ClassName,            \
-                            ::Ferris::FerrisExRefCountedContext, \
-                            Loki::DisallowConversion,            \
-                            FerrisLoki::FerrisExSmartPointerChecker,    \
-                            FerrisLoki::FerrisExSmartPtrStorage >  HandleName;
+    typedef boost::intrusive_ptr< ClassName > HandleName;
 #endif
     FERRIS_CTX_SMARTPTR( Context, fh_context );
 //    FERRIS_SMARTPTR( Context,                 fh_context   );
@@ -361,169 +396,5 @@ struct RegexCollectionPriv;
     
 };
 
-//#ifdef SIGCXX_HAS_LESS_THAN_FIVE_SIGNAL_ARGS_AS_MAX
-#include <sigc++/sigc++.h>
-
-// Using sigc++ 2.x
-#ifdef _SIGC_REFERENCE_WRAPPER_H_
-#define LIBFERRIS__DONT_INCLUDE_SIGCC_EXTENSIONS
-#endif
-
-#ifndef LIBFERRIS__DONT_INCLUDE_SIGCC_EXTENSIONS
-namespace SigC
-{
-    
-/// @ingroup Signals
-template <class R,class P1,class P2,class P3,class P4,class P5,class P6,class Marsh=Marshal<R> >
-class Signal6 : public SignalBase
-  {
-    public:
-      typedef Slot6<R,P1,P2,P3,P4,P5,P6> InSlotType;
-      typedef Slot6<typename Marsh::OutType,P1,P2,P3,P4,P5,P6> OutSlotType;
-      typedef typename Trait<typename Marsh::OutType>::type OutType;
- 
-    private:
-      // Used for both emit and proxy.
-      static OutType emit_(
-          typename Trait<P1>::ref p1,typename Trait<P2>::ref p2,
-          typename Trait<P3>::ref p3,typename Trait<P4>::ref p4,
-          typename Trait<P5>::ref p5,typename Trait<P6>::ref p6,
-          void* data);
-
-    public:
-      OutSlotType slot() const
-        { return create_slot((FuncPtr)(&emit_)); }
-
-      operator OutSlotType() const
-        { return create_slot((FuncPtr)(&emit_)); }
-
-      /// You can call Connection::disconnect() later.
-      Connection connect(const InSlotType& s)
-        { return Connection(push_back(s)); }
-
-      /// Call all the connected methods.
-      OutType emit(typename Trait<P1>::ref p1,typename Trait<P2>::ref p2,typename Trait<P3>::ref p3,typename Trait<P4>::ref p4,typename Trait<P5>::ref p5, typename Trait<P6>::ref p6)
-        { return emit_(p1,p2,p3,p4,p5,p6,impl_); }
-
-      /// See emit()
-      OutType operator()(typename Trait<P1>::ref p1,typename Trait<P2>::ref p2,typename Trait<P3>::ref p3,typename Trait<P4>::ref p4,typename Trait<P5>::ref p5, typename Trait<P6>::ref p6)
-        { return emit_(p1,p2,p3,p4,p5,p6,impl_); }
- 
-      Signal6() 
-        : SignalBase() 
-        {}
-
-      Signal6(const InSlotType& s)
-        : SignalBase() 
-        { connect(s); }
-
-      ~Signal6() {}
-  };
-
-
-// emit
-template <class R,class P1,class P2,class P3,class P4,class P5,class P6,class Marsh>
-typename Signal6<R,P1,P2,P3,P4,P5,P6,Marsh>::OutType
-Signal6<R,P1,P2,P3,P4,P5,P6,Marsh>::emit_(
-    typename Trait<P1>::ref p1,typename Trait<P2>::ref p2,
-    typename Trait<P3>::ref p3,typename Trait<P4>::ref p4,
-    typename Trait<P5>::ref p5,typename Trait<P6>::ref p6,
-    void* data)
-{
-    SignalNode* impl = static_cast<SignalNode*>(data);
-
-    if (!impl || !impl->begin_)
-      return Marsh::default_value();
-
-    Exec exec(impl);
-    Marsh rc;
-    SlotNode* s = 0;
-
-    for (SignalConnectionNode* i = impl->begin_; i; i=i->next_)
-      {
-        if (i->blocked()) continue;
-        s = i->dest();
-        if (rc.marshal(((typename Slot5<R,P1,P2,P3,P4,P5>::Proxy)(s->proxy_))(p1,p2,p3,p4,p5,s)))
-          return rc.value();
-      }
-    return rc.value();
-  }
-
-    
-/// @ingroup Signals
-template <class P1,class P2,class P3,class P4,class P5,class P6,class Marsh>
-class Signal6<void,P1,P2,P3,P4,P5,P6,Marsh> : public SignalBase
-  {
-    public:
-      typedef Slot6<void,P1,P2,P3,P4,P5,P6> InSlotType;
-      typedef InSlotType OutSlotType;
-      typedef void OutType;
- 
-    private:
-      // Used for both emit and proxy.
-      static OutType emit_(typename Trait<P1>::ref p1,typename Trait<P2>::ref p2,typename Trait<P3>::ref p3,typename Trait<P4>::ref p4,typename Trait<P5>::ref p5,typename Trait<P6>::ref p6,void* data);
-
-    public:
-      OutSlotType slot() const
-        { return create_slot((FuncPtr)(&emit_)); }
-
-      operator OutSlotType() const
-        { return create_slot((FuncPtr)(&emit_)); }
-
-      /// You can call Connection::disconnect() later.
-      Connection connect(const InSlotType& s)
-        { return Connection(push_back(s)); }
-
-      /// Call all the connected methods.
-      OutType emit(typename Trait<P1>::ref p1,typename Trait<P2>::ref p2,typename Trait<P3>::ref p3,typename Trait<P4>::ref p4,typename Trait<P5>::ref p5,typename Trait<P6>::ref p6)
-        {  emit_(p1,p2,p3,p4,p5,p6,impl_); }
-
-      /// See emit()
-      OutType operator()(typename Trait<P1>::ref p1,typename Trait<P2>::ref p2,typename Trait<P3>::ref p3,typename Trait<P4>::ref p4,typename Trait<P5>::ref p5, typename Trait<P6>::ref p6)
-        {  emit_(p1,p2,p3,p4,p5,p6,impl_); }
- 
-      Signal6() 
-        : SignalBase() 
-        {}
-
-      Signal6(const InSlotType& s)
-        : SignalBase() 
-        { connect(s); }
-
-      ~Signal6() {}
-  };
-
-
-// emit
-template <class P1,class P2,class P3,class P4,class P5,class P6,class Marsh>
-void Signal6<void,P1,P2,P3,P4,P5,P6,Marsh>::emit_(
-    typename Trait<P1>::ref p1,
-    typename Trait<P2>::ref p2,
-    typename Trait<P3>::ref p3,
-    typename Trait<P4>::ref p4,
-    typename Trait<P5>::ref p5,
-    typename Trait<P6>::ref p6,
-    void* data)
-{
-    SignalNode* impl = static_cast<SignalNode*>(data);
-
-    if (!impl||!impl->begin_)
-      return;
-
-    Exec exec(impl);
-    SlotNode* s = 0;
-    for (SignalConnectionNode* i = impl->begin_; i; i = i->next_)
-      {
-        if (i->blocked())
-          continue;
-
-        s = i->dest();
-        ((typename Slot6<void,P1,P2,P3,P4,P5,P6>::Proxy)(s->proxy_))(p1,p2,p3,p4,p5,p6,s);
-      }
-    return;
-  }
-};
-//#endif //SIGCXX_HAS_LESS_THAN_FIVE_SIGNAL_ARGS_AS_MAX
-#endif
 
 #endif // ifndef _ALREADY_INCLUDED_TYPEDECL_H_

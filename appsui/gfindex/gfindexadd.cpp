@@ -247,7 +247,7 @@ IndexAddGTK::main( int argc, char** argv )
         makeDefaultColumnViews();
         processAllPendingEvents();
 
-        m_indexer->getProgressSig().connect( sigc::mem_fun( *this, &_Self::OnEAProgress ) );
+        m_indexer->getProgressSig().connect( boost::bind( &_Self::OnEAProgress, this, _1, _2, _3 ) );
         
 //        sighandler.restartTimer();
         

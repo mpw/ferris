@@ -38,8 +38,8 @@ namespace Ferris
 {
     class FerrisBranchInternalContext;
 
-    typedef Loki::Functor< FerrisBranchInternalContext*,
-                           LOKI_TYPELIST_3( Context*, const fh_context&, const std::string& ) >
+    typedef boost::function< FerrisBranchInternalContext*
+                             ( Context*, const fh_context&, const std::string& ) >
     BranchInternalContextCreatorFunctor_t;
     
     /**

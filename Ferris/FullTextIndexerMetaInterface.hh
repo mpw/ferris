@@ -42,8 +42,6 @@
 
 #include <Ferris/HiddenSymbolSupport.hh>
 #include <Ferris/TypeDecl.hh>
-#include <FerrisLoki/loki/Factory.h>
-#include <FerrisLoki/loki/Functor.h>
 #include <string>
 
 namespace Ferris
@@ -67,7 +65,7 @@ namespace Ferris
          * @param std::streamsize is the current byte offset into the context being added
          * @param std::streamsize is the total size of the context being added
          */
-        typedef sigc::signal3< void, fh_context, std::streamsize, std::streamsize >
+        typedef boost::signals2::signal< void ( fh_context, std::streamsize, std::streamsize ) >
         AddToFullTextIndexProgress_Sig_t;
         AddToFullTextIndexProgress_Sig_t& getNullAddToFullTextIndexProgress_Sig();
 
@@ -498,10 +496,9 @@ namespace Ferris
         // factories for creating the indexes.
         FERRISEXP_API stringlist_t& getMetaFullTextIndexClassNames();
         FERRISEXP_API bool appendToMetaFullTextIndexClassNames( const std::string& s );
-        typedef Loki::SingletonHolder<
-            Loki::Factory< MetaFullTextIndexerInterface, std::string >,
-            Loki::CreateUsingNew, Loki::NoDestroy >
-        MetaFullTextIndexerInterfaceFactory;
+        typedef FerrisSingletonAlways<
+            std::map< std::string, boost::function< MetaFullTextIndexerInterface*() > >
+            > MetaFullTextIndexerInterfaceFactory;
 
 
         //

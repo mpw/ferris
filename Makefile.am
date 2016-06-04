@@ -1,4 +1,4 @@
-AUTOMAKE_OPTIONS = dist-bzip2 dist-xz subdir-objects 
+AUTOMAKE_OPTIONS = dist-bzip2 dist-xz subdir-objects dejagnu
 ACLOCAL_AMFLAGS = -I m4
 
 NULL=
@@ -34,7 +34,7 @@ SUBDIRS = lib ThirdParty $(CUSTOMALLOCDIR)              \
 	plugins                                         \
 	tests dot-ferris                                \
 	cc media firsttime $(XSLTFUNCTIONSDIR)          \
-	noarch migration perl exposures patches
+	noarch migration perl exposures patches testsuite
 
 bin_SCRIPTS = ferris-config
 
@@ -52,3 +52,5 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = ferris.pc ferrisui.pc ferrisxslt.pc
 
 
+RUNTESTDEFAULTFLAGS = \
+	--tool ferris EXBASE=`pwd`/ SDATA=`pwd`/testsuite/sampledata --srcdir $$srcdir/testsuite

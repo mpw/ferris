@@ -386,7 +386,7 @@ namespace Ferris
                 child->setChild( "ignore-umask", "1" );
             }
             fh_context newc = c->createSubContext( "", md );
-            sigh.emit( newc );
+            sigh( newc );
 
             return newc;
         }
@@ -405,7 +405,7 @@ namespace Ferris
                 child->setChild( "ignore-umask", "1" );
             }
             fh_context newc = c->createSubContext( "", md );
-            sigh.emit( newc );
+            sigh( newc );
 
             return newc;
         }
@@ -450,7 +450,7 @@ namespace Ferris
             child->setChild( "name",        newrdn );
             child->setChild( "link-target", target );
             fh_context newc   = newc_parent->createSubContext( "", md );
-            sigh.emit( newc );
+            sigh( newc );
             return newc;
         }
 
@@ -478,7 +478,7 @@ namespace Ferris
             fh_context newc   = c->createSubContext( "", md );
 //            cerr << "calling emit on sigh for newc:" << newc->getURL() << endl;
             
-            sigh.emit( newc );
+            sigh( newc );
             LG_CTX_D << "CreateDirOneLevel() c:" << c->getURL() << " n:" << n
                      << " newc:" << newc->getURL()
                      << endl;

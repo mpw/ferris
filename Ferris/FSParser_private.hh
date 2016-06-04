@@ -31,7 +31,6 @@
 #define _ALREADY_INCLUDED_FERRIS_FSPARSER_H_
 
 #include <Ferris/HiddenSymbolSupport.hh>
-#include <FerrisLoki/loki/Functor.h>
 #include <string>
 
 #define BOOST_SPIRIT_RULE_SCANNERTYPE_LIMIT 3
@@ -41,6 +40,7 @@
 using namespace boost::spirit;
 
 #include <boost/function.hpp>
+#include <boost/bind.hpp>
 #include <boost/lambda/lambda.hpp>
 using namespace boost::lambda;
 
@@ -57,9 +57,7 @@ namespace Ferris
     // see play/boost/spirit for this code.
     struct FERRISEXP_DLLLOCAL Tramp
     {
-        typedef Loki::Functor<
-            void, LOKI_TYPELIST_2( const char*, const char* ) >
-        SAction_t;
+        typedef boost::function< void ( const char*, const char* ) > SAction_t;
         mutable SAction_t SAction;
         typedef const char* IteratorT;
     
@@ -71,7 +69,7 @@ namespace Ferris
         template <typename PointerToObj, typename PointerToMemFn>
         Tramp( const PointerToObj& pObj, PointerToMemFn pMemFn )
             :
-            SAction( SAction_t( pObj, pMemFn ) )
+            SAction( boost::bind( pMemFn, pObj, boost::lambda::_1, boost::lambda::_2  ) )
             {
             }
 

@@ -79,7 +79,7 @@ namespace FerrisUI
     void
     FerrisOptionMenu::setLabel( const std::string& s )
     {
-        if( getLabelChangeSig().emit( this, m_label, s ) )
+        if( getLabelChangeSig()( this, m_label, s ) )
             return;
         
         m_label = s;

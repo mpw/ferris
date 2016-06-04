@@ -102,9 +102,9 @@ namespace Ferris
                     else
                     {
                         LG_DB4_D << "setValue, waiting to sync later....." << endl;
-                        typedef Loki::Functor< void, LOKI_TYPELIST_2( Database*, SyncDelayer* ) > F;
-                        F f( db4Sync );
-                        SyncDelayer::ensure( GetImpl(getDB()), Loki::BindFirst( f, GetImpl(getDB()) ) );
+//                        typedef boost::function< void ( Database*, SyncDelayer* ) > F;
+//                        F f( db4Sync );
+                        SyncDelayer::ensure( GetImpl(getDB()), boost::bind( db4Sync, GetImpl(getDB()), _1 ));
                     }
                     
 //                    cerr << "db4::setValue() k:" << k << " v:" << v << endl;

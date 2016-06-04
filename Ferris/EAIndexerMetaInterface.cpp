@@ -40,7 +40,6 @@
 // guessComparisonOperatorFromData
 #include "FilteredContext_private.hh"
 
-#include <Functor.h>
 #include <gmodule.h>
 
 #include "config.h"
@@ -738,8 +737,7 @@ namespace Ferris
         {
             ensureEAIndexPluginFactoriesAreLoaded();
             
-            fh_idx idx = MetaEAIndexerInterfaceFactory::Instance().
-                CreateObject( index_classname );
+            fh_idx idx = MetaEAIndexerInterfaceFactory::instance()[ index_classname ]();
             
             return idx;
         }
@@ -1514,11 +1512,12 @@ namespace Ferris
             std::string libname = AUTOTOOLS_CONFIG_LIBDIR + "/ferris/plugins/eaindexers/"
                 + implnameraw;
 
-            typedef ::Loki::Functor< MetaEAIndexerInterface*,
-                ::Loki::NullType > CreateFunc_t;
+            typedef MetaEAIndexerInterface* (*CreateFuncPtr_t)();
+            // boost::function< FamppEventBase*() >            
+            typedef boost::function< MetaEAIndexerInterface* ( CreateFuncPtr_t ) > CreateFunc_t;
             MetaEAIndexerInterface* (*CreateFuncPtr)();
                 
-            typedef map< std::string, CreateFunc_t > cache_t;
+            typedef map< std::string, CreateFuncPtr_t > cache_t;
             static cache_t cache;
 
             cache_t::iterator ci = cache.find( libname );

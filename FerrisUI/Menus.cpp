@@ -208,7 +208,7 @@ namespace FerrisUI
     /********************************************************************************/
     /********************************************************************************/
 
-    static gboolean DropReference_cb(GtkObject *object, gpointer udata)
+    gboolean DropReference_cb(GtkObject *object, gpointer udata)
     {
         Handlable* h = (Handlable*)udata;
         h->Release();

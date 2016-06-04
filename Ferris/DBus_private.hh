@@ -33,7 +33,6 @@
 
 #define DBUS_API_SUBJECT_TO_CHANGE
 #include <dbus/dbus.h>
-#include <FerrisLoki/loki/LokiTypeInfo.h>
 #include <string>
 #include <iostream>
 #include <sstream>

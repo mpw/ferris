@@ -32,7 +32,6 @@
 #define _ALREADY_INCLUDED_FERRIS_AGENT_PRIV_H_
 
 #include <Ferris/Agent.hh>
-#include <Factory.h>
 #include <Ferris/FerrisStdHashMap.hh>
 
 namespace Ferris
@@ -215,17 +214,16 @@ namespace Ferris
         /********************************************************************************/
         /********************************************************************************/
         
-        typedef Loki::SingletonHolder<
-            Loki::Factory< BinaryClassifierAgentImplemenation, std::string >,
-            Loki::CreateUsingNew, Loki::NoDestroy >
+        typedef FerrisSingletonAlways<
+            std::map< std::string, boost::function< BinaryClassifierAgentImplemenation*() > > >
         BinaryClassifierAgentImplemenationFactory;
 
         template< typename ProductCreator >
         bool RegisterBinaryClassifierAgentImplemenationFactory( const std::string& agentName,
-                                                   ProductCreator creator )
+                                                                ProductCreator creator )
         {
             getBinaryAgentImplemenationNames().push_back( agentName );
-            return BinaryClassifierAgentImplemenationFactory::Instance().Register( agentName, creator );
+            return BinaryClassifierAgentImplemenationFactory::instance()[ agentName ] = creator;
         }
         
     };

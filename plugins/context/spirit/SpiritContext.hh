@@ -155,6 +155,9 @@ namespace Ferris
         SpiritContext( Context* parent, const std::string& rdn )
             : FakeInternalContext( parent, rdn )
         {
+            setForceNoEAGeneratorsForContext();
+            setForceNoOverMountForEAForContext();
+            
             createStateLessAttributes();
             supplementStateLessAttributes();
 

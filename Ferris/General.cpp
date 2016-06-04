@@ -1343,7 +1343,7 @@ namespace Ferris
             {
                 return FormatOverRide;
             }
-            return getEDBString( FDB_GENERAL, "strftime-format-string", "%y %b %e %H:%M" );
+            return getConfigString( FDB_GENERAL, "strftime-format-string", "%y %b %e %H:%M" );
         }
 
         /**
@@ -1870,7 +1870,7 @@ namespace Ferris
 
         void fireCloseSig( fh_iostream& oss )
         {
-            oss.getCloseSig().emit( oss, oss.tellp() );
+            oss.getCloseSig()( oss, oss.tellp() );
             
         }
         

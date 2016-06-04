@@ -53,8 +53,6 @@
 
 #include <Ferris/HiddenSymbolSupport.hh>
 #include <Ferris/TypeDecl.hh>
-#include <FerrisLoki/loki/Factory.h>
-#include <FerrisLoki/loki/Functor.h>
 #include <Ferris/SchemaSupport.hh>
 #include <string>
 
@@ -91,7 +89,7 @@ namespace Ferris
          * @param int is the current attribute number being added for this context
          * @param int is the total number of attributes that will be added for this context
          */
-        typedef sigc::signal3< void, fh_context, int, int >
+        typedef boost::signals2::signal< void ( fh_context, int, int ) >
         AddToEAIndexProgress_Sig_t;
         FERRISEXP_API AddToEAIndexProgress_Sig_t& getNullAddToEAIndexProgress_Sig();
 
@@ -680,10 +678,9 @@ namespace Ferris
         // factories for creating the indexes.
         stringlist_t& getMetaEAIndexClassNames();
         bool appendToMetaEAIndexClassNames( const std::string& s );
-        typedef Loki::SingletonHolder<
-            Loki::Factory< MetaEAIndexerInterface, std::string >,
-            Loki::CreateUsingNew, Loki::NoDestroy >
-        MetaEAIndexerInterfaceFactory;
+        typedef FerrisSingletonAlways<
+            std::map< std::string, boost::function< MetaEAIndexerInterface*() > >
+            > MetaEAIndexerInterfaceFactory;
 
 
         //

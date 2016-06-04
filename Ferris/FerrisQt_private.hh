@@ -178,8 +178,8 @@ namespace Ferris
      */
     class StreamToQIODevice
         :
-        public QIODevice,
-        public Handlable
+        public Handlable,
+        public QIODevice
     {
         QNetworkResponseWaiter m_waiter;
         
@@ -225,8 +225,8 @@ namespace Ferris
          * multiple times, call this to signal that the request is complete.
          */
         virtual void writingComplete() = 0;
-        typedef sigc::signal1< void,
-                               fh_StreamToQIODevice > WritingComplete_Sig_t;
+        typedef boost::signals2::signal< void (
+            fh_StreamToQIODevice ) > WritingComplete_Sig_t;
         WritingComplete_Sig_t& getWritingCompleteSig()
             {
                 return WritingComplete_Sig;

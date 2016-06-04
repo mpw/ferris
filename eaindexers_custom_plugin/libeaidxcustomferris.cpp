@@ -1366,7 +1366,7 @@ namespace Ferris
 //         namespace
 //         {
 //             static const std::string MetaIndexClassName = "db4";
-//             static bool reged = MetaEAIndexerInterfaceFactory::Instance().
+//             static bool reged = MetaEAIndexerInterfaceFactory::Instance).
 //                 Register( MetaIndexClassName,
 //                           &EAIndexManagerDB4::Create );
 //             static bool regedx = appendToMetaEAIndexClassNames( MetaIndexClassName );
@@ -1565,8 +1565,7 @@ namespace Ferris
 
             if( !m_attributeNameMap )
             {
-                m_attributeNameMap = LexiconFactory::Instance().
-                    CreateObject( attributeNameLexiconClass );
+                m_attributeNameMap = LexiconFactory::instance()[ attributeNameLexiconClass ]();
                     
                 m_attributeNameMap->setPathManager( this );
                 m_attributeNameMap->setFileName( "attributemap.lexicon.db" );
@@ -2060,7 +2059,7 @@ namespace Ferris
                 if( signalWindow > 5 )
                 {
                     signalWindow = 0;
-                    di->getProgressSig().emit( c, attributesDone, totalAttributes );
+                    di->getProgressSig()( c, attributesDone, totalAttributes );
                 }
                 ++attributesDone;
                 ++signalWindow;

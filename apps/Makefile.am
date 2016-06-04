@@ -38,7 +38,8 @@ SUBDIRS = \
 	du                          \
 	scripts                     \
 	$(UPNPDIR)                  \
-	tools rest yuibrowser
+	tools rest yuibrowser       \
+	fcreate
 
 
 bin_SCRIPTS = $(srcdir)/*.sh $(srcdir)/*.pl libferris-googleearth ferris-rdfproc fedit ferris-internal-extract-subtitles-to-format
@@ -53,8 +54,8 @@ EXTRA_DIST = $(srcdir)/*.sh $(srcdir)/*.pl libferris-googleearth ferris-rdfproc 
 # 	ferris-webphoto-remote-url-to-eaindex-predicate
 
 # INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib                                               \
-# 	@STLPORT_CFLAGS@                                \
-# 	@SIGC_CFLAGS@                                   \
+# 	                                \
+# 	                                   \
 # 	-I. 						\
 # 	-I$(srcdir) -I$(top_srcdir) -I$(top_srcdir)/src	\
 # 	-I$(top_builddir)				\
@@ -66,11 +67,11 @@ EXTRA_DIST = $(srcdir)/*.sh $(srcdir)/*.pl libferris-googleearth ferris-rdfproc 
 
 # ferris_webphoto_upload_SOURCES = ferris-webphoto-upload.cpp
 # ferris_webphoto_upload_LDADD = -lpopt @LIBFERRIS_LA@ @SHAREDWEBPHOTOS_LA@
-# ferris_webphoto_upload_LDFLAGS = $(GLIB_LIBS) @SIGC_LIBS@ @QT_LIBS@ @QTNETWORK_LIBS@
+# ferris_webphoto_upload_LDFLAGS = $(GLIB_LIBS)  @QT_LIBS@ @QTNETWORK_LIBS@
 
 # ferris_webphoto_remote_url_to_eaindex_predicate_SOURCES = ferris-webphoto-remote-url-to-eaindex-predicate.cpp
 # ferris_webphoto_remote_url_to_eaindex_predicate_LDADD = -lpopt @LIBFERRIS_LA@ @SHAREDWEBPHOTOS_LA@
-# ferris_webphoto_remote_url_to_eaindex_predicate_LDFLAGS = $(GLIB_LIBS) @SIGC_LIBS@ @QT_LIBS@ @QTNETWORK_LIBS@
+# ferris_webphoto_remote_url_to_eaindex_predicate_LDFLAGS = $(GLIB_LIBS)  @QT_LIBS@ @QTNETWORK_LIBS@
 
 
 

@@ -971,6 +971,11 @@ namespace Ferris
         return handleBadDeclaration(ss);
 #endif
     }
+
+    fh_stringstream tostream( DOMDocument* doc, bool gFormatPrettyPrint )
+    {
+        return tostream( *doc, gFormatPrettyPrint );
+    }
     
     fh_stringstream tostream( fh_domdoc doc, bool gFormatPrettyPrint )
     {
@@ -1119,11 +1124,12 @@ namespace Ferris
                 }
         };
 
-        typedef Loki::SingletonHolder<
-            XMLPlatformUtilsKeeper,
-            Loki::CreateUsingNew,
-            Loki::NoDestroy
-            > XMLPlatformUtilsSingleton;
+        // typedef Loki::SingletonHolder<
+        //     XMLPlatformUtilsKeeper,
+        //     Loki::CreateUsingNew,
+        //     Loki::NoDestroy
+        //     > XMLPlatformUtilsSingleton;
+        typedef FerrisSingletonAlways< XMLPlatformUtilsKeeper > XMLPlatformUtilsSingleton;
 
         /*******************************************************************************/
         /*******************************************************************************/
@@ -1221,7 +1227,7 @@ namespace Ferris
         void ensureXMLPlatformInitialized()
         {
             ::Ferris::Private::XMLPlatformUtilsKeeper& u = 
-                  ::Ferris::Private::XMLPlatformUtilsSingleton::Instance();
+                  ::Ferris::Private::XMLPlatformUtilsSingleton::instance();
         }
     };
     
@@ -3490,7 +3496,7 @@ static short myCompareDocumentPosition(const DOMNode* x1, const DOMNode* other)
             ensureXMLPlatformInitialized();
 
             Ferris_DOMDocument* doc = new Ferris_DOMDocument( c );
-            fh_domdoc ret = doc;
+            fh_domdoc ret( doc );
             doc->hideAsXMLAttribute( hideXMLAttribute );
             doc->hideEmblemAttributes( hideEmblemAttributes );
             doc->hideSchemaAttributes( hideSchemaAttributes );
@@ -3638,11 +3644,11 @@ static short myCompareDocumentPosition(const DOMNode* x1, const DOMNode* other)
                    << " input:" << s
                    << endl;
                 int errorCount   = parser->getErrorCount();
-                fh_domdoc    doc = parser->adoptDocument();
+                fh_domdoc    doc(parser->adoptDocument());
                 
                 Throw_XMLParse( tostr(ss), errorCount, doc );
             }
-            return parser->adoptDocument();
+            return fh_domdoc(parser->adoptDocument());
         }
         
         fh_domdoc StreamToDOM( fh_stringstream& iss )
@@ -3670,12 +3676,12 @@ static short myCompareDocumentPosition(const DOMNode* x1, const DOMNode* other)
         fh_domdoc makeDOM( const std::string& rootname )
         {
             DOMImplementation *impl = Factory::getDefaultDOMImpl();
-            fh_domdoc doc = 0;
+            fh_domdoc doc;
             
             if( !rootname.empty() )
-                doc = impl->createDocument( 0, X(rootname.c_str()), 0 );
+                doc = fh_domdoc(impl->createDocument( 0, X(rootname.c_str()), 0 ));
             else
-                doc = impl->createDocument();
+                doc = fh_domdoc(impl->createDocument());
             
             return doc;
         }
@@ -3808,7 +3814,7 @@ static short myCompareDocumentPosition(const DOMNode* x1, const DOMNode* other)
             Factory::ensureXMLPlatformInitialized();
 
             DOMImplementation *impl = Factory::getDefaultDOMImpl();
-            fh_domdoc    doc = impl->createDocument( 0, X("msg"), 0 );
+            fh_domdoc    doc = fh_domdoc(impl->createDocument( 0, X("msg"), 0 ));
             DOMElement* root = doc->getDocumentElement();
 
             string pid = tostr( getpid() );
@@ -3919,7 +3925,7 @@ static short myCompareDocumentPosition(const DOMNode* x1, const DOMNode* other)
             Factory::ensureXMLPlatformInitialized();
 
             DOMImplementation *impl = Factory::getDefaultDOMImpl();
-            fh_domdoc doc = impl->createDocument( 0, X("context"), 0 );
+            fh_domdoc doc = fh_domdoc(impl->createDocument( 0, X("context"), 0 ));
             
             DOMElement* root = doc->getDocumentElement();
 //            doc->appendChild( root );
@@ -3968,7 +3974,7 @@ static short myCompareDocumentPosition(const DOMNode* x1, const DOMNode* other)
         std::string stringmapToXML( const stringmap_t& sm )
         {
             DOMImplementation *impl = Factory::getDefaultDOMImpl();
-            fh_domdoc doc = impl->createDocument( 0, X("result"), 0 );
+            fh_domdoc doc( impl->createDocument( 0, X("result"), 0 ));
             DOMElement* root = doc->getDocumentElement();
 
             for( stringmap_t::const_iterator si = sm.begin(); si != sm.end(); ++si )
@@ -3993,7 +3999,7 @@ static short myCompareDocumentPosition(const DOMNode* x1, const DOMNode* other)
                                                        stringmap_t extraAttrs = stringmap_t() )
         {
             DOMImplementation *impl = Factory::getDefaultDOMImpl();
-            fh_domdoc doc = impl->createDocument( 0, X("context"), 0 );
+            fh_domdoc doc( impl->createDocument( 0, X("context"), 0 ) );
             
             DOMElement* root = doc->getDocumentElement();
 //            doc->appendChild( root );
@@ -4388,7 +4394,7 @@ static short myCompareDocumentPosition(const DOMNode* x1, const DOMNode* other)
                     {
                         m_iss.read( (char*)toFill, maxToRead );
                         unsigned int ret = m_iss.gcount();
-                        cerr << "readBytes() max:" << maxToRead << " got:" << ret << endl;
+//                        cerr << "readBytes() max:" << maxToRead << " got:" << ret << endl;
                         return ret;
                     }
                 virtual const XMLCh* getContentType() const
@@ -4437,7 +4443,7 @@ static short myCompareDocumentPosition(const DOMNode* x1, const DOMNode* other)
             {
                 string earl = c->getURL();
                 fh_istream iss = c->getIStream();
-                cerr << " makeInputSource() c:" << c->getURL() << endl;
+//                cerr << " makeInputSource() c:" << c->getURL() << endl;
                 return makeInputSource( iss, earl.c_str(), XMLPlatformUtils::fgMemoryManager );
             }
         };

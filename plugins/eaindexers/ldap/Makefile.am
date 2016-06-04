@@ -5,14 +5,7 @@ plugin_LTLIBRARIES = libeaindexldap.la libeaindexldap_factory.la
 libeaindexldap_la_SOURCES = libeaindexldap.cpp libeaindexldap.hh
 libeaindexldap_factory_la_SOURCES = libeaindexldap_factory.cpp
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I..                                            \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	-I/usr/local/lib                                \
-	@LDAP_CFLAGS@                                   \
-	@CFLAGS@
+INCLUDES = @LDAP_CFLAGS@ @CFLAGS@
 
 libeaindexldap_la_LDFLAGS = @GLIB_LIBS@    \
 	@LDAP_LIBS@                      \

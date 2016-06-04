@@ -2,13 +2,8 @@ if FERRIS_BUILD_XINE_EAGENERATOR
 
 plugindir = $(libdir)/ferris/plugins/eagenerators
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@XINE_EAGENERATOR_CFLAGS@                       \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/eagenerators \
+	@XINE_EAGENERATOR_CFLAGS@ @CFLAGS@
 
 plugin_LTLIBRARIES = libferrisxineea.la 
 libferrisxineea_la_SOURCES = libferrisxineea.cpp

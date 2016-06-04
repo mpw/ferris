@@ -50,8 +50,8 @@ namespace Ferris
      * inlined for passing the code as a function argument.
      */
 #define LG_EXCEPTION_SWITCH( neededState )                                \
-     (Logging::LG_EXCEPTIONS::Instance().state() & neededState)           \
-     ? Logging::LG_EXCEPTIONS::Instance().getRealStream( neededState )    \
+     (Logging::LG_EXCEPTIONS::instance().state() & neededState)           \
+     ? Logging::LG_EXCEPTIONS::instance().getRealStream( neededState )    \
      : ::Ferris::Factory::getNullTimber()    
 
 

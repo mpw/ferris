@@ -23,8 +23,8 @@ bin_PROGRAMS = \
 	ferris-xml-edit
 
 INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib                                               \
-	@STLPORT_CFLAGS@                                \
-	@SIGC_CFLAGS@                                   \
+	                                \
+	                                   \
 	-I. 						\
 	-I$(srcdir) -I$(top_srcdir) -I$(top_srcdir)/src	\
 	-I$(top_builddir)				\
@@ -35,15 +35,15 @@ INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib                            
 
 ferris_filesystem_to_xsltfs_sheets_SOURCES = ferris-filesystem-to-xsltfs-sheets.cpp
 ferris_filesystem_to_xsltfs_sheets_LDADD = -lpopt @LIBFERRIS_LA@ 
-ferris_filesystem_to_xsltfs_sheets_LDFLAGS = $(GLIB_LIBS) @SIGC_LIBS@
+ferris_filesystem_to_xsltfs_sheets_LDFLAGS = $(GLIB_LIBS) 
 
 ferris_xml_edit_SOURCES = ferris-xml-edit.cpp
 ferris_xml_edit_LDADD = -lpopt @LIBFERRIS_LA@ 
-ferris_xml_edit_LDFLAGS = $(GLIB_LIBS) @SIGC_LIBS@
+ferris_xml_edit_LDFLAGS = $(GLIB_LIBS) 
 
 ferris_xqilla_SOURCES = ferris-xqilla.cpp
 ferris_xqilla_LDADD   = -lpopt @LIBFERRIS_LA@ 
-ferris_xqilla_LDFLAGS = $(GLIB_LIBS) @SIGC_LIBS@ @XQILLA_LIBS@
+ferris_xqilla_LDFLAGS = $(GLIB_LIBS)  @XQILLA_LIBS@
 ferris_xqilla_CXXFLAGS = $(INCLUDES) @XQILLA_CFLAGS@
 
 

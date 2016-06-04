@@ -1,7 +1,8 @@
 
 namespace Ferris
 {
-
+    
+#if 0
     template <class P>
     struct FerrisSmartPointerChecker
     {
@@ -18,5 +19,6 @@ namespace Ferris
             }
         static void Swap(FerrisSmartPointerChecker&) {}
     };
- 
+ #endif
+    
 };

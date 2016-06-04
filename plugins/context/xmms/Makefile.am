@@ -2,11 +2,7 @@
 if HAVE_XMMS
 plugindir = $(libdir)/ferris/plugins/context
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
+INCLUDES = -I$(top_srcdir)/plugins/context              \
 	@LIBXMMS_CFLAGS@                                \
 	@GLIB_CFLAGS@                                   \
 	@CFLAGS@

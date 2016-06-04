@@ -749,8 +749,9 @@ namespace Ferris
             std::string m_baseTableName;
             
         public:
-            typedef Loki::Functor< fh_concept, LOKI_TYPELIST_2( const fh_conceptLattice&,
-                                                                int /* maxItemSetSizeInBits */ ) > F_ConceptFactory_t;
+            typedef boost::function< fh_concept (
+                const fh_conceptLattice&,
+                int /* maxItemSetSizeInBits */ ) > F_ConceptFactory_t;
         private:
             /**
              * Factory function to create new Concept objects.
@@ -1030,12 +1031,7 @@ namespace Ferris
         /********************************************************************************/
 
         class LatticeLayout;
-        typedef Loki::SmartPtr<
-            LatticeLayout,
-            FerrisLoki::FerrisExRefCounted,
-            Loki::DisallowConversion,
-            FerrisLoki::FerrisExSmartPointerChecker,
-            FerrisLoki::FerrisExSmartPtrStorage >   fh_latticelayout;
+        typedef boost::intrusive_ptr< LatticeLayout > fh_latticelayout;
 
 
         class LatticeLayout

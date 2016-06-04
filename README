@@ -1,3 +1,4 @@
+
 Make sure you have run the following
 $ ferris-first-time-user  --setup-defaults
 to setup each user who is going to use libferris. 
@@ -11,6 +12,24 @@ levels are set to None or Emergency using the ``all'' slider. Running
 ferris-first-time-user should do that automatically for you. Though
 when you update to a new libferris, new functionality might be
 included with default logging levels higher than you might like.
+---
+
+Note that the test suite expects to be able to find some works from
+project gutenburg. Since I don't care to track copyright for
+redistributing those, you will have to download them yourself and make
+them available to the test suite.
+
+$ md5sum *
+135e06ad31b169065bccbf03ec7236f2  alice13a.txt
+7dd30f1b37e32cdb5d21fe992bbf248d  boysw10.txt
+87c05f11193c0e05b3d0dec0808a0450  dmoro11.txt
+633503b2e625f34d35e179e1ad7a4a0d  frsls10.txt
+ab4ed2c9e62ec3c29be60f0f5e44744b  nobos10.txt
+a67f97221d991e09530d5ab703f3dfb2  sbshp10.txt
+77f1d35b262e7ec252630f26f74e6a4f  snark12.txt
+d4226467454cd49cbd6d461e8288197f  warw11.txt
+
+--------
 
 
 C++ Virtual file system

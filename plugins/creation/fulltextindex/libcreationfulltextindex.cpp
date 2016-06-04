@@ -82,7 +82,7 @@ namespace Ferris
             else if( stemModeString == "none" )
                 stemMode = FullTextIndex::STEM_NONE;
 
-//            cerr << "About to create FullTextIndex object" << endl;
+            cerr << "About to create FullTextIndex object" << endl;
             
             FullTextIndex::fh_idx baseidx
                 = FullTextIndex::createFullTextIndex( "native",
@@ -92,7 +92,7 @@ namespace Ferris
                                                       stemMode,
                                                       lex_class );
             fh_nidx idx = dynamic_cast< FullTextIndexManagerNative* >( GetImpl( baseidx ));
-//            cerr << "created FullTextIndex object" << endl;
+            cerr << "created FullTextIndex object" << endl;
 
             idx->setInvertedSkiplistMaxSize( skiplistMaxSize );
             idx->setDocumentNumberGapCode( dgap_code );

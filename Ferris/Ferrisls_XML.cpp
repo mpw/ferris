@@ -286,22 +286,23 @@ Ferrisls_xml_display::Ferrisls_xml_display()
 
         
         int maxChars = EA.size();
-        fh_xmlch xch = new XMLCh[ maxChars + 2 ];
-        bool encodedOK = XMLString::transcode( EA.c_str(), xch, EA.size() );
+        fh_xmlch xch( new XMLCh[ maxChars + 2 ] );
+        bool encodedOK = XMLString::transcode( EA.c_str(), xch.get(), EA.size() );
         
 //        cerr << "attr:" << attr << " have-xch:" << isBound(xch) << endl;
             if( encodedOK )
             {
-                DOMText* childVal = P->m_dom->createTextNode( xch );
+                DOMText* childVal = P->m_dom->createTextNode( xch.get() );
                 el->appendChild( childVal );
             }
             else
             {
 //                cerr << "Failed to get plain XML text attribute data for ea:" << EA << endl;
 
-                xch = Factory::makeXMLBase64encoded( EA );
+                fh_xmlch tmp(Factory::makeXMLBase64encoded( EA ));
+                xch = tmp;
 
-                DOMText* childVal = P->m_dom->createTextNode( xch );
+                DOMText* childVal = P->m_dom->createTextNode( xch.get() );
                 el->appendChild( childVal );
                 setAttribute( el, "encoding", "base64" );
             }

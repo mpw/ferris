@@ -7,15 +7,7 @@ libferrisdb4_factory_la_LIBADD  = @LIBFERRIS_PLUGIN_FACTORY_LIBADD@
 libferrisdb4_factory_la_LDFLAGS = @LIBFERRIS_PLUGIN_LT_LINE@
 libferrisdb4_la_SOURCES         = libferrisdb4.cpp
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	-I@COMMONDBDIR@                                 \
-	@DB4_CFLAGS@                                    \
-	@GLIB_CFLAGS@                                   \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/context -I@COMMONDBDIR@ @DB4_CFLAGS@ @GLIB_CFLAGS@ @CFLAGS@
 
 libferrisdb4_la_LIBADD =                                \
 	@COMMONDB_LA@                                   \

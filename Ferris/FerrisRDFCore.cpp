@@ -611,6 +611,8 @@ namespace Ferris
         Model::FromMetadataContext( const std::string& earl )
         {
             fh_context md = Shell::acquireContext( earl );
+            md->setForceNoEAGeneratorsForContext();
+            md->setForceNoOverMountForEAForContext();
             return FromMetadataContext( md );
         }
         
@@ -656,6 +658,9 @@ namespace Ferris
             if( md->isSubContextBound( "metadata" ) )
                 md = md->getSubContext( "metadata" );
 
+            md->setForceNoEAGeneratorsForContext();
+            md->setForceNoOverMountForEAForContext();
+            
             string backendName = getStrSubCtx( md, "backend", "redland" );
             if( backendName.empty() )
                 backendName = "redland";
@@ -720,6 +725,22 @@ namespace Ferris
                 else
                 {
                     LG_RDF_D << "using local storage..." << endl;
+                    if( !backend )
+                    {
+                        cerr << "No RDF backend was loaded! We will crash soon." << endl;
+                        cerr << "backendName:   " << backendName << endl;
+                        cerr << "pi.instance(): " << (void*)Soprano::PluginManager::instance() << endl;
+                        QList<const Soprano::Backend*> blist = Soprano::PluginManager::instance()->allBackends();
+                        cerr << "soprano plugins.size:" << blist.size() << endl;
+                        for (int i = 0; i < blist.size(); ++i) {
+                            const Soprano::Backend* be = blist.at(i);
+                            cerr << " plugin:" << tostr(be->pluginName()) << endl;
+                        }
+                        
+//                        BackTrace();
+                    }
+                    
+                        
 //                    cerr << "using local storage..." << endl;
                     model = backend->createModel( settings );
                     if ( !model )
@@ -1344,9 +1365,9 @@ namespace Ferris
             bool usingCustomStore = false;
             try
             {
-//                 fh_context rdfdbc = Resolve( "~/.ferris/rdfdb" );
+//                 fh_context rdfdbc = Resolve( getDotFerrisPath() + "rdfdb" );
 //                 std::string storage_name = getStrSubCtx( rdfdbc, "ferris-storage-name", "" );
-//                 std::string db_name      = getStrSubCtx( rdfdbc, "ferris-db-name", "~/.ferris/rdfdb/myrdf" );
+//                 std::string db_name      = getStrSubCtx( rdfdbc, "ferris-db-name", getDotFerrisPath() + "rdfdb/myrdf" );
 //                 std::string db_options   = getStrSubCtx( rdfdbc, "ferris-db-options", "" );
 
 //                 if( !storage_name.empty() )
@@ -1367,8 +1388,9 @@ namespace Ferris
                     throw;
             }
 
-//            fh_context dbc = Shell::acquireContext( "~/.ferris/rdf-soprano-db/metadata" );
-            fh_context dbc = Shell::acquireContext( "~/.ferris/rdfdb/metadata" );
+            fh_context dbc = Shell::acquireContext( getDotFerrisPath() + "rdfdb/metadata" );
+            dbc->setForceNoEAGeneratorsForContext();
+            dbc->setForceNoOverMountForEAForContext();
             m = Model::FromMetadataContext( dbc );
             return m;
         }

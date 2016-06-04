@@ -15,12 +15,8 @@ tracklist_interface.cpp tracklist_interface.h: tracklist_interface.xml
 
 
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@LIBAMAROK_CFLAGS@                                \
+INCLUDES = -I$(top_srcdir)/plugins/context              \
+	@LIBAMAROK_CFLAGS@                              \
 	@GLIB_CFLAGS@                                   \
 	@QT_CFLAGS@ @QTNETWORK_CFLAGS@                  \
 	@QTDBUS_CFLAGS@                                 \

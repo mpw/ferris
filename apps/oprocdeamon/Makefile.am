@@ -5,8 +5,8 @@ MAINTAINERCLEANFILES = Makefile.in
 bin_PROGRAMS = ferris-out-of-proc-notification-deamon
 
 INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib                                               \
-	@STLPORT_CFLAGS@                                \
-	@SIGC_CFLAGS@                                   \
+	                                \
+	                                   \
 	-I. 						\
 	-I$(srcdir) -I$(top_srcdir) -I$(top_srcdir)/src	\
 	-I$(top_builddir)				\
@@ -16,5 +16,5 @@ INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib                            
 
 ferris_out_of_proc_notification_deamon_SOURCES = ferris-out-of-proc-notification-deamon.cpp
 ferris_out_of_proc_notification_deamon_LDADD = -lpopt @LIBFERRIS_LA@ 
-ferris_out_of_proc_notification_deamon_LDFLAGS = $(GLIB_LIBS) @SIGC_LIBS@
+ferris_out_of_proc_notification_deamon_LDFLAGS = $(GLIB_LIBS) 
 

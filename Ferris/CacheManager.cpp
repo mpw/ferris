@@ -212,7 +212,6 @@ namespace Ferris
 
         CacheManagerContextStateInTime::CacheManagerContextStateInTime( Context* c )
             :
-            ref_count( c->ref_count ),
             NumberOfSubContexts( c->NumberOfSubContexts ),
             ItemsSz( c->getItems().size() ),
             isReClaimable( c->isReClaimable() ),
@@ -229,6 +228,7 @@ namespace Ferris
             isParentBound( c->isParentBound() ),
             parent( 0 ), parentR( 0 ), Delegate( 0 )
         {
+            c->setRefCounterToExplicit( c->getReferenceCount() );
             if( cvc )
             {
                 Delegate = GetImpl(cvc->Delegate);
@@ -256,7 +256,6 @@ namespace Ferris
             stringstream ss;
 
             ss << "C"
-               << " rc:" << ref_count
                << " numSc:" << NumberOfSubContexts
                << " item.sz:" << ItemsSz
                << " claim:" << isReClaimable
@@ -479,10 +478,10 @@ namespace Ferris
 //         autoCleanUpCall(true)
         numberOfAllowedPermanentContextsInFreeList(-1),
         maxNumberOfContextsToFreeAtOnce(
-            toint( getEDBString( FDB_GENERAL, "vm-auto-cleanup-maxfreeatonce", "100" ))),
+            toint( getConfigString( FDB_GENERAL, "vm-auto-cleanup-maxfreeatonce", "100" ))),
         maxNumberOfContextsInFreeList(
-            toint( getEDBString( FDB_GENERAL, "vm-auto-cleanup-maxnumberinfreelist", "15" ))),
-        autoCleanUpCall( toint( getEDBString( FDB_GENERAL, "vm-auto-cleanup", "0" ))),
+            toint( getConfigString( FDB_GENERAL, "vm-auto-cleanup-maxnumberinfreelist", "15" ))),
+        autoCleanUpCall( toint( getConfigString( FDB_GENERAL, "vm-auto-cleanup", "0" ))),
         m_insideResolveCall( 0 ),
         m_insideCleanupCall( false )
     {
@@ -708,7 +707,7 @@ namespace Ferris
             if( !c->isParentBound() )
             {
                 cerr << "no parent bound.... c:" << (void*)c << endl;
-                cerr << "type:" << Loki::TypeInfo( typeid(c) ).name() << endl;
+//                cerr << "type:" << Loki::TypeInfo( typeid(c) ).name() << endl;
                 cerr << "url:" << c->getURL() << endl;
 
                 if( f_mdcontext* cc = dynamic_cast<f_mdcontext*>(c) )
@@ -874,7 +873,7 @@ namespace Ferris
 
 #ifdef FERRIS_DEBUG_VM
                 cerr << "CacheManager::cleanUp( 8 ) c:" << toVoid(c) << endl;
-                cerr << "CacheManager::cleanUp( 8 ) rc:" << c->ref_count << endl;
+                cerr << "CacheManager::cleanUp( 8 ) rc:" << c->getReferenceCount() << endl;
                 cerr << "CacheManager::cleanUp( 8 ) rdn:" << c->getDirName() << endl;
 //                DEBUG_dumpcl("CacheManager::cleanUp");
 #endif
@@ -882,7 +881,7 @@ namespace Ferris
                 cerr << "CacheManager::cleanUp0 c:" << (void*)c << endl;
                 if( c )
                 {
-                    cerr << "CacheManager::cleanUp0 c.rc:" << c->ref_count << endl;
+                    cerr << "CacheManager::cleanUp0 c.rc:" << c->getReferenceCount() << endl;
                 }
                 
                 
@@ -906,7 +905,7 @@ namespace Ferris
 //                             << " rdn:" << omc->getDirName()
 //                             << " cc:" << isBound( omc->CoveredContext )
 //                             << " omc:" << isBound( omc->OverMountContext_Delegate )
-//                             << " c.rc:" << omc->ref_count
+//                             << " c.rc:" << omc->getReferenceCount()
 //                             << " c.mRC:" << omc->getMinimumReferenceCount()
 //                             << endl;
 
@@ -916,15 +915,15 @@ namespace Ferris
                         
 //                         LG_VM_D << "Have found the root of an overmount tree."
 //                                 << " c:" << toVoid(cc)
-//                                 << " c.rc:" << cc->ref_count
+//                                 << " c.rc:" << cc->getReferenceCount()
 //                                 << " c.mRC:" << cc->getMinimumReferenceCount()
 //                                 << endl;
 //                         cerr << "Have found the root of an overmount tree."
 //                                 << " c:" << toVoid(cc)
-//                                 << " c.rc:" << cc->ref_count
+//                                 << " c.rc:" << cc->getReferenceCount()
 //                                 << " c.mRC:" << cc->getMinimumReferenceCount()
 //                                 << endl;
-//                         if( cc->ref_count = (cc->getMinimumReferenceCount()+1) )
+//                         if( cc->getReferenceCount() = (cc->getMinimumReferenceCount()+1) )
 //                         {
 //                             LG_VM_D << "Calling depthFirstDelete on whole overmount tree:"
 //                                     << toVoid(cc)
@@ -1062,9 +1061,10 @@ namespace Ferris
                                 cerr << " 2ctxlist.size:" << ctxlist.size() << endl;
                                 Private::CacheManagerImpl* cm = Private::getCacheManagerImpl();
                                 cm->removeFromFreeList( cc, true );
-                                cc->ParentContext.ExplicitlyLeakPointer();
-                                cc->CoveredContext.ExplicitlyLeakPointer();
-                                cc->OverMountContext_Delegate.ExplicitlyLeakPointer();
+                                // ExplicitlyLeakPointer()
+                                cc->ParentContext.detach();
+                                cc->CoveredContext.detach();
+                                cc->OverMountContext_Delegate.detach();
                                 Factory::getPluginOutOfProcNotificationEngine().forgetContext( cc );
                                 delete cc;
                             }
@@ -1135,7 +1135,7 @@ namespace Ferris
                     /*
                      * Quick check to make sure they are ready to die
                      */
-                    if( c->ref_count > c->getMinimumReferenceCount() )
+                    if( c->getReferenceCount() > c->getMinimumReferenceCount() )
                     {
                         c->WeAreInFreeList = 1;
                         rejects.insert( c );

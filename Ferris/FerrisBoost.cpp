@@ -163,7 +163,8 @@ namespace Ferris
     }
     fh_rex toregexh( const std::string& s, boost::regex::flag_type rflags )
     {
-        return new boost::regex( s, rflags | regex::optimize );
+        fh_rex ret(new boost::regex( s, rflags | regex::optimize ));
+        return ret;
     }
     fh_rex toregexh( const stringlist_t& sl, boost::regex::flag_type rflags )
     {

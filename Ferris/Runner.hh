@@ -45,7 +45,7 @@ namespace Ferris
     namespace Private
     {
         FERRISEXP_API void attachStreamCollector( const fh_runner& r,
-                                    const Runner_AsyncIOFunctor_t& x );
+                                                  const Runner_AsyncIOFunctor_t& x );
     };
 };
 
@@ -53,8 +53,6 @@ namespace Ferris
 
 #include <glib.h>
 
-#include <sigc++/sigc++.h>
-#include <SmartPtr.h>
 
 
 namespace Ferris
@@ -71,8 +69,8 @@ namespace Ferris
     public:
         
         typedef std::vector<std::string> ArgArray_t;
-//         typedef Loki::Functor< fh_istream,
-//                                LOKI_TYPELIST_2( fh_runner, fh_istream ) > AsyncIOFunctor_t;
+//         typedef boost::function< fh_istream
+//                                ( fh_runner, fh_istream ) > AsyncIOFunctor_t;
 #ifndef LIBFERRIS_INTERNAL_COMPILING_SWIG_WRAPPER
 
     private:
@@ -194,7 +192,7 @@ namespace Ferris
 
         void setAsyncStdOutFunctor( Runner_AsyncIOFunctor_t x );
 
-        typedef Loki::Functor< void, LOKI_TYPELIST_1( fh_runner ) > ChildSetupFunctor_t;
+        typedef boost::function< void ( fh_runner ) > ChildSetupFunctor_t;
 
         /*
          * A function to be called after fork() just before exec()

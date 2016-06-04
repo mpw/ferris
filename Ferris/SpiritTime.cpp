@@ -71,9 +71,7 @@ namespace Ferris
     {
         struct FERRISEXP_DLLLOCAL ParseRelativeTimeTramp
         {
-            typedef Loki::Functor<
-                void, LOKI_TYPELIST_2( const char*, const char* ) >
-            SAction_t;
+            typedef boost::function< void ( const char*, const char* ) > SAction_t;
             mutable SAction_t SAction;
             typedef const char* IteratorT;
     
@@ -85,7 +83,7 @@ namespace Ferris
             template <typename PointerToObj, typename PointerToMemFn>
             ParseRelativeTimeTramp( const PointerToObj& pObj, PointerToMemFn pMemFn )
                 :
-                SAction( SAction_t( pObj, pMemFn ) )
+                SAction( boost::bind( pMemFn, pObj, boost::lambda::_1, boost::lambda::_2 ) )
                 {
                 }
 
@@ -122,9 +120,7 @@ namespace Ferris
         template < class T >
         struct ParseRelativeTimeTrampNumeric
         {
-            typedef Loki::Functor<
-                void, LOKI_TYPELIST_1( T ) >
-            SAction_t;
+            typedef boost::function< void ( T ) > SAction_t;
             mutable SAction_t SAction;
     
             ParseRelativeTimeTrampNumeric( const SAction_t& SAction )
@@ -135,7 +131,7 @@ namespace Ferris
             template <typename PointerToObj, typename PointerToMemFn>
             ParseRelativeTimeTrampNumeric( const PointerToObj& pObj, PointerToMemFn pMemFn )
                 :
-                SAction( SAction_t( pObj, pMemFn ) )
+                SAction( boost::bind( pMemFn, pObj, boost::lambda::_1 ) )
                 {
                 }
 

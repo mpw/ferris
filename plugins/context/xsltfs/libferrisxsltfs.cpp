@@ -27,7 +27,6 @@
 *******************************************************************************
 ******************************************************************************/
 
-#define LIBFERRIS__DONT_INCLUDE_SIGCC_EXTENSIONS
 
 #include <FerrisContextPlugin.hh>
 #include <Ferris/Ferris.hh>
@@ -399,8 +398,8 @@ namespace Ferris
                 }
 
                 
-                XercesDOMSupport theDOMSupport;
-                XercesParserLiaison theParserLiaison(theDOMSupport);
+                XercesParserLiaison theParserLiaison;
+                XercesDOMSupport theDOMSupport(theParserLiaison);
 
                 const XercesDOMWrapperParsedSource parsedSource(
                     GetImpl(inputDOM), theParserLiaison, theDOMSupport );
@@ -562,7 +561,7 @@ namespace Ferris
 
                 LG_XSLTFS_D << "getIOStream() on non base element" << endl;
                 fh_iostream ret = _Base::getIOStream( m );
-                ret->getCloseSig().connect( bind( sigc::mem_fun( *this, &_Self::OnSubStreamClosed ), m ));
+                ret->getCloseSig().connect( boost::bind( &_Self::OnSubStreamClosed, this, _1, _2, m ));
                 return ret;
             }
     protected:
@@ -716,7 +715,7 @@ namespace Ferris
                 if( s.empty() )
                     return s;
                 
-                string d = getEDBString( FDB_GENERAL,
+                string d = getConfigString( FDB_GENERAL,
                                          CFG_XSLTFS_STYLESHEET_PATH_K,
                                          CFG_XSLTFS_STYLESHEET_PATH_DEFAULT );
                 stringlist_t sl;
@@ -803,8 +802,8 @@ namespace Ferris
                     
                 LG_XSLTFS_D << "xmlContext:" << xmlContext->getURL() << endl;
                     
-                XercesDOMSupport theDOMSupport;
-                XercesParserLiaison theParserLiaison(theDOMSupport);
+                XercesParserLiaison theParserLiaison;
+                XercesDOMSupport theDOMSupport(theParserLiaison);
 
                 const XercesDOMWrapperParsedSource parsedSource(
                     GetImpl(theDOM), theParserLiaison, theDOMSupport );
@@ -1272,7 +1271,7 @@ namespace Ferris
                 if( s.empty() )
                     return s;
                 
-                string d = getEDBString( FDB_GENERAL,
+                string d = getConfigString( FDB_GENERAL,
                                          CFG_XSLTFS_STYLESHEET_PATH_K,
                                          CFG_XSLTFS_STYLESHEET_PATH_DEFAULT );
                 stringlist_t sl;
@@ -1755,13 +1754,13 @@ namespace Ferris
         if( Lazy_XSLTFS_DOMWrapper* lp = dynamic_cast<Lazy_XSLTFS_DOMWrapper*>( p ) )
         {
             fh_iostream ret = Delegate->getParent()->priv_getIOStream( m );
-            ret->getCloseSig().connect( bind( sigc::mem_fun( *this, &_Self::OnDocumentRootStreamClosed ), m ));
+            ret->getCloseSig().connect( boost::bind( &_Self::OnDocumentRootStreamClosed, this, _1, _2, m ));
             return ret;
         }
                 
         fh_iostream ret = Delegate->priv_getIOStream( m );
 //                fh_stringstream ret = priv_getRealStream( m );
-        ret->getCloseSig().connect( bind( sigc::mem_fun( *this, &_Self::OnDocumentRootStreamClosed ), m ));
+        ret->getCloseSig().connect( boost::bind( &_Self::OnDocumentRootStreamClosed, this, _1, _2, m ));
         return ret;
     }
     

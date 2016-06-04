@@ -73,9 +73,9 @@ namespace Ferris
         enum {
             REFCOUNT = 3
         };
-        virtual FerrisLoki::Handlable::ref_count_t AddRef()
+        virtual Handlable::ref_count_t AddRef()
             { return REFCOUNT; }
-        virtual FerrisLoki::Handlable::ref_count_t Release()
+        virtual Handlable::ref_count_t Release()
             { return REFCOUNT; }
         
     public:
@@ -454,7 +454,8 @@ namespace Ferris
                     LG_SQLDB_D << "priv_FillCreateSubContextSchemaParts(A5)" << endl;
                 
                     m["tuple"] = Context::SubContextCreator(
-                        Context::SubContextCreator::Perform_t( this, &_Self::SubCreateTuple),
+                        boost::bind( &_Self::SubCreateTuple, this,
+                                     boost::lambda::_1, boost::lambda::_2 ),
                         tostr(ss));
                     LG_SQLDB_D << "priv_FillCreateSubContextSchemaParts(A6)" << endl;
                 }

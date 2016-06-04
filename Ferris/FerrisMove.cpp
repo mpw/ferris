@@ -55,7 +55,7 @@ namespace Ferris
     {
         backupMaker.setMode( "none" );
         
-        getSkippingContextSignal().connect( sigc::mem_fun( *this,  &_Self::OnSkippingContext ));
+        getSkippingContextSignal().connect( boost::bind( &_Self::OnSkippingContext, this, _1,_2,_3,_4 ));
     }
 
     FerrisMv::SkippingContextSignal_t&
@@ -305,12 +305,12 @@ namespace Ferris
                     
                 if( srctt == -1 || dsttt == -1 )
                 {
-                    getSkippingContextSignal().emit( *this, oldrdn, newrdn, "" );
+                    getSkippingContextSignal()( *this, oldrdn, newrdn, "" );
                     return true;
                 }
                 if( srctt <= dsttt )
                 {
-                    getSkippingContextSignal().emit( *this, oldrdn, newrdn, "src not newer" );
+                    getSkippingContextSignal()( *this, oldrdn, newrdn, "src not newer" );
                     return true;
                 }
             }
@@ -319,7 +319,7 @@ namespace Ferris
             }
             catch( exception& e )
             {
-                getSkippingContextSignal().emit( *this, oldrdn, newrdn,
+                getSkippingContextSignal()( *this, oldrdn, newrdn,
                                                  "problem resolving destination" );
                 return true;
             }
@@ -546,7 +546,7 @@ namespace Ferris
             if( m_AttributeUpdaterInUse )
             {
                 fh_cp fcp = getCopyObject();
-                fcp->getAttributeUpdaterSignal().emit(
+                fcp->getAttributeUpdaterSignal()(
                     GetImpl(fcp), oldchild, child,
                     oldchild->getURL(), child->getURL() );
             }

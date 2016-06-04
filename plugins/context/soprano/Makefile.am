@@ -1,13 +1,7 @@
 
 plugindir = $(libdir)/ferris/plugins/context
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@SOPRANO_CFLAGS@	                        \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/context @SOPRANO_CFLAGS@ @CFLAGS@
 
 plugin_LTLIBRARIES =  libferrissoprano.la libferrissoprano_factory.la
 

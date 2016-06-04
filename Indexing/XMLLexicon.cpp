@@ -42,9 +42,6 @@
 #include <FerrisBackup.hh>
 #include <FerrisDOM.hh>
 
-#include <Singleton.h>
-#include <Factory.h>
-#include <Functor.h>
 
 #include <STLdb4/stldb4.hh>
 
@@ -96,15 +93,16 @@ namespace Ferris
             static string getClassName()
                 { return "XML"; }
         };
-        bool Lexicon_XML::reged = LexiconFactory::Instance().
-        Register( Lexicon_XML::getClassName(),
-                  &MakeObject<Lexicon,Lexicon_XML>::Create );
+        bool Lexicon_XML::reged = LexiconFactory::instance()
+            [ Lexicon_XML::getClassName() ]
+            = boost::factory<Lexicon_XML*>();
         bool Lexicon_XML::regedx = appendToLexiconClassNames(
             Lexicon_XML::getClassName() );
 
 
-        static bool rg = LexiconFactory::Instance().
-        Register( "XML", &MakeObject<Lexicon,Lexicon_XML>::Create );
+        static bool rg = LexiconFactory::instance()
+            [ "XML" ]
+            = boost::factory<Lexicon_XML*>();
         static bool rx = appendToLexiconAliasNames( "XML" );
 
 
@@ -180,7 +178,7 @@ namespace Ferris
         Lexicon_XML::save()
         {
             DOMImplementation *impl = Ferris::Factory::getDefaultDOMImpl();
-            fh_domdoc    doc = impl->createDocument( 0, X("lexicon"), 0 );
+            fh_domdoc    doc(impl->createDocument( 0, X("lexicon"), 0 ));
             DOMElement* root = doc->getDocumentElement();
             
             for( m_lexicon_t::iterator li = m_lexicon.begin(); li!=m_lexicon.end(); ++li )

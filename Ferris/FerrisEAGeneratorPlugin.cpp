@@ -39,8 +39,14 @@ namespace Ferris
     
     StaticEAGenFactorys_t& getStaticLinkedEAGenFactorys()
     {
-        static StaticEAGenFactorys_t ret;
-        return ret;
+//        static StaticEAGenFactorys_t ret;
+//        return ret;
+
+        // EXPLICITLEAK: explicit leak
+        static StaticEAGenFactorys_t* ret = 0;
+        if( !ret )
+            ret = new StaticEAGenFactorys_t;
+        return *ret;
     }
     
     bool RegisterEAGeneratorModule(

@@ -5,13 +5,7 @@ plugin_LTLIBRARIES = libeaindexnull.la libeaindexnull_factory.la
 libeaindexnull_la_SOURCES         = libeaindexnull.cpp
 libeaindexnull_factory_la_SOURCES = libeaindexnull_factory.cpp
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I..                                            \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	-I/usr/local/lib                                \
-	@CFLAGS@
+INCLUDES = @CFLAGS@
 
 libeaindexnull_la_LDFLAGS = @GLIB_LIBS@ @LIBFERRIS_PLUGIN_LT_LINE@
 libeaindexnull_factory_la_LDFLAGS = @LIBFERRIS_PLUGIN_LT_LINE@

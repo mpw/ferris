@@ -42,8 +42,6 @@
 
 #include <fstream>
 
-#include <sigc++/sigc++.h>
-
 #include <Resolver_private.hh>
 
 

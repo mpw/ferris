@@ -400,11 +400,7 @@ namespace Ferris
         public stringstream_methods<_CharT, _Traits, io_ferris_stream_traits< _CharT, _Traits > >
     {
         typedef gstreamer_readFrom_streambuf<_CharT, _Traits, _Alloc> ss_impl_t;
-        typedef Loki::SmartPtr<  ss_impl_t,
-                                 FerrisLoki::FerrisExRefCounted,
-                                 Loki::DisallowConversion,
-                                 FerrisLoki::FerrisExSmartPointerChecker,
-                                 FerrisLoki::FerrisExSmartPtrStorage > ss_t;
+        typedef boost::intrusive_ptr<  ss_impl_t > ss_t;
         ss_t ss;
         typedef Ferris_commonstream<_CharT, _Traits> _CS;
         typedef io_ferris_stream_traits< _CharT, _Traits > _FerrisStreamTraits;

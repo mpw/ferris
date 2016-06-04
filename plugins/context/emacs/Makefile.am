@@ -8,16 +8,12 @@ libferrisemacs_factory_la_LIBADD  = @LIBFERRIS_PLUGIN_FACTORY_LIBADD@
 libferrisemacs_factory_la_LDFLAGS = @LIBFERRIS_PLUGIN_LT_LINE@
 libferrisemacs_la_SOURCES         = libferrisemacs.cpp 
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@EMACS_MOUNT_CFLAGS@                                  \
+INCLUDES = -I$(top_srcdir)/plugins/context \
+	@EMACS_MOUNT_CFLAGS@               \
 	@CFLAGS@
 
-libferrisemacs_la_LDFLAGS =                           \
-	@EMACS_MOUNT_LIBS@                                  \
+libferrisemacs_la_LDFLAGS =                \
+	@EMACS_MOUNT_LIBS@                 \
 	@LIBFERRIS_PLUGIN_LT_LINE@                   
 
 endif

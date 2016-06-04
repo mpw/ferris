@@ -1258,7 +1258,7 @@ namespace Ferris
          {
                 LG_PG_D << "priv_FillCreateSubContextSchemaParts(B)" << endl;
                 m["table"] = SubContextCreator(
-                    SubContextCreator::Perform_t( this, &_Self::SubCreateTable),
+                    boost::bind( &_Self::SubCreateTable, this, boost::lambda::_1, boost::lambda::_2 ),
 /**/                "	<elementType name=\"table\">\n"
 /**/                "		<elementType name=\"name\" default=\"newtable\">\n"
 /**/                "			<dataTypeRef name=\"string\"/>\n"
@@ -1269,7 +1269,7 @@ namespace Ferris
 /**/                "	</elementType>\n");
 
                 m["queryview"] = SubContextCreator(
-                        SubContextCreator::Perform_t( this, &_Self::SubCreateQV),
+                    boost::bind( &_Self::SubCreateQV, this, boost::lambda::_1, boost::lambda::_2 ),
 /**/                "	<elementType name=\"queryview\">\n"
 /**/                "		<elementType name=\"name\" default=\"newqtable\">\n"
 /**/                "			<dataTypeRef name=\"string\"/>\n"

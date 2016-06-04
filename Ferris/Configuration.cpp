@@ -43,17 +43,38 @@ namespace Ferris
     using namespace std;
     using namespace ::STLdb4;
 
-    std::string GET_FDB_GENERAL()
+    FERRISEXP_API std::string GET_FDB_GENERAL()
     {
-        return "/.ferris/general.db";
+        return getDotFerrisPath() + "/general.db";
+    }
+    std::string GET_FDB_FERRISDEV()
+    {
+        return getDotFerrisPath() + "/general.db";
+    }
+    FERRISEXP_API std::string& GET_FDB_LOGGING()
+    {
+        static string s = getDotFerrisPath() + "/logging.db";
+        return s;
+    }
+    std::string GET_FDB_SECURE()
+    {
+        return getDotFerrisPath() + "/secure.db";
+    }
+    std::string GET_FDB_CACHE()
+    {
+        return getDotFerrisPath() + "/cache.db";
+    }
+    std::string GET_CREATEHISTORY_RELATIVE()
+    {
+        return getDotFerrisPath() + "cache.db/create-history";
     }
     
-    const std::string FDB_GENERAL   = GET_FDB_GENERAL();//"/.ferris/general.db";
-    const std::string FDB_FERRISDEV = "/.ferris/general.db";
-    char const FDB_LOGGING[] = "/.ferris/logging.db";
-    const std::string FDB_SECURE  = "/.ferris/secure.db";
-    const std::string FDB_CACHE   = "/.ferris/cache.db";
-    const std::string CREATEHISTORY_RELATIVE = "/.ferris/cache.db/create-history";
+    const std::string FDB_GENERAL   = GET_FDB_GENERAL();
+    const std::string FDB_FERRISDEV = getDotFerrisPath() + "general.db";
+    const std::string FDB_LOGGING = GET_FDB_LOGGING();
+    const std::string FDB_SECURE  = getDotFerrisPath() + "secure.db";
+    const std::string FDB_CACHE   = getDotFerrisPath() + "cache.db";
+    const std::string CREATEHISTORY_RELATIVE = getDotFerrisPath() + "cache.db/create-history";
 
     /******************************************************************************/
     /******************************************************************************/
@@ -190,11 +211,10 @@ namespace Ferris
         /* ~/ files are assumed to be config files and should thus be cached. */
         typedef map< string, fh_database > DotFileCache_t;
 //        static DotFileCache_t dotCache;
-        typedef Loki::SingletonHolder< DotFileCache_t,
-            Loki::CreateUsingNew, Loki::NoDestroy > dotCache;
+        typedef FerrisSingletonAlways< DotFileCache_t > dotCache;
 
-        DotFileCache_t::iterator iter = dotCache::Instance().find( edbname_relhome );
-        if( iter == dotCache::Instance().end() )
+        DotFileCache_t::iterator iter = dotCache::instance().find( edbname_relhome );
+        if( iter == dotCache::instance().end() )
         {
             fh_database db = 0;
             try
@@ -214,7 +234,7 @@ namespace Ferris
                 return 0;
             }
 
-            iter = dotCache::Instance().insert( make_pair( edbname_relhome, db ) ).first;
+            iter = dotCache::instance().insert( make_pair( edbname_relhome, db ) ).first;
         }
         return iter->second;
             
@@ -255,33 +275,32 @@ namespace Ferris
     }
     
 
-    /**
-     * Note that as this function is called from the logging code, it can not use any
-     * LG_XXX_D logging because it might create a cyclic loop.
-     *
-     */
-    string getEDBString( const string& edbname_relhome,
-                         const string& k,
-                         const string& def,
-                         bool isEdbName_RelativeToHome,
-                         bool throw_for_errors )
+
+
+    string getConfigString( const string& edbname_relhome,
+                            const string& k,
+                            const string& def,
+                            bool throw_for_errors )
     {
-        /* Dont cache non local files */
-        if( !isEdbName_RelativeToHome )
-        {
-            return get_db4_string( edbname_relhome, k, def, throw_for_errors );
-        }
-        
         string filename = Shell::getHomeDirPath_nochecks()+edbname_relhome;
-        fh_database db = getCachedDb4( edbname_relhome, filename, k, throw_for_errors, "get" );
+        fh_database db = getCachedDb4( edbname_relhome, edbname_relhome, k, throw_for_errors, "get" );
         if( db )
         {
             return get_db4_string( db, k, def, throw_for_errors );
         }
-        
         return def;
     }
-
+    void setConfigString( const string& edbname_relhome,
+                          const string& k,
+                          const string& v,
+                          bool throw_for_errors )
+    {
+        string filename = edbname_relhome;
+        fh_database db = getCachedDb4( edbname_relhome, edbname_relhome, k, throw_for_errors, "set" );
+        if( db )
+            set_db4_string( db, k, v, throw_for_errors );
+    }
+    
     /******************************************************************************/
     /******************************************************************************/
     /******************************************************************************/
@@ -385,30 +404,6 @@ namespace Ferris
     }
 
     
-    void setEDBString( const string& edbname_relhome,
-                       const string& k,
-                       const string& v,
-                       bool isEdbName_RelativeToHome,
-                       bool throw_for_errors )
-    {
-        string filename = edbname_relhome;
-        if( isEdbName_RelativeToHome )
-        {
-            filename = Shell::getHomeDirPath_nochecks()+edbname_relhome;
-        }
-
-//        cerr << "setEDBString(A) k:" << k << " v:" << v << endl;
-
-        /* Dont cache non local files */
-        if( !isEdbName_RelativeToHome )
-        {
-            return set_db4_string( filename, k, v, throw_for_errors );
-        }
-
-        fh_database db = getCachedDb4( edbname_relhome, filename, k, throw_for_errors, "set" );
-        if( db )
-            set_db4_string( db, k, v, throw_for_errors );
-    }
 
     static STLdb4::fh_database
     ensureFerrisConfigFileExists_sub( const std::string& parentPath,

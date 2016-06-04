@@ -5,8 +5,8 @@ MAINTAINERCLEANFILES = Makefile.in
 bin_PROGRAMS = fnamespace 
 
 INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib                                               \
-	@STLPORT_CFLAGS@                                \
-	@SIGC_CFLAGS@                                   \
+	                                \
+	                                   \
 	-I. 						\
 	-I$(srcdir) -I$(top_srcdir) -I$(top_srcdir)/src	\
 	-I$(top_builddir)				\
@@ -16,5 +16,5 @@ INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib                            
 
 fnamespace_SOURCES = fnamespace.cpp
 fnamespace_LDADD = -lpopt @LIBFERRIS_LA@ 
-fnamespace_LDFLAGS = $(GLIB_LIBS) @SIGC_LIBS@ 
+fnamespace_LDFLAGS = $(GLIB_LIBS)  
 

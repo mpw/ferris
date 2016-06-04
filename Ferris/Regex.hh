@@ -34,7 +34,6 @@
 #include <Ferris/HiddenSymbolSupport.hh>
 #include <Ferris/TypeDecl.hh>
 //#include <Ferris/FerrisBoost.hh>
-#include <SmartPtr.h>
 
 namespace boost {
     namespace serialization {

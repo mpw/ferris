@@ -306,7 +306,7 @@ namespace FullTextIndex
         {
             if( !m_writer )
             {
-                m_writer = new IndexWriter( getPath().c_str(), newAnalyzer(), false );
+                m_writer = l_IndexWriter( new IndexWriter( getPath().c_str(), newAnalyzer(), false ));
                 m_writer->setMaxFieldLength( 512*1024*1024 );
 //                cerr << "IndexWriter::DEFAULT_MAX_FIELD_LENGTH:" << IndexWriter::DEFAULT_MAX_FIELD_LENGTH << endl;
             }
@@ -369,7 +369,7 @@ namespace FullTextIndex
             try
             {
                 Analyzer* a = new StandardAnalyzer();
-                l_IndexWriter writer = new IndexWriter( getPath().c_str(), a, true );
+                l_IndexWriter writer( new IndexWriter( getPath().c_str(), a, true ));
                 writer->close();
             }
             catch ( exception& e )
@@ -533,10 +533,10 @@ namespace FullTextIndex
                     }
                 }
 
-                l_Query query = QueryParser::parse( W(term).c_str(), _T("contents"), analyzer);
+                l_Query query( QueryParser::parse( W(term).c_str(), _T("contents"), analyzer));
                 LG_IDX_D << "Searching for:" << term << endl;
 
-                l_Hits hits = searcher->search( GetImpl(query) );
+                l_Hits hits( searcher->search( GetImpl(query) ));
                 LG_IDX_D << "total matching documents:" << hits->length() << endl;
 
                 for (int i = 0; i < hits->length(); i++)
@@ -570,11 +570,11 @@ namespace FullTextIndex
 
 
             
-            l_Term t = newterm( "ferris-url", c->getURL() );
-            l_TermQuery pq = new TermQuery( t );
+            l_Term t( newterm( "ferris-url", c->getURL() ));
+            l_TermQuery pq( new TermQuery( GetImpl(t) ));
 
             auto_ptr<Searcher> searcher( new IndexSearcher( getPath().c_str() ) );
-            l_Hits hits = searcher->search( pq );
+            l_Hits hits = searcher->search( GetImpl(pq) );
 
             LG_IDX_D << "hits:" << hits->length() << " c:" << c->getURL() << endl;
             if( hits->length() )

@@ -194,13 +194,13 @@ public:
         ShowMeter( false ),
         alwaysPreserveExisting( false )
         {
-            getCopyStartSignal().connect( sigc::mem_fun( *this,    &_Self::OnCopyStart ));
-            getCopyPorgressSignal().connect( sigc::mem_fun( *this, &_Self::OnCopyPorgress ));
-            getCopyEndSignal().connect( sigc::mem_fun( *this,      &_Self::OnCopyEnd ));
-            getCopyVerboseSignal().connect( sigc::mem_fun( *this,  &_Self::OnCopyVerbose ));
-            getSkippingContextSignal().connect( sigc::mem_fun( *this,  &_Self::OnSkippingContext ));
-            getAskReplaceContextSignal().connect( sigc::mem_fun( *this,&_Self::OnAskReplaceContext));
-            getAskReplaceAttributeSignal().connect( sigc::mem_fun( *this,&_Self::OnAskReplaceAttribute));
+            getCopyStartSignal().connect( boost::bind(    &_Self::OnCopyStart, this,_1,_2,_3,_4 ));
+            getCopyPorgressSignal().connect( boost::bind( &_Self::OnCopyPorgress, this,_1,_2,_3,_4 ));
+            getCopyEndSignal().connect( boost::bind(      &_Self::OnCopyEnd, this,_1,_2,_3,_4 ));
+            getCopyVerboseSignal().connect( boost::bind(  &_Self::OnCopyVerbose, this,_1,_2,_3,_4,_5 ));
+            getSkippingContextSignal().connect( boost::bind(     &_Self::OnSkippingContext, this,_1,_2,_3 ));
+            getAskReplaceContextSignal().connect( boost::bind(   &_Self::OnAskReplaceContext, this,_1,_2,_3,_4,_5 ));
+            getAskReplaceAttributeSignal().connect( boost::bind( &_Self::OnAskReplaceAttribute, this,_1,_2,_3,_4,_5,_6 ));
         }
 
     virtual ~FerrisCopy_TTY() throw ()

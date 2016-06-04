@@ -50,8 +50,8 @@ namespace Ferris
             static const std::string MetaIndexClassName = "native";
             namespace
             {
-                static bool reged = MetaFullTextIndexerInterfaceFactory::Instance().
-                    Register( MetaIndexClassName, &CreateFullTextIndexer );
+                static bool reged = MetaFullTextIndexerInterfaceFactory::instance()
+                    [ MetaIndexClassName ] = &CreateFullTextIndexer;
                 static bool regedx = appendToMetaFullTextIndexClassNames( MetaIndexClassName );
             }
         };

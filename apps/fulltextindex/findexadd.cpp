@@ -82,7 +82,7 @@ void addToIndexFromFileList( fh_idx& idx, fh_istream& fiss )
     indexer->setDontCheckIfAlreadyThere( DontCheckIfAlreadyThere );
     if( Verbose )
     {
-        indexer->getProgressSig().connect( sigc::ptr_fun( progressf ) );
+        indexer->getProgressSig().connect( &progressf );
     }
 
     while( getline( fiss, srcURL ))
@@ -206,7 +206,7 @@ int main( int argc, char** argv )
                 fh_docindexer indexer = FullTextIndex::Factory::makeDocumentIndexer( idx );
                 indexer->setDontCheckIfAlreadyThere( DontCheckIfAlreadyThere );
                 if( Verbose )
-                    indexer->getProgressSig().connect( sigc::ptr_fun( progressf ) );
+                    indexer->getProgressSig().connect( &progressf );
                 indexer->addContextToIndex( c );
                 ++TotalFilesDoneCount;
             }

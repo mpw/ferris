@@ -8,16 +8,7 @@ plugin_LTLIBRARIES = libftxidxlucene.la libftxidxlucene_factory.la
 libftxidxlucene_la_SOURCES = libftxidxlucene.cpp 
 libftxidxlucene_factory_la_SOURCES = libftxidxlucene_factory.cpp 
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I..                                            \
-	-I$(top_srcdir)/src 				\
-	-I$(top_srcdir)/FerrisGCJ                       \
-	-I$(includedir)					\
-	-I/usr/local/lib                                \
-	@GCJ_CFLAGS@                                    \
-	@GCJLUCENE_CFLAGS@                              \
-	@CFLAGS@
+INCLUDES = @GCJ_CFLAGS@ @GCJLUCENE_CFLAGS@ @CFLAGS@
 
 GCJFLAGS = @GCJLUCENE_GCJFLAGS@ @GCJFLAGS@
 

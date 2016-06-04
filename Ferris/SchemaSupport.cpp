@@ -282,13 +282,13 @@ namespace Ferris
             {
             }
 
-        typedef Loki::Functor< fh_istream,
-                               LOKI_TYPELIST_3( Context*,
-                                           const std::string&,
-                                           EA_Atom* ) > SchemaReadFunctor_t;
+        typedef boost::function< fh_istream (
+            Context*,
+            const std::string&,
+            EA_Atom* ) > SchemaReadFunctor_t;
     SchemaReadFunctor_t getFunctor()
     {
-        SchemaReadFunctor_t f( this, &GetSchemaURLIStream::getIStream );
+        SchemaReadFunctor_t f = boost::bind( &GetSchemaURLIStream::getIStream, this, _1,_2,_3 );
         return f;
     }
     
@@ -390,10 +390,10 @@ namespace Ferris
         return (XSDBasic_t)(t & 0x00FFFFFF);
     }
 
-    typedef Loki::Functor< fh_istream,
-                           LOKI_TYPELIST_3( Context*,
-                                       const std::string&,
-                                       EA_Atom* ) > SchemaReadFunctor_t;
+    typedef boost::function< fh_istream (
+        Context*,
+        const std::string&,
+        EA_Atom* ) > SchemaReadFunctor_t;
     struct FERRISEXP_DLLLOCAL StateLessAttacher
     {
         static void attach( Context* c,
@@ -453,8 +453,7 @@ namespace Ferris
                         << " GIVES:" << readval << endl;
 
             Attacher::attach( c,  sea,
-                              SchemaReadFunctor_t( fi->second,
-                                                   &GetSchemaURLIStream::getIStream ) );
+                              boost::bind( &GetSchemaURLIStream::getIStream, fi->second, _1,_2,_3 ) );
 
             LG_SCHEMA_D << "attachSchema(final test) getattr:" << getStrAttr( c, sea, "no" ) << endl;
             
@@ -571,7 +570,7 @@ namespace Ferris
 //                        Time::Benchmark bm( "getting schema" );
                         v = false;
                         
-                        static fh_context base = Resolve( "~/.ferris/schema.xml" );
+                        static fh_context base = Resolve( getDotFerrisPath() + "schema.xml" );
                         static fh_context c1 = base;
                         static fh_context c2 = Factory::makeInheritingEAContext( base );
                         ret = c2;
@@ -591,9 +590,8 @@ namespace Ferris
                 }
             }
     };
-    typedef Loki::SingletonHolder< SchemaContextSchemaVFS_RootContextDropper,
-            Loki::CreateUsingNew, Loki::NoDestroy > link_ctx_schema_singleton;
-    static RootContextDropper& schemad = link_ctx_schema_singleton::Instance();
+    typedef FerrisSingletonAlways< SchemaContextSchemaVFS_RootContextDropper > link_ctx_schema_singleton;
+    static RootContextDropper& schemad = link_ctx_schema_singleton::instance();
 
     /********************************************************************************/
     /********************************************************************************/

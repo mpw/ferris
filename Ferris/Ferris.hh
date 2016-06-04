@@ -57,11 +57,13 @@
 #include <Ferris/Debug.hh>
 
 #include <glib.h>
-#include <sigc++/sigc++.h>
-#include <sigc++/slot.h>
-#include <Functor.h>
-#include <SmartPtr.h>
-#include <AssocVector.h>
+// #include <sigc++/sigc++.h>
+// #include <sigc++/slot.h>
+// #include <Functor.h>
+// #include <SmartPtr.h>
+// #include <AssocVector.h>
+
+#include <FerrisStreams/All.hh>
 
 #include <Ferris/TypeDecl.hh>
 #include <Ferris/Hashing.hh>
@@ -78,7 +80,38 @@
 
 namespace Ferris
 {
-    typedef Loki::Functor< bool, LOKI_TYPELIST_1( const fh_context& ) > fh_matcher;
+    /**
+     * Traditionally ~/.ferris but can be changed to allow settings to
+     * be loaded from elsewhere. It is simplest to make the function
+     * named this way as it mirrors the thinking of what it does.
+     */
+    std::string getDotFerrisPath();
+//    const char* getDotFerrisPathCSTR();
+    
+    typedef boost::function<bool (const fh_context& )> fh_matcher;
+
+    template< typename T >
+    void* toVoid( T* p )
+    {
+        return (void*)p;
+    }
+    template< typename T >
+    const void* toVoid( const T* p )
+    {
+        return (void*)p;
+    }
+    template< typename T >
+    const void* toVoid( boost::intrusive_ptr<T> p )
+    {
+        return (void*)GetImpl(p);
+    }
+    template< typename T >
+    const void* toVoid( boost::shared_ptr<T> p )
+    {
+        return (void*)GetImpl(p);
+    }
+    
+    
     typedef std::list<fh_matcher> fh_matchers;
     namespace Factory
     {
@@ -113,7 +146,6 @@ namespace Ferris
 };
 
 #include <Ferris/FerrisException.hh>
-#include <FerrisLoki/Extensions.hh>
 #include <Ferris/FerrisHandle.hh>
 #include <Ferris/SignalStreams.hh>
 #include <Ferris/FerrisEvent.hh>
@@ -126,6 +158,7 @@ namespace Ferris
 
 namespace Ferris
 {
+    
 #ifdef GCC_HASCLASSVISIBILITY
 #pragma GCC visibility push(default)
 #endif
@@ -479,7 +512,7 @@ namespace Ferris
          * @see Medallion::removeEmblem()
          *
          */
-        typedef sigc::signal1< void, fh_context > NamingEvent_MedallionUpdated_Sig_t;
+        typedef boost::signals2::signal< void ( fh_context ) > NamingEvent_MedallionUpdated_Sig_t;
     
         /**
          * Context changed signal type. This signal consists of a special changed
@@ -499,9 +532,9 @@ namespace Ferris
          * @see NamingEvent_Changed
          *
          */
-        typedef sigc::signal3< void,
+        typedef boost::signals2::signal< void (
                          NamingEvent_Changed*,
-                         std::string, std::string> NamingEvent_Changed_Sig_t;
+                         std::string, std::string )> NamingEvent_Changed_Sig_t;
     
 
         /**
@@ -523,9 +556,9 @@ namespace Ferris
          * @see NamingEvent_Deleted
          *
          */
-        typedef sigc::signal3< void,
+        typedef boost::signals2::signal< void (
                          NamingEvent_Deleted*,
-                         std::string, std::string> NamingEvent_Deleted_Sig_t;
+                         std::string, std::string )> NamingEvent_Deleted_Sig_t;
 
         /**
          * Context has started being executed signal type.
@@ -541,9 +574,9 @@ namespace Ferris
          * @see NamingEvent_Start_Reading_Context
          * @see NamingEvent_Stop_Reading_Context
          */
-        typedef sigc::signal3< void,
+        typedef boost::signals2::signal< void (
                          NamingEvent_Start_Execute*,
-                         std::string, std::string> NamingEvent_Start_Execute_Sig_t;
+                         std::string, std::string )> NamingEvent_Start_Execute_Sig_t;
 
         /**
          * Context has stopped being executed signal type.
@@ -559,9 +592,9 @@ namespace Ferris
          * @see NamingEvent_Start_Reading_Context
          * @see NamingEvent_Stop_Reading_Context
          */
-        typedef sigc::signal3< void,
+        typedef boost::signals2::signal< void (
                          NamingEvent_Stop_Execute*,
-                         std::string, std::string> NamingEvent_Stop_Execute_Sig_t;
+                         std::string, std::string )> NamingEvent_Stop_Execute_Sig_t;
     
         /**
          * Context has been created signal type.
@@ -580,10 +613,10 @@ namespace Ferris
          * @see NamingEvent
          * @see NamingEvent_Created
          */
-        typedef sigc::signal4< void,
+        typedef boost::signals2::signal< void (
                                NamingEvent_Created*,
                                const fh_context&,
-                               std::string, std::string> NamingEvent_Created_Sig_t;
+                               std::string, std::string )> NamingEvent_Created_Sig_t;
 
         /**
          * Context has been discovered to exist already signal type.
@@ -600,10 +633,10 @@ namespace Ferris
          * @see NamingEvent
          * @see NamingEvent_Exists
          */
-        typedef sigc::signal4< void,
+        typedef boost::signals2::signal< void (
                                NamingEvent_Exists*,
                                const fh_context&,
-                               std::string, std::string> NamingEvent_Exists_Sig_t;
+                               std::string, std::string )> NamingEvent_Exists_Sig_t;
 
         /**
          * Context has been moved signal type.
@@ -618,9 +651,9 @@ namespace Ferris
          * @see NamingEvent
          * @see NamingEvent_Moved
          */
-        typedef sigc::signal3< void,
+        typedef boost::signals2::signal< void (
                          NamingEvent_Moved*,
-                         std::string, std::string> NamingEvent_Moved_Sig_t;
+                         std::string, std::string )> NamingEvent_Moved_Sig_t;
 
         /**
          * Context has started to be read() signal type.
@@ -639,9 +672,9 @@ namespace Ferris
          * @see NamingEvent_Start_Reading_Context
          * @see NamingEvent_Stop_Reading_Context
          */
-        typedef sigc::signal1< void,
-                         NamingEvent_Start_Reading_Context*
-                         > NamingEvent_Start_Reading_Context_Sig_t;
+        typedef boost::signals2::signal<
+            void ( NamingEvent_Start_Reading_Context* )
+            > NamingEvent_Start_Reading_Context_Sig_t;
 
 
         /**
@@ -658,9 +691,9 @@ namespace Ferris
          * @see NamingEvent_Start_Reading_Context
          * @see NamingEvent_Stop_Reading_Context
          */
-        typedef sigc::signal1< void,
+        typedef boost::signals2::signal< void (
                          NamingEvent_Stop_Reading_Context*
-                         > NamingEvent_Stop_Reading_Context_Sig_t;
+            ) > NamingEvent_Stop_Reading_Context_Sig_t;
 
         /**
          * For contexts that represent network data this event is fired
@@ -686,9 +719,9 @@ namespace Ferris
          * @param stringset_t collection of the names of header that were obtained.
          *        use getStrAttr( c, set[k] ) to get the values of these keys
          */
-        typedef sigc::signal2< void,
+        typedef boost::signals2::signal< void (
                                fh_context, 
-                               const stringset_t& > ContextEvent_Headers_Received_Sig_t;
+                               const stringset_t& ) > ContextEvent_Headers_Received_Sig_t;
 
         /**
          * get access to the NamingEvent_MedallionUpdated_Sig_t signal
@@ -869,49 +902,49 @@ namespace Ferris
 
 
 
-        typedef Loki::Functor< fh_istream,
-                               LOKI_TYPELIST_3( Context*,
+        typedef boost::function< fh_istream
+                               ( Context*,
                                                 const std::string&,
                                                 EA_Atom* ) > GetIStream_Func_t;
-        typedef Loki::Functor< fh_stringstream&,
-                               LOKI_TYPELIST_4( Context*,
+        typedef boost::function< fh_stringstream&
+                               ( Context*,
                                                 const std::string&,
                                                 EA_Atom*,
                                                 fh_stringstream& ) > GetIStream_PassedInStream_Func_t;
-        typedef Loki::Functor< fh_iostream,
-                               LOKI_TYPELIST_3( Context*,
+        typedef boost::function< fh_iostream
+                               ( Context*,
                                                 const std::string&,
                                                 EA_Atom* ) > GetIOStream_Func_t;
-    typedef Loki::Functor< void,
-                           LOKI_TYPELIST_4( Context*,
+    typedef boost::function< void
+                           ( Context*,
                                             const std::string&,
                                             EA_Atom*,
                                             fh_istream ) > IOStreamClosed_Func_t;
     
-typedef Loki::Functor< fh_istream,
-                       LOKI_TYPELIST_3( ChildCtx*,
+typedef boost::function< fh_istream
+                       ( ChildCtx*,
                                         const std::string&,
                                         EA_Atom* ) > StateLessIEA_t;
 
-typedef Loki::Functor< fh_stringstream&,
-                       LOKI_TYPELIST_4( ChildCtx*,
+typedef boost::function< fh_stringstream&
+                       ( ChildCtx*,
                                         const std::string&,
                                         EA_Atom*,
                                         fh_stringstream& ) > StateLessIEA_PassedInStream_t;
 
-typedef Loki::Functor< fh_iostream,
-                       LOKI_TYPELIST_3( ChildCtx*,
+typedef boost::function< fh_iostream
+                       ( ChildCtx*,
                                         const std::string&,
                                         EA_Atom* ) > StateLessIOEA_t;
 
-typedef Loki::Functor< fh_stringstream&,
-                       LOKI_TYPELIST_4( ChildCtx*,
+typedef boost::function< fh_stringstream&
+                       ( ChildCtx*,
                                         const std::string&,
                                         EA_Atom*,
                                         fh_stringstream& ) > StateLessIOEA_PassedInStream_t;
 
-typedef Loki::Functor< void,
-                       LOKI_TYPELIST_4( ChildCtx*,
+typedef boost::function< void
+                       ( ChildCtx*,
                                         const std::string&,
                                         EA_Atom*,
                                         fh_istream ) > StateLessIOClosedEA_t;
@@ -1161,7 +1194,7 @@ typedef Loki::Functor< void,
             }
         
         
-        virtual void getTypeInfos( std::list< Loki::TypeInfo >& l )
+        virtual void getTypeInfos( std::list< boost::typeindex::type_index >& l )
             {
                 l.push_back( typeid( _Self ) );
                 _Base::getTypeInfos( l );
@@ -1327,8 +1360,8 @@ namespace Ferris
         :
 //         public StateLessEAHolder< Context, Attribute >,
 //         public AttributeCollection,
-        public Attribute,
         public StateLessEAHolder< Context, AttributeCollection >,
+        public Attribute,
         public ContextCollection,
         public MutableCollectionEvents,
         public CacheManaged<Context>
@@ -1895,8 +1928,11 @@ namespace Ferris
 /**/         m_overMountAttemptHasAlreadyFailedEAOnly:1, //< Overmounting for EA is less powerful than for content.
 /**/         m_forcePassiveViewCache:1, //< A cache used in getForcePassiveView()
 /**/         m_forcePassiveViewCacheIsValid:1, //< if !true recalculate m_forcePassiveViewCache
-/**/         m_holdingReferenceToParentContext:1; //< true if we have called getParent()->AddRef()
-        
+/**/         m_holdingReferenceToParentContext:1, //< true if we have called getParent()->AddRef()
+/**/         m_forceNoEAGeneratorsForContext:1,   //< Do not run the EA generators for this context.
+/**/         m_forceNoOverMountForEAForContext:1; //< Do not try to overmount to find EA for this context.
+    
+                             
         friend struct tryToGetUUIDNode_StringARM;
         friend struct Semantic::tryToGetUUIDNode_StringARM;
         friend class FCA::DatabaseResultSetContext;
@@ -1904,9 +1940,19 @@ namespace Ferris
     protected:
 
         void setAttributesHaveBeenCreated()
-            {
-                AttributesHaveBeenCreated = 1;
-            }
+        {
+            AttributesHaveBeenCreated = 1;
+        }
+      public:
+        void setForceNoEAGeneratorsForContext()
+        {
+            m_forceNoEAGeneratorsForContext = 1;
+        }
+        void setForceNoOverMountForEAForContext()
+        {
+            m_forceNoOverMountForEAForContext = 1;
+        }
+      protected:
         
         
         class ReadingDirRAII 
@@ -2053,9 +2099,9 @@ namespace Ferris
                                      << " this:" << this
                                      << std::endl;
                             if( created )
-                                Emit_Created( 0, ret, rdn, rdn, 0 );
+                                Emit_Created( 0, ret, rdn, rdn );
                             else
-                                Emit_Exists( 0, ret, rdn, rdn, 0 );
+                                Emit_Exists( 0, ret, rdn, rdn );
                             return dynamic_cast<SubT*>(GetImpl(ret));
                         }
                     }
@@ -2102,9 +2148,9 @@ namespace Ferris
                             fh_context c = *subc_iter;
                             c->setHasBeenDeleted( false );
                             if( created )
-                                Emit_Created( 0, c, rdn, rdn, 0 );
+                                Emit_Created( 0, c, rdn, rdn );
                             else
-                                Emit_Exists( 0, c, rdn, rdn, 0 );
+                                Emit_Exists( 0, c, rdn, rdn );
                             SubT* ret = dynamic_cast<SubT*>(GetImpl(c));
                             creator.setupExisting( ret );
                             return ret;
@@ -2299,7 +2345,7 @@ namespace Ferris
         friend class RootContext;
         friend struct RootRootContext;
 
-        sigc::connection AttributeCountRaisedFromOne_Connection;
+        boost::signals2::connection AttributeCountRaisedFromOne_Connection;
 
     protected:
         virtual fh_context priv_getSubContext( const std::string& rdn )
@@ -2454,8 +2500,8 @@ namespace Ferris
         ContextEvent_Headers_Received_Sig_t&     getContextEvent_Headers_Received_Sig();
 
 
-        virtual FerrisLoki::Handlable::ref_count_t AddRef();
-        virtual FerrisLoki::Handlable::ref_count_t Release();
+        virtual Handlable::ref_count_t AddRef();
+        virtual Handlable::ref_count_t Release();
         virtual bool        all_attributes_have_single_ref_count();
 
         virtual bool isAttributeBound( const std::string& rdn,
@@ -2468,25 +2514,23 @@ namespace Ferris
 
         void Emit_MedallionUpdated();
         void Emit_Changed( NamingEvent_Changed* e,
-                           const std::string& olddn, const std::string& newdn, sigc::trackable* ExtraData );
+                           const std::string& olddn, const std::string& newdn );
         void Emit_Deleted( NamingEvent_Deleted* e,
-                           std::string olddn, std::string newdn, sigc::trackable* ExtraData );
+                           std::string olddn, std::string newdn );
         void Emit_Start_Execute( NamingEvent_Start_Execute* e,
-                                 std::string olddn, std::string newdn, sigc::trackable* ExtraData );
+                                 std::string olddn, std::string newdn );
         void Emit_Stop_Execute( NamingEvent_Stop_Execute* e,
-                                std::string olddn, std::string newdn, sigc::trackable* ExtraData );
+                                std::string olddn, std::string newdn );
         void Emit_Created( NamingEvent_Created* e,
                            const fh_context& newc,
-                           std::string olddn, std::string newdn, sigc::trackable* ExtraData );
+                           std::string olddn, std::string newdn );
         void Emit_Moved( NamingEvent_Moved* e,
-                         std::string olddn, std::string newdn, sigc::trackable* ExtraData );
+                         std::string olddn, std::string newdn );
         void Emit_Exists( NamingEvent_Exists* e,
                           const fh_context& newc,
-                          std::string olddn, std::string newdn, sigc::trackable* ExtraData );
-        void Emit_Start_Reading_Context( NamingEvent_Start_Reading_Context* e,
-                                         sigc::trackable* ExtraData );
-        void Emit_Stop_Reading_Context( NamingEvent_Stop_Reading_Context* e,
-                                        sigc::trackable* ExtraData );
+                          std::string olddn, std::string newdn );
+        void Emit_Start_Reading_Context( NamingEvent_Start_Reading_Context* e );
+        void Emit_Stop_Reading_Context( NamingEvent_Stop_Reading_Context* e );
 
 
     protected:
@@ -2524,8 +2568,8 @@ namespace Ferris
              * @returns the new context that was created.
              *
              */
-            typedef Loki::Functor< fh_context,
-                                   LOKI_TYPELIST_2( fh_context, fh_context ) > Perform_t;
+            typedef boost::function< fh_context
+                                   ( fh_context, fh_context ) > Perform_t;
 
             SubContextCreator( Perform_t f = SL_SubCreate_alwaysThrow,
                                std::string schema = "",
@@ -2622,8 +2666,8 @@ namespace Ferris
     private:
         virtual void tryToFindAttributeByOverMounting( const std::string& eaname = "" );
 
-//         typedef ::Loki::Functor< void,
-//                                  LOKI_TYPELIST_2(const fh_context& ctx,
+//         typedef ::boost::function< void
+//                                  (const fh_context& ctx,
 //                                             const string& eaname)> ContextEAGenFunctor_t;
 //         typedef map< string, ContextEAGenFunctor_t > ContextEAGenMap_t;
 //         virtual ContextEAGenMap_t& getContextEAGenerators();
@@ -2719,7 +2763,7 @@ namespace Ferris
 //         // call StreamIsOpeningHandler
         friend class Attribute;
 //         void StreamIsOpeningHandler( fh_istream ss );
-        void StreamIsClosingHandler( FerrisLoki::Handlable* );
+        void StreamIsClosingHandler( Handlable* );
         
         /*************************************************************
          * Event mechanics.
@@ -2909,7 +2953,7 @@ namespace Ferris
          * A function that can create an image object from a context
          * object
          */
-        typedef Loki::Functor< fh_image, LOKI_TYPELIST_1( const fh_context& ) > f_imageEAGenerator;
+        typedef boost::function< fh_image ( const fh_context& ) > f_imageEAGenerator;
     protected:
 
         /**

@@ -134,12 +134,12 @@ int main( int argc, char** argv )
     {
         fh_context c = Resolve("apps://");
         cerr << "1raw apps:// ctx:" << (void*)GetImpl(c) << endl;
-        cerr << "1raw before read REF_COUNT:" << c->ref_count
+        cerr << "1raw before read REF_COUNT:" << c->getReferenceCount()
              << " c:" << GetImpl(c)
              << " omc:" << c->getOverMountContext()
              << endl;
         c->read();
-        cerr << "1raw after read REF_COUNT:" << c->ref_count << endl;
+        cerr << "1raw after read REF_COUNT:" << c->getReferenceCount() << endl;
 
         for( Context::iterator ci = c->begin(); ci != c->end(); ++ci )
         {

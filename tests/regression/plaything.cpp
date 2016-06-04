@@ -66,8 +66,8 @@ int main( int argc, char** argv )
         EAIndex::fh_idx idx = EAIndex::Factory::getDefaultEAIndex();
         int limit = 1;
         fh_context c = EAIndex::ExecuteQueryAsync( s, limit, idx );
-        c->getNamingEvent_Exists_Sig() .connect(sigc::ptr_fun( OnExists ));
-        c->getNamingEvent_Created_Sig() .connect(sigc::ptr_fun( OnCreated ));
+        c->getNamingEvent_Exists_Sig() .connect( &OnExists );
+        c->getNamingEvent_Created_Sig() .connect( &OnCreated );
 
         cerr << "entering main loop" << endl;
         Main::mainLoop();

@@ -88,11 +88,15 @@ namespace Ferris
 %ignore Ferris::ferris_ios::o_mseq;
 %ignore Ferris::ferris_ios::all_mask;
 
+%ignore Ferris::Handlable::ref_count;
+%ignore Ferris::Handlable::GenericCloseSignal;
+%ignore Ferris::Handlable::GenericCloseSignal_t;
 %ignore FerrisLoki::Handlable::ref_count;
 %ignore FerrisLoki::Handlable::GenericCloseSignal;
+%ignore Ferris::Etagere::GenericCloseSignal;
+%ignore Ferris::Etagere::GenericCloseSignal_t;
 
 
-%include <FerrisLoki/Extensions.hh>
 %include <FerrisStreams/Exceptions.hh>
 %include <FerrisStreams/Streams.hh>
 %include <FerrisStreams/Shell.hh>
@@ -104,14 +108,14 @@ namespace Ferris
         { public:
             Ferris::Context* operator->();
         };
-    %name(AttributeProxy) class fh_attribute
-        { public:
-            Ferris::AttributeProxy* operator->();
-        };
-    %name(AttributeCollection) class fh_attrcol
-        { public:
-            Ferris::AttributeCollection* operator->();
-        };
+    /* %name(AttributeProxy) class fh_attribute */
+    /*     { public: */
+    /*         Ferris::AttributeProxy* operator->(); */
+    /*     }; */
+    /* %name(AttributeCollection) class fh_attrcol */
+    /*     { public: */
+    /*         Ferris::AttributeCollection* operator->(); */
+    /*     }; */
     %name(Runner) class fh_runner
         { public:
             Ferris::Runner* operator->();
@@ -120,26 +124,26 @@ namespace Ferris
         { public:
             Ferris::PreprocessedSortString* operator->();
         };
-    %name(Emblem) class fh_emblem
-        { public:
-            Ferris::Emblem* operator->();
-        };
-    %name(ColdEmblem) class fh_cemblem
-        { public:
-            Ferris::ColdEmblem* operator->();
-        };
-    %name(Etagere) class fh_etagere
-        { public:
-            Ferris::Etagere* operator->();
-        };
-    %name(Medallion) class fh_medallion
-        { public:
-            Ferris::Medallion* operator->();
-        };
-    %name(MedallionBelief) class fh_medallionBelief
-        { public:
-            Ferris::MedallionBelief* operator->();
-        };
+    /* %name(Emblem) class fh_emblem */
+    /*     { public: */
+    /*         Ferris::Emblem* operator->(); */
+    /*     }; */
+    /* %name(ColdEmblem) class fh_cemblem */
+    /*     { public: */
+    /*         Ferris::ColdEmblem* operator->(); */
+    /*     }; */
+    /* %name(Etagere) class fh_etagere */
+    /*     { public: */
+    /*         Ferris::Etagere* operator->(); */
+    /*     }; */
+    /* %name(Medallion) class fh_medallion */
+    /*     { public: */
+    /*         Ferris::Medallion* operator->(); */
+    /*     }; */
+    /* %name(MedallionBelief) class fh_medallionBelief */
+    /*     { public: */
+    /*         Ferris::MedallionBelief* operator->(); */
+    /*     }; */
 
     namespace FCA
     {

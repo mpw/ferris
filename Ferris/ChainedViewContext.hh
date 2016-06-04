@@ -35,9 +35,6 @@
 
 #include <string>
 
-#include <sigc++/sigc++.h>
-#include <SmartPtr.h>
-
 #include <TypeDecl.hh>
 #include <Ferris.hh>
 #include <FerrisEvent.hh>

@@ -2,12 +2,7 @@ if HAVE_WV
 
 plugindir = @FERRIS_AS_TEXT_PLUGIN_DIR@
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I..                                            \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	@CFLAGS@
+INCLUDES = @CFLAGS@
 
 plugin_LTLIBRARIES = libastextwv.la 
 libastextwv_la_SOURCES = libastextwv.cpp

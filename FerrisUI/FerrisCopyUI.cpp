@@ -168,13 +168,13 @@ namespace FerrisUI
     void
     FerrisCopy_SignalHandler::attach()
     {
-        fc->getCopyStartSignal().connect( sigc::mem_fun( *this,    &_Self::OnCopyStart ));
-        fc->getCopyPorgressSignal().connect( sigc::mem_fun( *this, &_Self::OnCopyProgress ));
-        fc->getCopyEndSignal().connect( sigc::mem_fun( *this,      &_Self::OnCopyEnd ));
-        fc->getCopyVerboseSignal().connect( sigc::mem_fun( *this,  &_Self::OnCopyVerbose ));
-        fc->getSkippingContextSignal().connect( sigc::mem_fun( *this,  &_Self::OnSkippingContext ));
-        fc->getAskReplaceContextSignal().connect( sigc::mem_fun( *this,&_Self::OnAskReplaceContext));
-        fc->getAskReplaceAttributeSignal().connect( sigc::mem_fun( *this,&_Self::OnAskReplaceAttribute));
+        fc->getCopyStartSignal().connect(    boost::bind( &_Self::OnCopyStart, this, _1, _2, _3, _4 ));
+        fc->getCopyPorgressSignal().connect( boost::bind( &_Self::OnCopyProgress, this, _1, _2, _3, _4 ));
+        fc->getCopyEndSignal().connect(      boost::bind( &_Self::OnCopyEnd, this, _1, _2, _3, _4 ));
+        fc->getCopyVerboseSignal().connect(  boost::bind( &_Self::OnCopyVerbose, this, _1, _2, _3, _4, _5 ));
+        fc->getSkippingContextSignal().connect(     boost::bind( &_Self::OnSkippingContext, this, _1, _2, _3 ));
+        fc->getAskReplaceContextSignal().connect(   boost::bind( &_Self::OnAskReplaceContext, this, _1, _2, _3, _4, _5));
+        fc->getAskReplaceAttributeSignal().connect( boost::bind( &_Self::OnAskReplaceAttribute, this, _1, _2, _3, _4, _5, _6 ));
     }
 
 

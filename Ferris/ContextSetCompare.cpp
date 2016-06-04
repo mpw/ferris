@@ -110,8 +110,8 @@ namespace Ferris
     
     struct FERRISEXP_DLLLOCAL ContextSetComparePData
     {
-        typedef Loki::Functor< bool, LOKI_TYPELIST_2( const fh_context&,
-                                                      const fh_context& ) > Fun_t;
+        typedef boost::function< bool ( const fh_context&,
+                                        const fh_context& ) > Fun_t;
         Fun_t fun;
         /**
          * 0 is sort by name, ie. default. otherwise it points to a string

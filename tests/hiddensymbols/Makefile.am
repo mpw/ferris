@@ -4,7 +4,7 @@ NULL=
 lib_LTLIBRARIES = libferrishsrtest.la
 
 INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib                                               \
-	@STLPORT_CFLAGS@                                \
+	                                \
 	-I. 						\
 	-I$(srcdir) -I$(top_srcdir) 			\
 	-I$(top_srcdir)/Ferris                          \
@@ -75,7 +75,7 @@ libferrishsrtest_la_LDFLAGS = \
 noinst_PROGRAMS = hsrtest
 hsrtest_SOURCES = hsrtest.cpp
 hsrtest_LDADD = -lpopt @LIBFERRIS_LA@  libferrishsrtest.la
-hsrtest_LDFLAGS = $(GLIB_LIBS) @SIGC_LIBS@
+hsrtest_LDFLAGS = $(GLIB_LIBS) 
 
 
 endif

@@ -7,15 +7,10 @@ CLEANFILES = $(MOC_DEP_SRCS)
 
 plugindir = $(libdir)/ferris/plugins/context
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	@SIGC_CFLAGS@                                   \
-	-I. 						\
+INCLUDES =  						\
+	-I$(top_srcdir)/plugins/context                 \
 	-I$(srcdir) -I$(top_srcdir) -I$(top_srcdir)/src	\
 	-I$(srcdir)/..                                  \
-	-I$(top_builddir)				\
-	-I$(includedir)					\
-	-I/usr/local/include                            \
 	@GLIB_CFLAGS@                                   \
 	@QT_CFLAGS@                                     \
 	@QTNETWORK_CFLAGS@                              \
@@ -52,9 +47,9 @@ bin_PROGRAMS = \
 
 ferris_webphoto_upload_SOURCES = ferris-webphoto-upload.cpp
 ferris_webphoto_upload_LDADD = -lpopt @LIBFERRIS_LA@ @SHAREDWEBPHOTOS_LA@
-ferris_webphoto_upload_LDFLAGS = $(GLIB_LIBS) @SIGC_LIBS@ @QT_LIBS@ @QTNETWORK_LIBS@
+ferris_webphoto_upload_LDFLAGS = $(GLIB_LIBS) @QT_LIBS@ @QTNETWORK_LIBS@
 
 ferris_webphoto_remote_url_to_eaindex_predicate_SOURCES = ferris-webphoto-remote-url-to-eaindex-predicate.cpp
 ferris_webphoto_remote_url_to_eaindex_predicate_LDADD = -lpopt @LIBFERRIS_LA@ @SHAREDWEBPHOTOS_LA@
-ferris_webphoto_remote_url_to_eaindex_predicate_LDFLAGS = $(GLIB_LIBS) @SIGC_LIBS@ @QT_LIBS@ @QTNETWORK_LIBS@
+ferris_webphoto_remote_url_to_eaindex_predicate_LDFLAGS = $(GLIB_LIBS) @QT_LIBS@ @QTNETWORK_LIBS@
 

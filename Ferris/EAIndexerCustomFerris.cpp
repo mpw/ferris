@@ -48,8 +48,8 @@ namespace Ferris
             }
 
             static const std::string MetaIndexClassName = "db4";
-            static bool reged = MetaEAIndexerInterfaceFactory::Instance().
-                Register( MetaIndexClassName, &CreateEAIndexer );
+            static bool reged = MetaEAIndexerInterfaceFactory::instance()
+                [ MetaIndexClassName ] = &CreateEAIndexer;
             static bool regedx = appendToMetaEAIndexClassNames( MetaIndexClassName );
         }
 
@@ -65,8 +65,8 @@ namespace Ferris
             }
 
             static const std::string MetaIndexClassName_db4tree = "db4tree";
-            static bool reged_db4tree = MetaEAIndexerInterfaceFactory::Instance().
-                Register( MetaIndexClassName_db4tree, &CreateEAIndexer_db4tree );
+            static bool reged_db4tree = MetaEAIndexerInterfaceFactory::instance()
+                [ MetaIndexClassName_db4tree ] = &CreateEAIndexer_db4tree;
             static bool regedx_db4tree = appendToMetaEAIndexClassNames( MetaIndexClassName_db4tree );
         }
 

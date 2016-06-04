@@ -474,8 +474,8 @@ namespace Ferris
             EnsureStartStopReadingIsFiredRAII _raii1( this );
             clearContext();
 
-            sigc::connection c = Delegate->getNamingEvent_Exists_Sig().connect(
-                sigc::mem_fun( *this, &_Self::OnExists));
+            boost::signals2::connection c = Delegate->getNamingEvent_Exists_Sig().connect(
+                boost::bind( &_Self::OnExists, this, _1,_2,_3,_4 ));
             Delegate->read( true );
             c.disconnect();
             

@@ -86,7 +86,7 @@ namespace Ferris
                 }
         };
 
-        typedef Loki::SingletonHolder< KAppHolder, Loki::CreateUsingNew, Loki::NoDestroy  > KAppSingleton;
+        typedef FerrisSingletonAlways< KAppHolder > KAppSingleton;
 #endif
 
 
@@ -95,7 +95,7 @@ namespace Ferris
             installQTMsgHandler();
 #ifdef HAVE_KDE
             if(getenv("DISPLAY") && strlen(getenv("DISPLAY")))
-                KAppSingleton::Instance();
+                KAppSingleton::instance();
             else
                 ensureQApplication();
 #else
@@ -106,7 +106,7 @@ namespace Ferris
         std::string guessMimeType( const std::string& path )
         {
 #ifdef HAVE_KDE
-            KAppSingleton::Instance();
+            KAppSingleton::instance();
             KUrl u;
             u.setPath( path.c_str() );
             KMimeType::Ptr type = KMimeType::findByUrl( u );
@@ -118,7 +118,7 @@ namespace Ferris
         string getMimeType( fh_context c, bool fromContent  )
         {
 #ifdef HAVE_KDE
-            KAppSingleton::Instance();
+            KAppSingleton::instance();
 
             if( fromContent )
             {

@@ -31,7 +31,6 @@
 #define _ALREADY_INCLUDED_FERRIS_ITERATOR_H_
 
 #include <Ferris/HiddenSymbolSupport.hh>
-#include <SmartPtr.h>
 #include <iostream>
 #include <iterator>
 
@@ -69,26 +68,20 @@ public:
     explicit circular_iterator(collection_type& __c)
         : col(__c), current( __c.end() ), initial( __c.end() ) {}
 
-    template
-    <
-        typename T1,
-        template <class> class OP1,
-        class CP1,
-        template <class> class KP1,
-        template <class> class SP1
-    >
-    explicit circular_iterator( const Loki::SmartPtr<T1, OP1, CP1, KP1, SP1>& __c,
+    template < typename T1 >
+    explicit circular_iterator( const boost::shared_ptr<T1>& __c,
                                 iterator_type& __x )
         : col( *GetImpl(__c)), current( __x ), initial( __x ) {}
-    template
-    <
-        typename T1,
-        template <class> class OP1,
-        class CP1,
-        template <class> class KP1,
-        template <class> class SP1
-    >
-    explicit circular_iterator( const Loki::SmartPtr<T1, OP1, CP1, KP1, SP1>& __c )
+    template < typename T1 >
+    explicit circular_iterator( const boost::shared_ptr<T1>& __c )
+        : col( *GetImpl(__c)), current( __c->end() ), initial( __c->end() ) {}
+
+    template < typename T1 >
+    explicit circular_iterator( const boost::intrusive_ptr<T1>& __c,
+                                iterator_type& __x )
+        : col( *GetImpl(__c)), current( __x ), initial( __x ) {}
+    template < typename T1 >
+    explicit circular_iterator( const boost::intrusive_ptr<T1>& __c )
         : col( *GetImpl(__c)), current( __c->end() ), initial( __c->end() ) {}
     
     circular_iterator(const _Self& __x)
@@ -209,32 +202,28 @@ make_circular_iterator( _Collection& c )
     return circular_iterator<_Collection, typename _Collection::iterator>(c);
 }
 
-template
-<
-    typename T1,
-    template <class> class OP1,
-    class CP1,
-    template <class> class KP1,
-    template <class> class SP1
->
+template < typename T1 >
 circular_iterator< T1, typename T1::iterator>
-make_circular_iterator( const Loki::SmartPtr<T1, OP1, CP1, KP1, SP1>& c )
+make_circular_iterator( const boost::intrusive_ptr<T1>& c )
+{
+    return circular_iterator< T1, typename T1::iterator>( *GetImpl(c) );
+}
+template < typename T1 >
+circular_iterator< T1, typename T1::iterator>
+make_circular_iterator( const boost::shared_ptr<T1>& c )
 {
     return circular_iterator< T1, typename T1::iterator>( *GetImpl(c) );
 }
 
-template
-<
-    typename T1,
-    template <class> class OP1,
-    class CP1,
-    template <class> class KP1,
-    template <class> class SP1,
-    class _Iterator
->
+template < typename T1, class _Iterator >
 circular_iterator< T1, _Iterator >
-make_circular_iterator( const Loki::SmartPtr<T1, OP1, CP1, KP1, SP1>& c,
-                        _Iterator& i )
+make_circular_iterator( const boost::intrusive_ptr<T1>& c, _Iterator& i )
+{
+    return circular_iterator< T1, _Iterator >( *GetImpl(c), i );
+}
+template < typename T1, class _Iterator >
+circular_iterator< T1, _Iterator >
+make_circular_iterator( const boost::shared_ptr<T1>& c, _Iterator& i )
 {
     return circular_iterator< T1, _Iterator >( *GetImpl(c), i );
 }

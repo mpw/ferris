@@ -553,7 +553,7 @@ namespace Ferris
                                                    udi.c_str(),
                                                    QDBusConnection::systemBus() );
             c->setup( hdev );
-            pctx->Emit_Created( 0, c, rdn, rdn, 0 );
+            pctx->Emit_Created( 0, c, rdn, rdn );
             LG_HAL_D << "DeviceAdded (end):" << udi
                      << " pctx:" << pctx->getURL()
                      << " c:" << c->getURL()

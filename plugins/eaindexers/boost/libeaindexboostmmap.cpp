@@ -51,7 +51,6 @@ namespace bmi = boost::multi_index;
 
 #include <string>
 
-#include <Functor.h>
 #include <gmodule.h>
 
 #include <boost/interprocess/file_mapping.hpp>

@@ -28,7 +28,6 @@
 ******************************************************************************/
 
 #include "config.h"
-#include <FerrisLoki/loki/Functor.h>
 
 #include <FerrisContextPlugin.hh>
 #include <Ferris/Ferris.hh>
@@ -73,9 +72,7 @@ namespace Ferris
 
     struct FERRISEXP_DLLLOCAL Tramp
     {
-        typedef Loki::Functor<
-            void, LOKI_TYPELIST_2( const char*, const char* ) >
-        SAction_t;
+        typedef boost::function< void ( const char*, const char* ) > SAction_t;
         mutable SAction_t SAction;
         typedef const char* IteratorT;
     
@@ -87,7 +84,7 @@ namespace Ferris
         template <typename PointerToObj, typename PointerToMemFn>
         Tramp( const PointerToObj& pObj, PointerToMemFn pMemFn )
             :
-            SAction( SAction_t( pObj, pMemFn ) )
+            SAction( boost::bind( pMemFn, pObj, _1, _2 ) )
             {
             }
 
@@ -377,8 +374,7 @@ namespace Ferris
 //                  ret << data;
                 }
                 ret->getCloseSig().connect(
-                    sigc::bind(
-                        sigc::mem_fun( *this, &_Self::OnStreamClosed ), m ));
+                    boost::bind( &_Self::OnStreamClosed, this, _1, _2, m ));
                 return ret;
             }
 

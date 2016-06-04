@@ -86,9 +86,6 @@
 #include <Configuration_private.hh>
 #include <FerrisBackup.hh>
 
-#include <Singleton.h>
-#include <Factory.h>
-#include <Functor.h>
 
 #include <iomanip>
 
@@ -523,16 +520,14 @@ namespace Ferris
             static string getClassName()
                 { return "FrontCodedBlocks (3-in-4)"; }
         };
-        bool Lexicon_FrontCodedBlocks::reged = LexiconFactory::Instance().
-        Register( Lexicon_FrontCodedBlocks::getClassName(),
-                  &MakeObject<Lexicon,Lexicon_FrontCodedBlocks>::Create );
+        bool Lexicon_FrontCodedBlocks::reged = LexiconFactory::instance()
+            [Lexicon_FrontCodedBlocks::getClassName()] = boost::factory<Lexicon_FrontCodedBlocks*>();
         bool Lexicon_FrontCodedBlocks::regedx = appendToLexiconClassNames(
             Lexicon_FrontCodedBlocks::getClassName() );
 
 
-        static bool alias_rg = LexiconFactory::Instance().
-        Register( "FrontCodedBlocks",
-                  &MakeObject<Lexicon,Lexicon_FrontCodedBlocks>::Create );
+        static bool alias_rg = LexiconFactory::instance()
+            [ "FrontCodedBlocks" ] = boost::factory<Lexicon_FrontCodedBlocks*>();
         static bool alias_rx = appendToLexiconAliasNames( "FrontCodedBlocks" );
 
 
@@ -606,16 +601,14 @@ namespace Ferris
             static string getClassName()
                 { return "FrontCodedBlocks (3-in-4)"; }
         };
-        bool ReverseLexicon_FrontCodedBlocks::reged = ReverseLexiconFactory::Instance().
-        Register( ReverseLexicon_FrontCodedBlocks::getClassName(),
-                  &MakeObject<ReverseLexicon,ReverseLexicon_FrontCodedBlocks>::Create );
+        bool ReverseLexicon_FrontCodedBlocks::reged = ReverseLexiconFactory::instance()
+            [ ReverseLexicon_FrontCodedBlocks::getClassName() ] = boost::factory<ReverseLexicon_FrontCodedBlocks*>();
         bool ReverseLexicon_FrontCodedBlocks::regedx = appendToReverseLexiconClassNames(
             ReverseLexicon_FrontCodedBlocks::getClassName() );
 
 
-        static bool ralias_rg = ReverseLexiconFactory::Instance().
-        Register( "FrontCodedBlocks",
-                  &MakeObject<ReverseLexicon,ReverseLexicon_FrontCodedBlocks>::Create );
+        static bool ralias_rg = ReverseLexiconFactory::instance()
+            [ "FrontCodedBlocks" ] = boost::factory<ReverseLexicon_FrontCodedBlocks*>();
 //        static bool ralias_rx = appendToReverseLexiconAliasNames( "FrontCodedBlocks" );
         
         

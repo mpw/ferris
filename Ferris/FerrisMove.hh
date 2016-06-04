@@ -55,8 +55,8 @@ namespace Ferris
 
     class FERRISEXP_API MovePopTableCollector
         :
-        public basic_PopTableCollector,
-        public Handlable
+        public Handlable,
+        public basic_PopTableCollector
     {
         fh_mv mv;
         
@@ -129,12 +129,12 @@ namespace Ferris
 
         fh_mv_collector getPoptCollector();
 
-        typedef sigc::signal4< void,
-                               FerrisMv&,            // thisobj,
-                               std::string,          // srcDescription,
-                               std::string,          // dstDescription,
-                               std::string           // reason
-                               > SkippingContextSignal_t;
+        typedef boost::signals2::signal< void (
+            FerrisMv&,            // thisobj,
+            std::string,          // srcDescription,
+            std::string,          // dstDescription,
+            std::string           // reason
+            ) > SkippingContextSignal_t;
     
         SkippingContextSignal_t& getSkippingContextSignal();
         

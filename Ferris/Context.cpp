@@ -210,9 +210,12 @@ namespace Ferris
                 fh_stringstream ret;
                 if( !( m & std::ios::trunc ) )
                     ret = real_getIOStream( m );
+                // ret->getCloseSig().connect(
+                //     sigc::bind(
+                //         sigc::mem_fun(*this, &_Self::priv_OnStreamClosed ), m ));
                 ret->getCloseSig().connect(
-                    sigc::bind(
-                        sigc::mem_fun(*this, &_Self::priv_OnStreamClosed ), m ));
+                    boost::bind( &_Self::priv_OnStreamClosed, this, _1, _2, m ));
+
 //                cerr << "priv_getIOStream()" << endl;
                 return ret;
             }
@@ -572,7 +575,7 @@ StaticContentLeafContext::StaticContentLeafContext( Context* parent,
             {
                 expungeInterval_ID = 0;
                 createStateLessAttributes();
-                Delegate->getNamingEvent_Changed_Sig().connect( sigc::mem_fun( *this, &_Self::OnChanged));
+                Delegate->getNamingEvent_Changed_Sig().connect( boost::bind( &_Self::OnChanged, this, _1,_2,_3));
 
                 if( Delegate->supportsMonitoring() )
                     expungeInterval = 0;
@@ -853,7 +856,7 @@ StaticContentLeafContext::StaticContentLeafContext( Context* parent,
                 LG_CTX_D << "clearing the cache." << endl;
 
                 clearCaches();
-                Emit_Changed( 0, getDirPath(), getDirPath(), 0 );
+                Emit_Changed( 0, getDirPath(), getDirPath() );
             }
         
         virtual void OnExists ( NamingEvent_Exists* ev,
@@ -896,7 +899,7 @@ StaticContentLeafContext::StaticContentLeafContext( Context* parent,
         void
         OnDeleted( NamingEvent_Deleted* ev, string olddn, string newdn )
             {
-//                Emit_Deleted( ev, newdn, olddn, 0 );
+//                Emit_Deleted( ev, newdn, olddn );
                 Remove( olddn );
             }
 
@@ -933,14 +936,14 @@ StaticContentLeafContext::StaticContentLeafContext( Context* parent,
                 for( Items_t::iterator iter = getItems().begin();
                  iter != getItems().end(); ++iter )
             {
-                Emit_Exists( 0, *iter, (*iter)->getDirName(), (*iter)->getDirName(), 0 );
+                Emit_Exists( 0, *iter, (*iter)->getDirName(), (*iter)->getDirName() );
             }
                 
 //                 SubContextNames_t na = getSubContextNames();
 //                 for( SubContextNames_t::iterator iter = na.begin();
 //                      iter != na.end(); ++iter )
 //                 {
-//                     Emit_Exists( 0, *iter, *iter, 0 );
+//                     Emit_Exists( 0, *iter, *iter );
 //                 }
             }
         virtual void UnPageSubContextsIfNeeded()
@@ -1161,7 +1164,7 @@ StaticContentLeafContext::StaticContentLeafContext( Context* parent,
     SortedContext::OnDeleted( NamingEvent_Deleted* ev, string olddn, string newdn )
     {
         
-//         Emit_Deleted( ev, newdn, olddn, 0 );
+//         Emit_Deleted( ev, newdn, olddn );
 //         Remove( ev->getSource()->getSubContext( olddn ) );
 
 //         cerr << "SortedContext::OnDeleted url:" << getURL()
@@ -1344,14 +1347,14 @@ StaticContentLeafContext::StaticContentLeafContext( Context* parent,
                  iter != getSortedItems().end(); ++iter )
             {
                 LG_SORT_D << "SortedContext::emitExists... rdn:" << (*iter)->getDirName() << endl;
-                Emit_Exists( 0, *iter, (*iter)->getDirName(), (*iter)->getDirName(), 0 );
+                Emit_Exists( 0, *iter, (*iter)->getDirName(), (*iter)->getDirName() );
             }
             
 //             SubContextNames_t na = getSubContextNames();
 //             for( SubContextNames_t::iterator iter = na.begin();
 //                  iter != na.end(); ++iter )
 //             {
-//                 Emit_Exists( 0, *iter, *iter, 0 );
+//                 Emit_Exists( 0, *iter, *iter );
 //             }
         }
         catch( FerrisNotReadableAsContext& e )
@@ -2685,7 +2688,7 @@ StaticContentLeafContext::StaticContentLeafContext( Context* parent,
     {
         if( isSubContextBound( olddn ) )
         {
-            Emit_Deleted( ev, newdn, olddn, 0 );
+            Emit_Deleted( ev, newdn, olddn );
             Remove( ev->getSource()->getSubContext( olddn ) );
         }
     }
@@ -3375,7 +3378,7 @@ StaticContentLeafContext::StaticContentLeafContext( Context* parent,
     bool
     ManyBaseToOneChainedViewContext::shouldInsertContext( const fh_context& c, bool created )
     {
-        return priv_discoveredSubContext( c->getDirName(), created );
+        return isBound(priv_discoveredSubContext( c->getDirName(), created ));
     }
 
     void
@@ -3555,7 +3558,7 @@ StaticContentLeafContext::StaticContentLeafContext( Context* parent,
         if( p->haveTwoContexts( c ) )
         {
             fh_stringstream cmdss;
-            cmdss << getEDBString( FDB_GENERAL, 
+            cmdss << getConfigString( FDB_GENERAL, 
                                    CFG_ATTRIBUTES_GNU_DIFF_CMD_FILES_K,
                                    CFG_ATTRIBUTES_GNU_DIFF_CMD_FILES_DEFAULT )
                   << " " << p->getFirstContext( c )->getDirPath()
@@ -3625,7 +3628,7 @@ StaticContentLeafContext::StaticContentLeafContext( Context* parent,
         fh_runner&        m_runidiff     = p->m_runidiff;
 
         fh_stringstream cmdss;
-        cmdss << getEDBString( FDB_GENERAL, 
+        cmdss << getConfigString( FDB_GENERAL, 
                                CFG_ATTRIBUTES_GNU_DIFF_CMD_FILES_K,
                                CFG_ATTRIBUTES_GNU_DIFF_CMD_FILES_DEFAULT )
               << " " << p->getFirstContext( c )->getDirPath()
@@ -3704,7 +3707,7 @@ StaticContentLeafContext::StaticContentLeafContext( Context* parent,
         // and then read diffs result
         //
         fh_stringstream cmdss;
-        cmdss << getEDBString( FDB_GENERAL, 
+        cmdss << getConfigString( FDB_GENERAL, 
                                CFG_ATTRIBUTES_GNU_DIFF_CMD_FILES_K,
                                CFG_ATTRIBUTES_GNU_DIFF_CMD_FILES_DEFAULT )
               << " /dev/fd/" << fcat_stdout_fd1
@@ -4243,7 +4246,7 @@ StaticContentLeafContext::StaticContentLeafContext( Context* parent,
     void
     InheritingEAContext::OnDeleted( NamingEvent_Deleted* ev, string olddn, string newdn )
     {
-        Emit_Deleted( ev, newdn, olddn, 0 );
+        Emit_Deleted( ev, newdn, olddn );
         Remove( ev->getSource()->getSubContext( olddn ) );
     }
     
@@ -4406,6 +4409,15 @@ StaticContentLeafContext::StaticContentLeafContext( Context* parent,
         }
         fh_context makeInheritingEAContext( fh_context ctx )
         {
+            // FERRIS_CTX_SMARTPTR( InheritingEAContext, fh_InheritingEAContext );
+
+            // ctx->setRefCounterToHigh();
+            // fh_InheritingEAContext c = new InheritingEAContext( 0, ctx );
+            // c->setup();
+            // c->setIsChainedViewContextRoot();
+            // c->setRefCounterToHigh();
+            // return c;
+            
             InheritingEAContext* c = new InheritingEAContext( 0, ctx );
             fh_context ret;
             Upcast( ret, c );

@@ -1,13 +1,7 @@
 plugindir = $(libdir)/ferris/plugins/context
 
-INCLUDES = -I$(top_builddir)/lib -I$(top_srcdir)/lib 						\
-	@STLPORT_CFLAGS@                                \
-	-I$(srcdir)/..                                  \
-	-I$(top_srcdir)/src 				\
-	-I$(includedir)					\
-	-I/usr/local/lib                                \
-	@GSTREAMER_CFLAGS@                              \
-	@CFLAGS@
+INCLUDES = -I$(top_srcdir)/plugins/context \
+	@GSTREAMER_CFLAGS@ @CFLAGS@
 
 plugin_LTLIBRARIES = libferrisgstreamer.la libferrisgstreamer_factory.la
 libferrisgstreamer_factory_la_SOURCES = libferrisgstreamer_factory.cpp

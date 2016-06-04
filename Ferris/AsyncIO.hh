@@ -42,8 +42,6 @@
 
 #include <glib.h>
 
-#include <sigc++/sigc++.h>
-#include <SmartPtr.h>
 
 namespace Ferris
 {
@@ -67,8 +65,8 @@ namespace Ferris
             
     public:
 
-        typedef Loki::Functor< fh_istream,
-                               LOKI_TYPELIST_2( fh_aiohandler, fh_istream ) > AsyncIOFunctor_t;
+        typedef boost::function< fh_istream
+                               ( fh_aiohandler, fh_istream ) > AsyncIOFunctor_t;
         AsyncIOFunctor_t theFunctor;
         
         AsyncIOHandler( int fd = -1 );
@@ -205,8 +203,8 @@ namespace Ferris
          */
         void attach( fh_runner r )
             {
-                Private::attachStreamCollector( r, Runner_AsyncIOFunctor_t(
-                                                    this, &_Self::runner_io_cb ));
+                Private::attachStreamCollector(
+                    r, boost::bind( &_Self::runner_io_cb, this, boost::lambda::_1, boost::lambda::_2 ));
 //                 r->setAsyncStdOutFunctor(
 //                     Runner_AsyncIOFunctor_t(
 //                         this, &_Self::runner_io_cb ));
@@ -222,7 +220,7 @@ namespace Ferris
 //             }
         
 
-//         typedef sigc::signal4< void, ChildStreamServer*, fh_runner, int, int > ChildCompleteSig_t;
+//         typedef boost::signals2::signal< void ( ChildStreamServer*, fh_runner, int, int ) > ChildCompleteSig_t;
 //         ChildCompleteSig_t ChildCompleteSig;
 //         ChildCompleteSig_t& getChildCompleteSig()
 //             {
@@ -236,7 +234,8 @@ namespace Ferris
         
         void attach( fh_aiohandler h )
             {
-                h->setFunctor( AsyncIOHandler::AsyncIOFunctor_t( this, &_Self::aioh_io_cb ));
+                h->setFunctor( boost::bind( &_Self::aioh_io_cb, this,
+                                            boost::lambda::_1, boost::lambda::_2 ));
             }
         
         
@@ -277,7 +276,7 @@ namespace Ferris
         virtual fh_istream io_cb( fh_istream iss );
 
         
-        typedef sigc::signal1< void, fh_xstreamcol > MessageArrivedSig_t;
+        typedef boost::signals2::signal< void ( fh_xstreamcol ) > MessageArrivedSig_t;
         MessageArrivedSig_t& getMessageArrivedSig();
         
         const std::string& getXMLString();

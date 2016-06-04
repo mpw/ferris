@@ -39,3 +39,5 @@ gnulib
 lib
 snippet
 #config.h.in#
+*.sum
+ferris.xml

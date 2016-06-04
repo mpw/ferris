@@ -92,7 +92,7 @@ namespace FerrisUI
      * @param height
      * @param dataptr
      */
-    typedef Loki::Functor< void, LOKI_TYPELIST_3( int, int, gpointer ) > RGBAtoPixbufFree_f;
+    typedef boost::function< void ( int, int, gpointer ) > RGBAtoPixbufFree_f;
     FERRISEXP_API void RGBAtoPixbuf_null( int w, int h, gpointer data );
     FERRISEXP_API void RGBAtoPixbuf_free( int w, int h, gpointer data );
     FERRISEXP_API void RGBAtoPixbuf_delarray( int w, int h, gpointer data );
@@ -417,13 +417,13 @@ namespace Ferris
 {
     
 
-class FERRISEXP_API GtkProgressBinder : public sigc::trackable
+class FERRISEXP_API GtkProgressBinder
 {
 private:
 
     GtkProgress* w;
     fh_context ctx;
-    sigc::connection conn;
+    boost::signals2::connection conn;
     guint32 interval;
     int update_gui;
     guint timer;

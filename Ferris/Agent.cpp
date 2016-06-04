@@ -77,7 +77,7 @@ namespace Ferris
                                       const std::string& def )
         {
             string k = agentUUID + "_" + uk;
-            return getEDBString( FDB_GENERAL, k, def, true, true );
+            return getConfigString( FDB_GENERAL, k, def, true );
         }
 
         static void setAgentConfig( const std::string& agentUUID,
@@ -85,7 +85,7 @@ namespace Ferris
                                     const std::string& v )
         {
             string k = agentUUID + "_" + uk;
-            return setEDBString( FDB_GENERAL, k, v );
+            return setConfigString( FDB_GENERAL, k, v );
         }
 
         typedef map< string, fh_agent > agents_t;
@@ -471,7 +471,7 @@ namespace Ferris
             if( v != getAgentImplemenationName() )
             {
                 fh_bAgentImpl  agent =
-                    BinaryClassifierAgentImplemenationFactory::Instance().CreateObject( v );
+                    BinaryClassifierAgentImplemenationFactory::instance()[ v ]();
                 agent->setStateDir( m_agent->getStateDir() );
                 m_agent = agent;
             }
@@ -621,8 +621,7 @@ namespace Ferris
             std::string uuid = Util::makeUUID();
             
             fh_bAgentImpl  agent =
-                BinaryClassifierAgentImplemenationFactory::Instance().CreateObject(
-                    agentImplemenationName );
+                BinaryClassifierAgentImplemenationFactory::instance()[ agentImplemenationName ]();
             agent->setStateDir( stateDir );
             agent->initialize();
             ret = new BinaryClassifierAgent( uuid,
@@ -639,12 +638,12 @@ namespace Ferris
             setAgentConfig( uuid, AI_AGENT_TYPE_KEY,          AI_AGENT_TYPE_BINARY );
             
             {
-                string n = getEDBString( FDB_GENERAL,
+                string n = getConfigString( FDB_GENERAL,
                                          AI_AGENT_UUIDLIST_KEY,
                                          AI_AGENT_UUIDLIST_DEFAULT );
                 stringlist_t sl = Util::parseCommaSeperatedList( n );
                 sl.push_back( uuid );
-                setEDBString( FDB_GENERAL, AI_AGENT_UUIDLIST_KEY, Util::createCommaSeperatedList( sl ));
+                setConfigString( FDB_GENERAL, AI_AGENT_UUIDLIST_KEY, Util::createCommaSeperatedList( sl ));
             }
             
             return ret;
@@ -668,12 +667,12 @@ namespace Ferris
         {
             string name = d->getName();
 
-            string n = getEDBString( FDB_GENERAL,
+            string n = getConfigString( FDB_GENERAL,
                                      AI_AGENT_UUIDLIST_KEY,
                                      AI_AGENT_UUIDLIST_DEFAULT );
             stringlist_t sl = Util::parseCommaSeperatedList( n );
             sl.erase( find( sl.begin(), sl.end(), d->getUUID() ) );
-            setEDBString( FDB_GENERAL, AI_AGENT_UUIDLIST_KEY, Util::createCommaSeperatedList( sl ));
+            setConfigString( FDB_GENERAL, AI_AGENT_UUIDLIST_KEY, Util::createCommaSeperatedList( sl ));
         }
         
         fh_agent getCompleteAgent()
@@ -743,9 +742,9 @@ namespace Ferris
         static bool
         BogoFilter_BinaryClassifierAgentImplemenation_Registered =
         RegisterBinaryClassifierAgentImplemenationFactory( 
-//        BinaryClassifierAgentImplemenationFactory::Instance().Register(
             "bogofilter",
-            &MakeObject< BinaryClassifierAgentImplemenation, BogoFilter_BinaryClassifierAgentImplemenation >::Create );
+            boost::factory<BogoFilter_BinaryClassifierAgentImplemenation*>() );
+//            &MakeObject< BinaryClassifierAgentImplemenation, BogoFilter_BinaryClassifierAgentImplemenation >::Create );
 
         /********************/
         /********************/
@@ -1005,8 +1004,7 @@ namespace Ferris
             fh_personality pers = obtainPersonality( toType<emblemID_t>( persID ));
             
             fh_bAgentImpl agent =
-                BinaryClassifierAgentImplemenationFactory::Instance().CreateObject(
-                    agentImplemenationName );
+                BinaryClassifierAgentImplemenationFactory::instance()[ agentImplemenationName ]();
             agent->setStateDir( stateDir );
             agent->initialize();
 
@@ -1023,7 +1021,7 @@ namespace Ferris
             if( forceReload || cache.empty() )
             {
                 cache.clear();
-                string n = getEDBString( FDB_GENERAL,
+                string n = getConfigString( FDB_GENERAL,
                                          AI_AGENT_UUIDLIST_KEY,
                                          AI_AGENT_UUIDLIST_DEFAULT );
                 stringlist_t sl = Util::parseCommaSeperatedList( n );

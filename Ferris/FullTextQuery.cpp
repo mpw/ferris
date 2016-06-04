@@ -44,7 +44,7 @@ namespace Ferris
      */
     namespace FullTextIndex 
     {
-        typedef Loki::SingletonHolder< Loki::Factory< FullTextQuery, QueryMode > > QueryFactory;
+        typedef FerrisSingleton< std::map< QueryMode, boost::function< FullTextQuery*() > > > QueryFactory;
 
         static bool shouldRunFullTextQueryFilesystemAsync_val = false;
         bool shouldRunFullTextQueryFilesystemAsync()
@@ -200,8 +200,9 @@ namespace Ferris
             m_asyncSelection = selection;
 
             m_asyncSlave = CreateFerrisSlaveProcess( "fulltext query", tostr(qss) );
-            m_asyncSlave->getMessageArrivedSig().connect( sigc::mem_fun( *this, &_Self::OnAsyncXMLMessage ) );
-            m_asyncSlave->getChildCompleteSig().connect(  sigc::mem_fun( *this, &_Self::OnAsyncChildComeplete ) );
+            m_asyncSlave->getMessageArrivedSig().connect( boost::bind( &_Self::OnAsyncXMLMessage, this, _1 ) );
+            m_asyncSlave->getChildCompleteSig().connect(  boost::bind( &_Self::OnAsyncChildComeplete, this,
+                                                                       _1,_2,_3,_4) );
             m_asyncSlave->getRunner()->Run();
             LG_IDX_D << "have started slave process..." << endl;
             
@@ -255,8 +256,7 @@ namespace Ferris
 
             static bool reged;
         };
-        bool RankedFullTextQuery::reged = QueryFactory::Instance().Register(
-            QUERYMODE_RANKED, &MakeObject<FullTextQuery,RankedFullTextQuery>::Create );
+        bool RankedFullTextQuery::reged = QueryFactory::instance()[ QUERYMODE_RANKED ] = boost::factory<RankedFullTextQuery*>();
         
         fh_context
         RankedFullTextQuery::execute()
@@ -298,8 +298,8 @@ namespace Ferris
 
             static bool reged;
         };
-        bool BooleanFullTextQuery::reged = QueryFactory::Instance().Register(
-            QUERYMODE_BOOLEAN, &MakeObject<FullTextQuery,BooleanFullTextQuery>::Create );
+        bool BooleanFullTextQuery::reged = QueryFactory::instance()[ QUERYMODE_BOOLEAN ]
+                  = boost::factory<BooleanFullTextQuery*>();        
 
         /**
          * Mount a boolean query string (eg. A & B | C ) as a filesystem
@@ -552,8 +552,9 @@ namespace Ferris
 
             static bool reged;
         };
-        bool XapianFullTextQuery::reged = QueryFactory::Instance().Register(
-            QUERYMODE_XAPIAN, &MakeObject<FullTextQuery,XapianFullTextQuery>::Create );
+        bool XapianFullTextQuery::reged = QueryFactory::instance()[ QUERYMODE_XAPIAN ]
+                  = boost::factory<XapianFullTextQuery*>();        
+        
         
         fh_context
         XapianFullTextQuery::execute()
@@ -619,8 +620,8 @@ namespace Ferris
 
             static bool reged;
         };
-        bool Tsearch2FullTextQuery::reged = QueryFactory::Instance().Register(
-            QUERYMODE_TSEARCH2, &MakeObject<FullTextQuery,Tsearch2FullTextQuery>::Create );
+        bool Tsearch2FullTextQuery::reged = QueryFactory::instance()[ QUERYMODE_TSEARCH2 ]
+                  = boost::factory<Tsearch2FullTextQuery*>();        
         
         fh_context
         Tsearch2FullTextQuery::execute()
@@ -687,8 +688,8 @@ namespace Ferris
 
             static bool reged;
         };
-        bool BeagleFullTextQuery::reged = QueryFactory::Instance().Register(
-            QUERYMODE_BEAGLE, &MakeObject<FullTextQuery,BeagleFullTextQuery>::Create );
+        bool BeagleFullTextQuery::reged = QueryFactory::instance()[ QUERYMODE_BEAGLE ]
+                  = boost::factory<BeagleFullTextQuery*>();        
         
         fh_context
         BeagleFullTextQuery::execute()
@@ -755,8 +756,8 @@ namespace Ferris
 
             static bool reged;
         };
-        bool ExternalFullTextQuery::reged = QueryFactory::Instance().Register(
-            QUERYMODE_EXTERNAL, &MakeObject<FullTextQuery,ExternalFullTextQuery>::Create );
+        bool ExternalFullTextQuery::reged = QueryFactory::instance()[ QUERYMODE_EXTERNAL ]
+                  = boost::factory<ExternalFullTextQuery*>();        
         
         fh_context
         ExternalFullTextQuery::execute()
@@ -821,7 +822,7 @@ namespace Ferris
                 if( !isBound( idx ) )
                     idx = Factory::getDefaultFullTextIndex();
                 
-                fh_ftquery ret = QueryFactory::Instance().CreateObject( qm );
+                fh_ftquery ret = QueryFactory::instance()[qm]();
 
                 ret->setIndex( idx );
                 ret->setQuery( s );

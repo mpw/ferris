@@ -700,8 +700,8 @@ namespace FerrisUI
 
         m_group = fopm = new FerrisOptionMenu("");
         updateGroupWidget();
-        fopm->getLabelChangeSig().connect( sigc::mem_fun( *this,
-                                                       &ContextPropertiesEditor::OnChangeGroup ));
+        fopm->getLabelChangeSig().connect(
+            boost::bind( &ContextPropertiesEditor::OnChangeGroup, this, _1, _2, _3 ));
         gtk_table_attach_defaults(GTK_TABLE( m_table ), fopm->getWidget(), 1, 4, r, r+1 );
 
         ++r;
@@ -814,7 +814,7 @@ namespace FerrisUI
         ++r;
         {
             m_du_sh = new SubprocessButtonAndLabel( 0, "size" );
-            m_du_sh->getUpdateRunnerSig().connect( sigc::mem_fun( *this, &_Self::getRunner_du_sh) );
+            m_du_sh->getUpdateRunnerSig().connect( boost::bind( &_Self::getRunner_du_sh, this, _1, _2 ) );
             m_du_sh->setReplaceRegex( "(\\S+)\\s.*" );
             m_du_sh->setReplaceRegexFormat( "$1" );
 
