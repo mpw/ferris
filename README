@@ -1,3 +1,5 @@
+As of version 1.0.0 onwards this code was moved to using boost for
+signals and smart pointers.
 
 Make sure you have run the following
 $ ferris-first-time-user  --setup-defaults
@@ -54,7 +56,7 @@ There is an 'ls' client for the VFS.
 Requirements:
 
 	gcc 3.1+
-	ferrisloki              see the witme sourceforge site
+	boost
 	libferrisstreams        see the witme sourceforge site
 	stldb4                  see the witme sourceforge site
 	fam++2                  see the fampp sourceforge site
@@ -62,13 +64,9 @@ Requirements:
 	glib/gtk2
 	Qt                      4.5+
 	Soprano                 (Installed with KDE4 by default)
-	libsigc++		1.2+
 	xerces-c                3.x
 	xalan-c                 1.10+ (optional but recommended)
 	a MIME engine           either gnome, KDE, or libfile.
-
-Optional but very highly recommended (only needed at build time):
-	pccts			1.33mr22
 
 Optional but very highly recommended:
 	gimp 			1.2.1
